@@ -1,0 +1,186 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+
+const rawBase = import.meta.env.BASE_URL ?? '/';
+const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
+---
+
+<BaseLayout
+  title="Servicios Artísticos · Lía Paz | Wedding Live Paintings & Retratos"
+  description="Servicio exclusivo de pintura en vivo para bodas (Wedding Live Painting) y encargo de retratos personalizados al óleo por la artista Lía Paz."
+>
+  <!-- Page Header -->
+  <section class="py-16 md:py-24 border-b border-neutral-100 bg-neutral-50/50">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <span class="font-sans text-[11px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-3">
+        Experiencias & Encargos
+      </span>
+      <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-neutral-900 font-normal tracking-wide">
+        Servicios Artísticos
+      </h1>
+      <p class="font-sans text-sm sm:text-base text-neutral-500 font-light max-w-xl mx-auto mt-4 leading-relaxed">
+        Obras de arte hechas a mano que celebran los lazos humanos y momentos irrepetibles.
+      </p>
+    </div>
+  </section>
+
+  <!-- Detailed Services Section -->
+  <section class="py-12 md:py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      
+      <!-- Service 1: Wedding Live Painting -->
+      <ServiceCard
+        title="Wedding Live Paintings"
+        tagline="Experiencia en Vivo para Bodas"
+        description="Una experiencia artística inmersiva que combina entretenimiento en directo para tus invitados y una obra de arte original que atesorarán para siempre. Pinto en tiempo real el instante más emblemático de su unión: la ceremonia, el intercambio de votos o su primer baile como esposos."
+        details={[
+          "Llegada de 2 a 3 horas antes del inicio para pintar la arquitectura y atmósfera del recinto",
+          "Pintura en vivo durante el cóctel y la fiesta (5 a 7 horas en sitio)",
+          "Interacción cálida y respetuosa con los invitados durante el proceso",
+          "Retoques finales y barniz protector UV en el estudio",
+          "Lienzo de lino profesional montado en bastidor de madera de cedro",
+          "Entrega personal o envío seguro cuidadosamente embalado"
+        ]}
+        image={`${base}/images/services/wedding-live.svg`}
+        ctaText="Consultar Fecha de Boda"
+        ctaHref="/contact"
+        reversed={false}
+      />
+
+      <!-- Service 2: Retratos por Encargo -->
+      <ServiceCard
+        title="Retratos Personalizados"
+        tagline="Comisiones & Arte Figurativo"
+        description="Retratos al óleo sobre lienzo o lino que buscan captar la esencia, mirada y carácter del retratado. Perfecto como homenaje personal, regalo de aniversario o legado familiar atemporal."
+        details={[
+          "Retratos individuales, parejas, familias o retratos conmemorativos",
+          "Trabajo a partir de fotografías de alta resolución o sesión guiada",
+          "Boceto tonal previo y validación de paleta de color con el cliente",
+          "Capas sucesivas al óleo tradicional con veladuras para máxima luminosidad",
+          "Múltiples formatos disponibles: desde 30x40 cm hasta grandes formatos de 100x120 cm",
+          "Certificado de autenticidad firmado por la artista"
+        ]}
+        image={`${base}/images/services/retratos.svg`}
+        ctaText="Cotizar mi Retrato"
+        ctaHref="/contact"
+        reversed={true}
+      />
+
+    </div>
+  </section>
+
+  <!-- Wedding Live Painting Step-by-Step Process -->
+  <section class="py-20 md:py-28 bg-neutral-50 border-t border-b border-neutral-200/60">
+    <div class="max-w-5xl mx-auto px-6 sm:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="font-sans text-[11px] tracking-[0.25em] uppercase text-neutral-400 font-medium block mb-2">
+          Paso a Paso
+        </span>
+        <h2 class="font-serif text-3xl sm:text-4xl text-neutral-900 font-normal">
+          ¿Cómo funciona el Wedding Live Painting?
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+        <!-- Step 1 -->
+        <div class="p-6 bg-white border border-neutral-200/70 relative">
+          <span class="font-serif text-3xl text-neutral-300 font-light block mb-2">01</span>
+          <h3 class="font-serif text-lg text-neutral-900 font-normal mb-2">Contacto & Fecha</h3>
+          <p class="font-sans text-xs text-neutral-500 leading-relaxed font-light">
+            Verificamos disponibilidad de agenda, lugar del evento y seleccionamos las dimensiones del lienzo.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-6 bg-white border border-neutral-200/70 relative">
+          <span class="font-serif text-3xl text-neutral-300 font-light block mb-2">02</span>
+          <h3 class="font-serif text-lg text-neutral-900 font-normal mb-2">Montaje Previo</h3>
+          <p class="font-sans text-xs text-neutral-500 leading-relaxed font-light">
+            Llego horas antes para instalar caballete francés e iniciar el fondo arquitectónico y lumínico.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-6 bg-white border border-neutral-200/70 relative">
+          <span class="font-serif text-3xl text-neutral-300 font-light block mb-2">03</span>
+          <h3 class="font-serif text-lg text-neutral-900 font-normal mb-2">Pintura en Vivo</h3>
+          <p class="font-sans text-xs text-neutral-500 leading-relaxed font-light">
+            Pinto a los novios en vivo. Los invitados disfrutan observando la magia del cuadro tomando forma.
+          </p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="p-6 bg-white border border-neutral-200/70 relative">
+          <span class="font-serif text-3xl text-neutral-300 font-light block mb-2">04</span>
+          <h3 class="font-serif text-lg text-neutral-900 font-normal mb-2">Detalle & Entrega</h3>
+          <p class="font-sans text-xs text-neutral-500 leading-relaxed font-light">
+            Toques finales en estudio, barnizado protector y entrega lista para lucir en su nuevo hogar.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frequently Asked Questions -->
+  <section class="py-20 md:py-28 bg-white">
+    <div class="max-w-4xl mx-auto px-6 sm:px-8">
+      <div class="text-center mb-14">
+        <span class="font-sans text-[11px] tracking-[0.25em] uppercase text-neutral-400 font-medium block mb-2">
+          Dudas Habituales
+        </span>
+        <h2 class="font-serif text-3xl sm:text-4xl text-neutral-900 font-normal">
+          Preguntas Frecuentes
+        </h2>
+      </div>
+
+      <div class="space-y-6 divide-y divide-neutral-100">
+        <div class="pt-6">
+          <h3 class="font-serif text-xl text-neutral-900 font-normal mb-2">
+            ¿Con cuánto tiempo de antelación debo reservar una boda?
+          </h3>
+          <p class="font-sans text-sm text-neutral-600 font-light leading-relaxed">
+            Se recomienda reservar con 6 a 12 meses de anticipación, especialmente para fines de semana en temporada alta de bodas (primavera y otoño).
+          </p>
+        </div>
+
+        <div class="pt-6">
+          <h3 class="font-serif text-xl text-neutral-900 font-normal mb-2">
+            ¿Te trasladas fuera de tu ciudad o internacionalmente?
+          </h3>
+          <p class="font-sans text-sm text-neutral-600 font-light leading-relaxed">
+            Sí. He viajado para documentar bodas en diversas locaciones y destinos. Los costos de traslado y hospedaje se cotizan con total transparencia según el destino.
+          </p>
+        </div>
+
+        <div class="pt-6">
+          <h3 class="font-serif text-xl text-neutral-900 font-normal mb-2">
+            ¿El cuadro se entrega terminado la misma noche?
+          </h3>
+          <p class="font-sans text-sm text-neutral-600 font-light leading-relaxed">
+            Al finalizar el evento la pintura estará entre un 85% y 95% completa para que los novios e invitados puedan apreciarla. Posteriormente regresa al estudio para detallado fino de rostros, secado y barniz de conservación.
+          </p>
+        </div>
+
+        <div class="pt-6">
+          <h3 class="font-serif text-xl text-neutral-900 font-normal mb-2">
+            ¿Cómo encargar un retrato si no estoy en la misma ciudad?
+          </h3>
+          <p class="font-sans text-sm text-neutral-600 font-light leading-relaxed">
+            El proceso es 100% digitalizado: me envías tus fotografías favoritas, definimos composición y tamaño, y te envío fotos del avance por WhatsApp o correo antes de embalar y enviar el lienzo terminado.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center mt-16">
+        <a
+          href={`${base}/contact`}
+          class="inline-block px-10 py-4 bg-neutral-950 text-white hover:bg-neutral-800 text-xs font-sans tracking-[0.25em] uppercase font-medium transition-colors"
+        >
+          Iniciar Consulta de Servicio
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+

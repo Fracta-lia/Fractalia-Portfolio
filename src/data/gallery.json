@@ -1,0 +1,99 @@
+[
+  {
+    "id": "w1",
+    "title": "Votos al Atardecer",
+    "category": "wedding",
+    "categoryLabel": "Wedding Live Painting",
+    "technique": "Óleo sobre lienzo",
+    "dimensions": "60 x 80 cm",
+    "year": "2025",
+    "src": "/images/gallery/wedding/wedding-1.svg",
+    "width": 1200,
+    "height": 900
+  },
+  {
+    "id": "w2",
+    "title": "El Primer Baile",
+    "category": "wedding",
+    "categoryLabel": "Wedding Live Painting",
+    "technique": "Óleo sobre lienzo",
+    "dimensions": "50 x 70 cm",
+    "year": "2025",
+    "src": "/images/gallery/wedding/wedding-2.svg",
+    "width": 1200,
+    "height": 900
+  },
+  {
+    "id": "w3",
+    "title": "Ceremonia en el Jardín",
+    "category": "wedding",
+    "categoryLabel": "Wedding Live Painting",
+    "technique": "Acrílico & Óleo",
+    "dimensions": "70 x 100 cm",
+    "year": "2024",
+    "src": "/images/gallery/wedding/wedding-3.svg",
+    "width": 1200,
+    "height": 900
+  },
+  {
+    "id": "r1",
+    "title": "Mirada en Claroscuro",
+    "category": "retratos",
+    "categoryLabel": "Retrato",
+    "technique": "Óleo sobre lino",
+    "dimensions": "40 x 50 cm",
+    "year": "2025",
+    "src": "/images/gallery/retratos/retrato-1.svg",
+    "width": 1000,
+    "height": 1200
+  },
+  {
+    "id": "r2",
+    "title": "Silueta Matutina",
+    "category": "retratos",
+    "categoryLabel": "Retrato",
+    "technique": "Grafito & Gouache",
+    "dimensions": "30 x 40 cm",
+    "year": "2024",
+    "src": "/images/gallery/retratos/retrato-2.svg",
+    "width": 1000,
+    "height": 1200
+  },
+  {
+    "id": "r3",
+    "title": "Retrato de Familia",
+    "category": "retratos",
+    "categoryLabel": "Retrato",
+    "technique": "Óleo sobre lienzo",
+    "dimensions": "60 x 80 cm",
+    "year": "2025",
+    "src": "/images/gallery/retratos/retrato-3.svg",
+    "width": 1200,
+    "height": 900
+  },
+  {
+    "id": "o1",
+    "title": "Composición No. 7",
+    "category": "otros",
+    "categoryLabel": "Otros Trabajos",
+    "technique": "Óleo y pigmentos naturales",
+    "dimensions": "80 x 80 cm",
+    "year": "2024",
+    "src": "/images/gallery/otros/obra-1.svg",
+    "width": 1200,
+    "height": 900
+  },
+  {
+    "id": "o2",
+    "title": "Atmósfera & Luz",
+    "category": "otros",
+    "categoryLabel": "Otros Trabajos",
+    "technique": "Óleo sobre lienzo",
+    "dimensions": "70 x 110 cm",
+    "year": "2024",
+    "src": "/images/gallery/otros/obra-2.svg",
+    "width": 1200,
+    "height": 800
+  }
+]
+
