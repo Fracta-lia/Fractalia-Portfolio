@@ -61,29 +61,24 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
   return (
     <div className="w-full">
-      {/* Visual Pure Image Grid (No text, no category filters) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      {/* Sean Layh style: Masonry layout respecting natural image aspect ratios, no forced crops */}
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 sm:gap-8">
         {items.map((item, index) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => handleOpen(index)}
-            aria-label={`Ver ficha técnica de ${item.title}`}
-            className="group relative block w-full aspect-[4/5] overflow-hidden bg-neutral-100 border border-neutral-200/80 shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 cursor-pointer"
-          >
-            <img
-              src={item.src}
-              alt={item.title}
-              loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-            />
-            {/* Subtle luxury hover overlay */}
-            <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/15 transition-colors duration-300 flex items-center justify-center">
-              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-sans text-[11px] tracking-[0.25em] uppercase text-white bg-neutral-900/80 px-4 py-2 backdrop-blur-xs font-light">
-                Ver Ficha
-              </span>
-            </div>
-          </button>
+          <div key={item.id} className="break-inside-avoid mb-6 sm:mb-8">
+            <button
+              type="button"
+              onClick={() => handleOpen(index)}
+              aria-label={`Ver ficha técnica de ${item.title}`}
+              className="group relative block w-full overflow-hidden bg-neutral-100 border border-neutral-200/70 shadow-xs cursor-pointer focus:outline-none"
+            >
+              <img
+                src={item.src}
+                alt={item.title}
+                loading="lazy"
+                className="w-full h-auto block transition-transform duration-700 ease-out group-hover:scale-[1.025]"
+              />
+            </button>
+          </div>
         ))}
       </div>
 
