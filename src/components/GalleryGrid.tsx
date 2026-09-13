@@ -93,26 +93,26 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
           {/* Main Modal Box (clicks inside do not close) */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-5xl max-h-[90vh] bg-white border border-neutral-200 shadow-2xl flex flex-col lg:flex-row overflow-hidden cursor-default"
+            className="relative w-full max-w-6xl xl:max-w-7xl max-h-[94vh] bg-white border border-neutral-200 shadow-2xl flex flex-col lg:flex-row overflow-hidden cursor-default"
           >
             {/* Close Button */}
             <button
               type="button"
               onClick={handleClose}
               aria-label="Cerrar ficha técnica"
-              className="absolute top-4 right-4 z-20 w-10 h-10 bg-white/90 hover:bg-neutral-900 hover:text-white text-neutral-800 flex items-center justify-center transition-colors shadow-sm focus:outline-none"
+              className="absolute top-4 right-4 z-30 w-10 h-10 bg-white/90 hover:bg-neutral-900 hover:text-white text-neutral-800 flex items-center justify-center transition-colors shadow-sm focus:outline-none"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            {/* Left/Center: High-Resolution Artwork */}
-            <div className="lg:w-7/12 bg-neutral-950 flex items-center justify-center p-4 sm:p-8 min-h-[350px] lg:min-h-[550px] relative overflow-hidden">
+            {/* Left/Center: High-Resolution Artwork (Dominant section, up to 86vh) */}
+            <div className="lg:flex-1 bg-neutral-950 flex items-center justify-center p-3 sm:p-6 lg:p-8 min-h-[380px] lg:min-h-[620px] relative overflow-hidden">
               <img
                 src={selectedItem.src}
                 alt={selectedItem.title}
-                className="max-h-[55vh] lg:max-h-[75vh] w-auto max-w-full object-contain shadow-md"
+                className="max-h-[60vh] sm:max-h-[68vh] lg:max-h-[86vh] w-auto max-w-full object-contain shadow-2xl transition-all duration-300"
               />
 
               {/* Prev / Next Navigation Arrows over image */}
@@ -139,8 +139,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               </button>
             </div>
 
-            {/* Right: Ficha Técnica */}
-            <div className="lg:w-5/12 p-8 sm:p-10 flex flex-col justify-between overflow-y-auto bg-white">
+            {/* Right: Ficha Técnica (Compact, elegant sidebar) */}
+            <div className="lg:w-80 xl:w-96 flex-shrink-0 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto bg-white border-t lg:border-t-0 lg:border-l border-neutral-100">
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium mb-3">
