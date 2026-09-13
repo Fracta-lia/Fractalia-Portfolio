@@ -27,7 +27,7 @@ const galleryItems = rawGalleryData.map(item => ({
         Galería de Obras
       </h1>
       <p class="font-sans text-sm sm:text-base text-neutral-500 font-light max-w-xl mx-auto mt-4 leading-relaxed">
-        Explora la selección de pinturas en vivo, retratos por encargo y piezas de estudio. Haz clic sobre cualquier obra para verla en detalle.
+        Colección completa de obras al óleo y técnicas tradicionales. Haz clic sobre cualquier obra para abrirla y consultar su ficha técnica.
       </p>
     </div>
   </section>
@@ -38,8 +38,6 @@ const galleryItems = rawGalleryData.map(item => ({
       <GalleryGrid
         client:load
         items={galleryItems}
-        initialCategory="all"
-        showFilters={true}
       />
     </div>
   </section>

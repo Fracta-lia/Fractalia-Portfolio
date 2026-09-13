@@ -1,144 +1,234 @@
-import React, { useState, useEffect } from 'react';
-import PhotoSwipeLightbox from 'photoswipe/lightbox';
+import React, { useState, useEffect, useCallback } from 'react';
 
 export interface GalleryItem {
   id: string;
   title: string;
-  category: string;
-  categoryLabel?: string;
   technique?: string;
   dimensions?: string;
   year?: string;
   src: string;
   width?: number;
   height?: number;
+  aspectRatio?: number;
 }
 
 interface GalleryGridProps {
   items: GalleryItem[];
-  initialCategory?: string;
-  showFilters?: boolean;
 }
 
-const CATEGORIES = [
-  { id: 'all', label: 'Todos' },
-  { id: 'wedding', label: 'Wedding Live Paintings' },
-  { id: 'retratos', label: 'Retratos' },
-  { id: 'otros', label: 'Otros Trabajos' },
-];
+export default function GalleryGrid({ items }: GalleryGridProps) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-export default function GalleryGrid({
-  items,
-  initialCategory = 'all',
-  showFilters = true
-}: GalleryGridProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+  const selectedItem = selectedIndex !== null ? items[selectedIndex] : null;
 
-  const filteredItems = selectedCategory === 'all'
-    ? items
-    : items.filter(item => item.category === selectedCategory);
+  const handleOpen = (index: number) => {
+    setSelectedIndex(index);
+  };
 
-  // Initialize PhotoSwipe Lightbox
+  const handleClose = useCallback(() => {
+    setSelectedIndex(null);
+  }, []);
+
+  const handlePrev = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedIndex((prev) => (prev !== null ? (prev - 1 + items.length) % items.length : null));
+  }, [items.length]);
+
+  const handleNext = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedIndex((prev) => (prev !== null ? (prev + 1) % items.length : null));
+  }, [items.length]);
+
+  // Keyboard navigation: Escape, ArrowLeft, ArrowRight
   useEffect(() => {
-    const lightbox = new PhotoSwipeLightbox({
-      gallery: '#lia-gallery-grid',
-      children: 'a.pswp-gallery-item',
-      pswpModule: () => import('photoswipe'),
-      padding: { top: 20, bottom: 20, left: 20, right: 20 },
-      wheelToZoom: true,
-      bgOpacity: 0.95,
-      showHideAnimationType: 'fade',
-    });
+    if (selectedIndex === null) return;
 
-    lightbox.init();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    // Lock body scroll while modal is open
+    document.body.style.overflow = 'hidden';
 
     return () => {
-      lightbox.destroy();
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
     };
-  }, [filteredItems]);
+  }, [selectedIndex, handleClose, handlePrev, handleNext]);
 
   return (
     <div className="w-full">
-      {/* Category Filter Tabs */}
-      {showFilters && (
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-12 md:mb-16">
-          {CATEGORIES.map(cat => {
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`font-sans text-xs tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 border ${
-                  isSelected
-                    ? 'border-neutral-900 bg-neutral-900 text-white font-medium shadow-sm'
-                    : 'border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300'
-                }`}
-              >
-                {cat.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Artwork Grid (Sean Layh style) */}
-      <div
-        id="lia-gallery-grid"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
-      >
-        {filteredItems.map(item => (
-          <div
+      {/* Visual Pure Image Grid (No text, no category filters) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        {items.map((item, index) => (
+          <button
             key={item.id}
-            className="group relative flex flex-col bg-white overflow-hidden border border-neutral-100 hover:border-neutral-200 transition-all duration-300"
+            type="button"
+            onClick={() => handleOpen(index)}
+            aria-label={`Ver ficha técnica de ${item.title}`}
+            className="group relative block w-full aspect-[4/5] overflow-hidden bg-neutral-100 border border-neutral-200/80 shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 cursor-pointer"
           >
-            {/* Clickable image anchor for PhotoSwipe */}
-            <a
-              href={item.src}
-              data-pswp-width={item.width || 1200}
-              data-pswp-height={item.height || 900}
-              target="_blank"
-              rel="noreferrer"
-              className="pswp-gallery-item block relative aspect-[4/3] w-full overflow-hidden bg-neutral-50 cursor-pointer"
-            >
-              <img
-                src={item.src}
-                alt={item.title}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-              />
-              <div className="absolute inset-0 bg-neutral-900/0 group-hover:bg-neutral-900/10 transition-colors duration-300 pointer-events-none" />
-            </a>
-
-            {/* Artwork Details */}
-            <div className="p-4 sm:p-5 flex flex-col justify-between">
-              <div>
-                <h3 className="font-serif text-lg md:text-xl text-neutral-900 tracking-wide font-normal">
-                  {item.title}
-                </h3>
-                {item.technique && (
-                  <p className="font-sans text-xs text-neutral-500 tracking-wider uppercase mt-1">
-                    {item.technique}
-                  </p>
-                )}
-              </div>
-
-              {(item.dimensions || item.year) && (
-                <div className="flex items-center justify-between text-[11px] text-neutral-400 font-sans tracking-widest uppercase mt-3 pt-3 border-t border-neutral-100">
-                  <span>{item.dimensions}</span>
-                  <span>{item.year}</span>
-                </div>
-              )}
+            <img
+              src={item.src}
+              alt={item.title}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            />
+            {/* Subtle luxury hover overlay */}
+            <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/15 transition-colors duration-300 flex items-center justify-center">
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-sans text-[11px] tracking-[0.25em] uppercase text-white bg-neutral-900/80 px-4 py-2 backdrop-blur-xs font-light">
+                Ver Ficha
+              </span>
             </div>
-          </div>
+          </button>
         ))}
       </div>
 
-      {filteredItems.length === 0 && (
-        <div className="text-center py-20 text-neutral-400 font-serif italic text-lg">
-          No hay obras en esta categoría actualmente.
+      {/* Modal / Ficha Técnica Lightbox */}
+      {selectedItem !== null && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={handleClose}
+          className="fixed inset-0 z-50 bg-neutral-950/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 md:p-10 animate-fade-in cursor-pointer"
+        >
+          {/* Main Modal Box (clicks inside do not close) */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-5xl max-h-[90vh] bg-white border border-neutral-200 shadow-2xl flex flex-col lg:flex-row overflow-hidden cursor-default"
+          >
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={handleClose}
+              aria-label="Cerrar ficha técnica"
+              className="absolute top-4 right-4 z-20 w-10 h-10 bg-white/90 hover:bg-neutral-900 hover:text-white text-neutral-800 flex items-center justify-center transition-colors shadow-sm focus:outline-none"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Left/Center: High-Resolution Artwork */}
+            <div className="lg:w-7/12 bg-neutral-950 flex items-center justify-center p-4 sm:p-8 min-h-[350px] lg:min-h-[550px] relative overflow-hidden">
+              <img
+                src={selectedItem.src}
+                alt={selectedItem.title}
+                className="max-h-[55vh] lg:max-h-[75vh] w-auto max-w-full object-contain shadow-md"
+              />
+
+              {/* Prev / Next Navigation Arrows over image */}
+              <button
+                type="button"
+                onClick={handlePrev}
+                aria-label="Obra anterior"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-neutral-900/60 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors backdrop-blur-xs"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNext}
+                aria-label="Obra siguiente"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-neutral-900/60 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors backdrop-blur-xs"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Right: Ficha Técnica */}
+            <div className="lg:w-5/12 p-8 sm:p-10 flex flex-col justify-between overflow-y-auto bg-white">
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-center justify-between text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium mb-3">
+                    <span>Ficha Técnica</span>
+                    <span>
+                      {(selectedIndex ?? 0) + 1} de {items.length}
+                    </span>
+                  </div>
+                  <h2 className="font-serif text-3xl sm:text-4xl text-neutral-900 font-normal tracking-wide">
+                    {selectedItem.title}
+                  </h2>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-neutral-100 text-sm font-sans">
+                  <div className="flex justify-between py-1 border-b border-neutral-100">
+                    <span className="text-neutral-400 uppercase text-xs tracking-wider">Artista</span>
+                    <span className="text-neutral-900 font-medium">Lía Paz</span>
+                  </div>
+
+                  {selectedItem.technique && (
+                    <div className="flex justify-between py-1 border-b border-neutral-100">
+                      <span className="text-neutral-400 uppercase text-xs tracking-wider">Técnica</span>
+                      <span className="text-neutral-900">{selectedItem.technique}</span>
+                    </div>
+                  )}
+
+                  {selectedItem.dimensions && (
+                    <div className="flex justify-between py-1 border-b border-neutral-100">
+                      <span className="text-neutral-400 uppercase text-xs tracking-wider">Dimensiones</span>
+                      <span className="text-neutral-900">{selectedItem.dimensions}</span>
+                    </div>
+                  )}
+
+                  {selectedItem.year && (
+                    <div className="flex justify-between py-1 border-b border-neutral-100">
+                      <span className="text-neutral-400 uppercase text-xs tracking-wider">Año</span>
+                      <span className="text-neutral-900">{selectedItem.year}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between py-1">
+                    <span className="text-neutral-400 uppercase text-xs tracking-wider">Tipo</span>
+                    <span className="text-neutral-900">Obra original</span>
+                  </div>
+                </div>
+
+                <p className="text-xs text-neutral-500 font-sans font-light leading-relaxed pt-2">
+                  Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-8 border-t border-neutral-100 space-y-3">
+                <a
+                  href={`/contact?obra=${encodeURIComponent(selectedItem.title)}`}
+                  className="block w-full py-3.5 text-center bg-neutral-900 text-white hover:bg-neutral-800 text-xs font-sans tracking-[0.25em] uppercase font-medium transition-colors"
+                >
+                  Consultar por esta Obra
+                </a>
+
+                <div className="flex items-center justify-between pt-2">
+                  <button
+                    type="button"
+                    onClick={handlePrev}
+                    className="text-xs font-sans tracking-wider uppercase text-neutral-500 hover:text-neutral-900 transition-colors flex items-center space-x-1"
+                  >
+                    <span>&larr; Anterior</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="text-xs font-sans tracking-wider uppercase text-neutral-500 hover:text-neutral-900 transition-colors flex items-center space-x-1"
+                  >
+                    <span>Siguiente &rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 }
+
 

@@ -1,99 +1,92 @@
 [
   {
-    "id": "w1",
-    "title": "Votos al Atardecer",
-    "category": "wedding",
-    "categoryLabel": "Wedding Live Painting",
+    "id": "siete-vidas",
+    "title": "Siete Vidas",
     "technique": "Óleo sobre lienzo",
-    "dimensions": "60 x 80 cm",
     "year": "2025",
-    "src": "/images/gallery/wedding/wedding-1.svg",
-    "width": 1200,
-    "height": 900
+    "src": "/images/gallery/siete-vidas.webp",
+    "width": 2400,
+    "height": 2400,
+    "aspectRatio": 1.0
   },
   {
-    "id": "w2",
-    "title": "El Primer Baile",
-    "category": "wedding",
-    "categoryLabel": "Wedding Live Painting",
+    "id": "actuacion-musical",
+    "title": "Actuación Musical",
     "technique": "Óleo sobre lienzo",
-    "dimensions": "50 x 70 cm",
     "year": "2025",
-    "src": "/images/gallery/wedding/wedding-2.svg",
-    "width": 1200,
-    "height": 900
+    "src": "/images/gallery/actuacion-musical.webp",
+    "width": 2400,
+    "height": 1594,
+    "aspectRatio": 1.506
   },
   {
-    "id": "w3",
-    "title": "Ceremonia en el Jardín",
-    "category": "wedding",
-    "categoryLabel": "Wedding Live Painting",
-    "technique": "Acrílico & Óleo",
-    "dimensions": "70 x 100 cm",
-    "year": "2024",
-    "src": "/images/gallery/wedding/wedding-3.svg",
-    "width": 1200,
-    "height": 900
-  },
-  {
-    "id": "r1",
-    "title": "Mirada en Claroscuro",
-    "category": "retratos",
-    "categoryLabel": "Retrato",
-    "technique": "Óleo sobre lino",
-    "dimensions": "40 x 50 cm",
-    "year": "2025",
-    "src": "/images/gallery/retratos/retrato-1.svg",
-    "width": 1000,
-    "height": 1200
-  },
-  {
-    "id": "r2",
-    "title": "Silueta Matutina",
-    "category": "retratos",
-    "categoryLabel": "Retrato",
-    "technique": "Grafito & Gouache",
-    "dimensions": "30 x 40 cm",
-    "year": "2024",
-    "src": "/images/gallery/retratos/retrato-2.svg",
-    "width": 1000,
-    "height": 1200
-  },
-  {
-    "id": "r3",
-    "title": "Retrato de Familia",
-    "category": "retratos",
-    "categoryLabel": "Retrato",
+    "id": "cadaver",
+    "title": "Cadáver",
     "technique": "Óleo sobre lienzo",
-    "dimensions": "60 x 80 cm",
     "year": "2025",
-    "src": "/images/gallery/retratos/retrato-3.svg",
-    "width": 1200,
-    "height": 900
+    "src": "/images/gallery/cadaver.webp",
+    "width": 2400,
+    "height": 1753,
+    "aspectRatio": 1.369
   },
   {
-    "id": "o1",
-    "title": "Composición No. 7",
-    "category": "otros",
-    "categoryLabel": "Otros Trabajos",
-    "technique": "Óleo y pigmentos naturales",
-    "dimensions": "80 x 80 cm",
-    "year": "2024",
-    "src": "/images/gallery/otros/obra-1.svg",
-    "width": 1200,
-    "height": 900
-  },
-  {
-    "id": "o2",
-    "title": "Atmósfera & Luz",
-    "category": "otros",
-    "categoryLabel": "Otros Trabajos",
+    "id": "retrato-nick",
+    "title": "Retrato",
     "technique": "Óleo sobre lienzo",
-    "dimensions": "70 x 110 cm",
     "year": "2024",
-    "src": "/images/gallery/otros/obra-2.svg",
-    "width": 1200,
-    "height": 800
+    "src": "/images/gallery/retrato-nick.webp",
+    "width": 1600,
+    "height": 1173,
+    "aspectRatio": 1.364
+  },
+  {
+    "id": "manos-y-anillo",
+    "title": "Manos y Anillo",
+    "technique": "Óleo sobre lienzo",
+    "year": "2025",
+    "src": "/images/gallery/manos-y-anillo.webp",
+    "width": 2400,
+    "height": 1919,
+    "aspectRatio": 1.251
+  },
+  {
+    "id": "mares-de-silencio",
+    "title": "Mares de Silencio",
+    "technique": "Óleo sobre lienzo",
+    "year": "2024",
+    "src": "/images/gallery/mares-de-silencio.webp",
+    "width": 1591,
+    "height": 1600,
+    "aspectRatio": 0.994
+  },
+  {
+    "id": "ninos-chapoteando",
+    "title": "Niños Chapoteando",
+    "technique": "Óleo sobre lienzo",
+    "year": "2024",
+    "src": "/images/gallery/ninos-chapoteando.webp",
+    "width": 2400,
+    "height": 1514,
+    "aspectRatio": 1.585
+  },
+  {
+    "id": "rostro-y-mano",
+    "title": "Rostro y Mano",
+    "technique": "Óleo sobre lienzo",
+    "year": "2025",
+    "src": "/images/gallery/rostro-y-mano.webp",
+    "width": 1611,
+    "height": 2400,
+    "aspectRatio": 0.671
+  },
+  {
+    "id": "vagon-9502",
+    "title": "Vagón 9502",
+    "technique": "Óleo sobre lienzo",
+    "year": "2024",
+    "src": "/images/gallery/vagon-9502.webp",
+    "width": 1018,
+    "height": 1600,
+    "aspectRatio": 0.636
   }
 ]
-

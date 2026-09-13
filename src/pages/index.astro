@@ -18,7 +18,7 @@ const featuredWorks = galleryData.slice(0, 4);
     <!-- Background Hero Artwork with subtle vignette -->
     <div class="absolute inset-0 z-0">
       <img
-        src={`${base}/images/hero/hero-main.svg`}
+        src={`${base}/images/gallery/mares-de-silencio.webp`}
         alt="Obra destacada de Lía Paz"
         class="w-full h-full object-cover opacity-35 scale-105 transition-transform duration-1000 ease-out"
       />
@@ -164,7 +164,7 @@ const featuredWorks = galleryData.slice(0, 4);
     </div>
   </section>
 
-  <!-- FEATURED GALLERY PREVIEW -->
+  <!-- FEATURED GALLERY PREVIEW (Pure visual cards, no text below) -->
   <section class="py-20 md:py-28 bg-white border-t border-neutral-200/60">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
       <div class="text-center max-w-2xl mx-auto mb-14 md:mb-20">
@@ -172,7 +172,7 @@ const featuredWorks = galleryData.slice(0, 4);
           Selección de Obras
         </span>
         <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl text-neutral-900 font-normal tracking-wide">
-          Galería Reciente
+          Galería
         </h2>
       </div>
 
@@ -180,23 +180,19 @@ const featuredWorks = galleryData.slice(0, 4);
         {featuredWorks.map(item => (
           <a
             href={`${base}/gallery`}
-            class="group block bg-white border border-neutral-100 overflow-hidden hover:border-neutral-300 transition-all duration-300"
+            aria-label={`Ver ${item.title} en galería`}
+            class="group relative block aspect-[4/5] bg-neutral-100 overflow-hidden border border-neutral-200/70 shadow-sm"
           >
-            <div class="aspect-[4/3] overflow-hidden bg-neutral-100">
-              <img
-                src={item.src}
-                alt={item.title}
-                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                loading="lazy"
-              />
-            </div>
-            <div class="p-4">
-              <h3 class="font-serif text-lg text-neutral-900 font-normal">
-                {item.title}
-              </h3>
-              <p class="font-sans text-xs text-neutral-400 uppercase tracking-wider mt-1">
-                {item.categoryLabel || item.technique}
-              </p>
+            <img
+              src={item.src}
+              alt={item.title}
+              class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              loading="lazy"
+            />
+            <div class="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/20 transition-colors duration-300 flex items-center justify-center">
+              <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[11px] tracking-[0.25em] uppercase font-sans text-white bg-neutral-900/80 px-4 py-2 backdrop-blur-xs">
+                Ver en Galería
+              </span>
             </div>
           </a>
         ))}
@@ -218,7 +214,7 @@ const featuredWorks = galleryData.slice(0, 4);
     <div class="max-w-5xl mx-auto px-6 sm:px-8 flex flex-col md:flex-row items-center gap-10 md:gap-16">
       <div class="w-48 h-48 md:w-64 md:h-64 rounded-none overflow-hidden bg-neutral-800 flex-shrink-0 border border-neutral-700">
         <img
-          src={`${base}/images/about/lia-portrait.svg`}
+          src={`${base}/images/about/lia-paz.webp`}
           alt="Lía Paz"
           class="w-full h-full object-cover grayscale contrast-125"
           loading="lazy"

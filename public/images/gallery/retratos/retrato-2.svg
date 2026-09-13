@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200" width="1000" height="1200">
-  <rect width="100%" height="100%" fill="#F9F9F9"/>
-  <rect x="30" y="30" width="940" height="1140" fill="none" stroke="#E5E5E5" stroke-width="1"/>
-  <rect x="45" y="45" width="910" height="1110" fill="#F0F0F0" opacity="0.5"/>
-  <circle cx="500" cy="570" r="70" fill="none" stroke="#E5E5E5" stroke-width="1" stroke-dasharray="4 4"/>
-  <text x="500" y="580" text-anchor="middle" font-family="Georgia, serif" font-size="32" font-style="italic" fill="#1A1A1A" letter-spacing="3">Silueta Matutina</text>
-  <text x="500" y="625" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" text-transform="uppercase" fill="#737373" letter-spacing="5">Retrato · Grafito & Gouache</text>
-  <text x="500" y="1140" text-anchor="middle" font-family="Georgia, serif" font-size="13" font-style="italic" fill="#737373" letter-spacing="4">L Í A   P A Z   ·   F I N E   A R T</text>
-</svg>
