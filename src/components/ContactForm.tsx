@@ -134,8 +134,8 @@ export default function ContactForm() {
               onChange={handleChange}
               className="w-full px-4 py-3 text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors cursor-pointer"
             >
-              <option value="wedding">Wedding Live Painting (Boda en Vivo)</option>
               <option value="retrato">Retrato Personalizado por Encargo</option>
+              <option value="wedding">Wedding Live Painting (Boda en Vivo)</option>
               <option value="original">Obra Original de Galería</option>
               <option value="otro">Otra Consulta Artística</option>
             </select>

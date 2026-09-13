@@ -7,8 +7,8 @@ const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
 ---
 
 <BaseLayout
-  title="Servicios Artísticos · Lía Paz | Wedding Live Paintings & Retratos"
-  description="Servicio exclusivo de pintura en vivo para bodas (Wedding Live Painting) y encargo de retratos personalizados al óleo por la artista Lía Paz."
+  title="Servicios Artísticos · Lía Paz | Retratos & Wedding Live Paintings"
+  description="Servicio exclusivo de encargo de retratos personalizados al óleo y pintura en vivo para bodas (Wedding Live Painting) por la artista Lía Paz."
 >
   <!-- Page Header -->
   <section class="py-16 md:py-24 border-b border-neutral-100 bg-neutral-50/50">
@@ -29,26 +29,7 @@ const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
   <section class="py-12 md:py-20 bg-white">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
       
-      <!-- Service 1: Wedding Live Painting -->
-      <ServiceCard
-        title="Wedding Live Paintings"
-        tagline="Experiencia en Vivo para Bodas"
-        description="Una experiencia artística inmersiva que combina entretenimiento en directo para tus invitados y una obra de arte original que atesorarán para siempre. Pinto en tiempo real el instante más emblemático de su unión: la ceremonia, el intercambio de votos o su primer baile como esposos."
-        details={[
-          "Llegada de 2 a 3 horas antes del inicio para pintar la arquitectura y atmósfera del recinto",
-          "Pintura en vivo durante el cóctel y la fiesta (5 a 7 horas en sitio)",
-          "Interacción cálida y respetuosa con los invitados durante el proceso",
-          "Retoques finales y barniz protector UV en el estudio",
-          "Lienzo de lino profesional montado en bastidor de madera de cedro",
-          "Entrega personal o envío seguro cuidadosamente embalado"
-        ]}
-        image={`${base}/images/services/wedding-live.svg`}
-        ctaText="Consultar Fecha de Boda"
-        ctaHref="/contact"
-        reversed={false}
-      />
-
-      <!-- Service 2: Retratos por Encargo -->
+      <!-- Service 1: Retratos por Encargo (First) -->
       <ServiceCard
         title="Retratos Personalizados"
         tagline="Comisiones & Arte Figurativo"
@@ -61,8 +42,27 @@ const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
           "Múltiples formatos disponibles: desde 30x40 cm hasta grandes formatos de 100x120 cm",
           "Certificado de autenticidad firmado por la artista"
         ]}
-        image={`${base}/images/services/retratos.svg`}
+        image={`${base}/images/gallery/retrato-nick.webp`}
         ctaText="Cotizar mi Retrato"
+        ctaHref="/contact"
+        reversed={false}
+      />
+
+      <!-- Service 2: Wedding Live Painting (Second) -->
+      <ServiceCard
+        title="Wedding Live Paintings"
+        tagline="Experiencia en Vivo para Bodas"
+        description="Una experiencia artística inmersiva que combina entretenimiento en directo para tus invitados y una obra de arte original que atesorarán para siempre. Pinto en tiempo real el instante más emblemático de su unión: la ceremonia, el intercambio de votos o su primer baile como esposos."
+        details={[
+          "Llegada de 2 a 3 horas antes del inicio para pintar la arquitectura y atmósfera del recinto",
+          "Pintura en vivo durante el cóctel y la fiesta (5 a 7 horas en sitio)",
+          "Interacción cálida y respetuosa con los invitados durante el proceso",
+          "Retoques finales y barniz protector UV en el estudio",
+          "Lienzo de lino profesional montado en bastidor de madera de cedro",
+          "Entrega personal o envío seguro cuidadosamente embalado"
+        ]}
+        image={`${base}/images/gallery/manos-y-anillo.webp`}
+        ctaText="Consultar Fecha de Boda"
         ctaHref="/contact"
         reversed={true}
       />
