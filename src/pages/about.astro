@@ -1,8 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry, render } from 'astro:content';
 
 const rawBase = import.meta.env.BASE_URL ?? '/';
 const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
+
+const aboutEntry = await getEntry('pages', 'about');
+const portrait = aboutEntry?.data.portrait ?? '/images/about/lia-paz.webp';
+const quote = aboutEntry?.data.quote ?? 'Creo firmemente que el arte plástico tiene el poder de capturar lo que la fotografía muchas veces pasa por alto: el peso del aire, la intensidad de un gesto y el calor de una emoción compartida.';
+
+const { Content } = aboutEntry ? await render(aboutEntry) : { Content: null };
 ---
 
 <BaseLayout
@@ -30,7 +37,7 @@ const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
         <div class="lg:col-span-5 sticky top-28">
           <div class="aspect-[3/4] bg-neutral-100 border border-neutral-200 overflow-hidden shadow-sm">
             <img
-              src={`${base}/images/about/lia-paz.webp`}
+              src={portrait.startsWith('http') ? portrait : `${base}${portrait}`}
               alt="Lía Paz en el estudio"
               class="w-full h-full object-cover contrast-[1.02]"
             />
@@ -47,20 +54,24 @@ const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
               La pintura como archivo emocional
             </h2>
             <p class="text-base sm:text-lg text-neutral-800 leading-relaxed font-normal font-serif italic">
-              &ldquo;Creo firmemente que el arte plástico tiene el poder de capturar lo que la fotografía muchas veces pasa por alto: el peso del aire, la intensidad de un gesto y el calor de una emoción compartida.&rdquo;
+              &ldquo;{quote}&rdquo;
             </p>
           </div>
 
           <div class="space-y-4 text-sm sm:text-base text-neutral-600">
-            <p>
-              Hola, soy <strong>Lía Paz</strong>. Mi pasión reside en traducir la vida, la intimidad y las celebraciones humanas al lenguaje atemporal del óleo y las artes visuales.
-            </p>
-            <p>
-              A lo largo de mi trayectoria he explorado diversas disciplinas plásticas, consolidando mi enfoque en la pintura figurativa contemporánea, el estudio anatómico y la captura de instantes fugaces en vivo.
-            </p>
-            <p>
-              La experiencia del <strong class="font-medium text-neutral-900">Wedding Live Painting</strong> nació como una forma orgánica de unir la celebración más significativa de una pareja con el proceso alquímico de la pintura en tiempo real. Ver cómo una obra evoluciona frente a los ojos de los novios e invitados transforma el evento en un recuerdo tangible que perdurará por generaciones.
-            </p>
+            {Content ? <Content /> : (
+              <>
+                <p>
+                  Hola, soy <strong>Lía Paz</strong>. Mi pasión reside en traducir la vida, la intimidad y las celebraciones humanas al lenguaje atemporal del óleo y las artes visuales.
+                </p>
+                <p>
+                  A lo largo de mi trayectoria he explorado diversas disciplinas plásticas, consolidando mi enfoque en la pintura figurativa contemporánea, el estudio anatómico y la captura de instantes fugaces en vivo.
+                </p>
+                <p>
+                  La experiencia del <strong class="font-medium text-neutral-900">Wedding Live Painting</strong> nació como una forma orgánica de unir la celebración más significativa de una pareja con el proceso alquímico de la pintura en tiempo real. Ver cómo una obra evoluciona frente a los ojos de los novios e invitados transforma el evento en un recuerdo tangible que perdurará por generaciones.
+                </p>
+              </>
+            )}
           </div>
 
           <!-- Creative Approach & Values -->

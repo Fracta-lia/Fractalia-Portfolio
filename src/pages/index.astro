@@ -1,12 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import galleryData from '../data/gallery.json';
+import { getCollection, getEntry } from 'astro:content';
 
 const rawBase = import.meta.env.BASE_URL ?? '/';
 const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
 
-// Featured works for homepage preview (first 4 items)
-const featuredWorks = galleryData.slice(0, 4);
+// Fetch gallery from Content Collection for featured works preview
+const galleryEntries = await getCollection('gallery');
+galleryEntries.sort((a, b) => a.data.order - b.data.order);
+const featuredWorks = galleryEntries.slice(0, 4).map(entry => ({
+  title: entry.data.title,
+  src: entry.data.image.startsWith('http') ? entry.data.image : `${base}${entry.data.image}`,
+}));
+
+// Fetch home page editable content
+const homeEntry = await getEntry('pages', 'home');
+const heroImage = homeEntry?.data.heroImage ?? '/images/gallery/mares-de-silencio.webp';
+const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guarda un latido.';
 ---
 
 <BaseLayout
@@ -18,7 +28,7 @@ const featuredWorks = galleryData.slice(0, 4);
     <!-- Background Hero Artwork with subtle vignette -->
     <div class="absolute inset-0 z-0">
       <img
-        src={`${base}/images/gallery/mares-de-silencio.webp`}
+        src={heroImage.startsWith('http') ? heroImage : `${base}${heroImage}`}
         alt="Obra destacada de Lía Paz"
         class="w-full h-full object-cover opacity-55 scale-105 transition-transform duration-1000 ease-out"
       />
@@ -65,7 +75,7 @@ const featuredWorks = galleryData.slice(0, 4);
         Visión Artística
       </span>
       <blockquote class="font-serif text-2xl sm:text-3xl md:text-4xl text-neutral-900 font-light italic leading-snug">
-        &ldquo;Cada pincelada guarda un latido: transformar la atmósfera y la memoria de una mirada o una boda en una obra eterna para toda la vida.&rdquo;
+        &ldquo;{visionQuote}&rdquo;
       </blockquote>
       <p class="font-sans text-xs tracking-[0.2em] uppercase text-neutral-500 mt-6">
         — Lía Paz
