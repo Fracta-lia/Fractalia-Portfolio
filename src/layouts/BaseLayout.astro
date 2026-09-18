@@ -62,6 +62,69 @@ const canonicalURL = new URL(currentPath, siteUrl);
     </main>
     <Footer />
     <SaveBar client:load />
+
+    <!-- Smooth Luxury Reveal on Scroll Script -->
+    <script is:inline>
+      (function() {
+        const setupScrollReveal = () => {
+          // If reduced motion is preferred or in edit mode, reveal immediately without animation
+          const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          const isEditMode = window.location.search.includes('edit=true') || localStorage.getItem('lia_edit_mode') === 'true';
+
+          const elements = document.querySelectorAll('.reveal-on-scroll');
+          if (isReducedMotion || isEditMode) {
+            elements.forEach(el => el.classList.add('is-revealed'));
+            return;
+          }
+
+          if (!('IntersectionObserver' in window)) {
+            elements.forEach(el => el.classList.add('is-revealed'));
+            return;
+          }
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-revealed');
+                  observer.unobserve(entry.target);
+                }
+              });
+            },
+            {
+              threshold: 0.08,
+              rootMargin: '0px 0px -40px 0px',
+            }
+          );
+
+          elements.forEach((el) => observer.observe(el));
+
+          // Also observe dynamically mounted elements (e.g. React islands)
+          if ('MutationObserver' in window) {
+            const mutationObserver = new MutationObserver((mutations) => {
+              mutations.forEach((m) => {
+                m.addedNodes.forEach((node) => {
+                  if (node.nodeType === 1) {
+                    const el = node;
+                    if (el.classList?.contains('reveal-on-scroll')) {
+                      observer.observe(el);
+                    }
+                    el.querySelectorAll?.('.reveal-on-scroll').forEach((child) => observer.observe(child));
+                  }
+                });
+              });
+            });
+            mutationObserver.observe(document.body, { childList: true, subtree: true });
+          }
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', setupScrollReveal);
+        } else {
+          setupScrollReveal();
+        }
+      })();
+    </script>
   </body>
 </html>
 

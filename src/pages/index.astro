@@ -95,7 +95,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
   <!-- 1. FEATURED GALLERY / PORTFOLIO PREVIEW (Sean Layh style: pure visual cards) -->
   <section class="py-20 md:py-28 bg-white border-b border-neutral-200/60">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 reveal-on-scroll">
         <div>
           <EditableText
             client:load
@@ -122,11 +122,13 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {featuredWorks.map(item => (
+        {featuredWorks.map((item, idx) => (
           <a
             href={`${base}/gallery`}
             aria-label={`Ver ${item.title} en galería`}
-            class="group relative block aspect-[4/5] bg-neutral-100 overflow-hidden border border-neutral-200/70 shadow-sm"
+            class={`group relative block aspect-[4/5] bg-neutral-100 overflow-hidden border border-neutral-200/70 shadow-sm reveal-on-scroll ${
+              idx === 1 ? 'delay-100' : idx === 2 ? 'delay-200' : idx === 3 ? 'delay-300' : ''
+            }`}
           >
             <img
               src={item.src}
@@ -138,7 +140,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
         ))}
       </div>
 
-      <div class="text-center mt-12 md:mt-16">
+      <div class="text-center mt-12 md:mt-16 reveal-on-scroll">
         <a
           href={`${base}/gallery`}
           class="inline-block px-9 py-4 border border-neutral-900 text-neutral-900 hover:bg-neutral-900 hover:text-white text-xs font-sans tracking-[0.25em] uppercase transition-colors duration-300 font-medium"
@@ -152,7 +154,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
   <!-- 2. SERVICES SECTION: RETRATOS & BODAS -->
   <section class="py-20 md:py-28 bg-neutral-50/70">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 reveal-on-scroll">
         <div>
           <EditableText
             client:load
@@ -180,7 +182,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
         <!-- Service Card 1: Retratos (First) -->
-        <div class="bg-white border border-neutral-200/70 p-8 sm:p-10 flex flex-col justify-between group hover:border-neutral-400 transition-all duration-300">
+        <div class="bg-white border border-neutral-200/70 p-8 sm:p-10 flex flex-col justify-between group hover:border-neutral-400 transition-all duration-300 reveal-on-scroll">
           <div>
             <div class="aspect-[16/10] overflow-hidden bg-neutral-100 mb-6">
               <EditableImage
@@ -228,7 +230,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
         </div>
 
         <!-- Service Card 2: Wedding Live Painting (Second) -->
-        <div class="bg-white border border-neutral-200/70 p-8 sm:p-10 flex flex-col justify-between group hover:border-neutral-400 transition-all duration-300">
+        <div class="bg-white border border-neutral-200/70 p-8 sm:p-10 flex flex-col justify-between group hover:border-neutral-400 transition-all duration-300 reveal-on-scroll delay-150">
           <div>
             <div class="aspect-[16/10] overflow-hidden bg-neutral-100 mb-6">
               <EditableImage
@@ -280,7 +282,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
 
   <!-- ARTIST CALLOUT BANNER -->
   <section class="py-20 md:py-24 bg-neutral-900 text-white">
-    <div class="max-w-5xl mx-auto px-6 sm:px-8 flex flex-col md:flex-row items-center gap-10 md:gap-16">
+    <div class="max-w-5xl mx-auto px-6 sm:px-8 flex flex-col md:flex-row items-center gap-10 md:gap-16 reveal-on-scroll">
       <div class="w-48 h-48 md:w-64 md:h-64 rounded-none overflow-hidden bg-neutral-800 flex-shrink-0 border border-neutral-700">
         <EditableImage
           client:load
@@ -330,7 +332,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
 
   <!-- CTA CONTACT BANNER -->
   <section class="py-20 md:py-24 bg-neutral-50 text-center">
-    <div class="max-w-3xl mx-auto px-6">
+    <div class="max-w-3xl mx-auto px-6 reveal-on-scroll">
       <EditableText
         client:load
         contentKey="services.banner.title"

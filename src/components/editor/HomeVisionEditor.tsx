@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EditorStore } from './EditorStore';
 
 interface HomeVisionEditorProps {
@@ -36,7 +36,7 @@ artisticVisionQuote: "${val.replace(/"/g, '\\"')}"
 
   return (
     <section className="py-20 md:py-28 bg-white border-b border-neutral-100">
-      <div className="max-w-3xl mx-auto px-6 text-center">
+      <div className="max-w-3xl mx-auto px-6 text-center reveal-on-scroll">
         <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-4">
           Visión Artística
         </span>

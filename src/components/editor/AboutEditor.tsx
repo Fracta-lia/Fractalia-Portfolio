@@ -88,7 +88,7 @@ export default function AboutEditor({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
       {/* Left Column: Portrait */}
-      <div className="lg:col-span-5 sticky top-28">
+      <div className="lg:col-span-5 sticky top-28 reveal-on-scroll">
         <div className="relative aspect-[3/4] bg-neutral-100 border border-neutral-200 overflow-hidden shadow-sm group">
           <EditableImage
             contentKey="about.portrait.image"
@@ -106,7 +106,7 @@ export default function AboutEditor({
       </div>
 
       {/* Right Column: Narrative & Biography */}
-      <div className="lg:col-span-7 space-y-8 text-neutral-700 font-sans font-light leading-relaxed">
+      <div className="lg:col-span-7 space-y-8 text-neutral-700 font-sans font-light leading-relaxed reveal-on-scroll delay-150">
         <div>
           <EditableText
             contentKey="about.bio.title"
