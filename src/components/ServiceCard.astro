@@ -1,4 +1,4 @@
-﻿---
+---
 import EditableText from './editor/EditableText';
 
 interface Props {
@@ -51,14 +51,14 @@ const fullCtaHref = ctaHref.startsWith('http') ? ctaHref : `${base}${ctaHref}`;
         contentKey={`${keyPrefix}.tagline`}
         defaultText={tagline}
         as="span"
-        className="font-sans text-[11px] tracking-[0.25em] text-neutral-400 uppercase font-medium block"
+        className="font-sans text-[11px] tracking-[0.25em] text-neutral-400 uppercase font-medium"
       />
       <EditableText
         client:load
         contentKey={`${keyPrefix}.title`}
         defaultText={title}
         as="h2"
-        className="font-serif text-3xl sm:text-4xl text-neutral-900 tracking-wide font-normal mt-2 block"
+        className="font-serif text-3xl sm:text-4xl text-neutral-900 tracking-wide font-normal mt-2"
       />
     </div>
 
@@ -67,7 +67,7 @@ const fullCtaHref = ctaHref.startsWith('http') ? ctaHref : `${base}${ctaHref}`;
       contentKey={`${keyPrefix}.desc`}
       defaultText={description}
       as="p"
-      className="font-sans text-neutral-600 text-sm sm:text-base leading-relaxed font-light block"
+      className="font-sans text-neutral-600 text-sm sm:text-base leading-relaxed font-light"
       multiline
     />
 

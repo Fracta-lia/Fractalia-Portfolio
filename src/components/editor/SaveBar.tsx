@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { EditorStore, type PendingDrafts } from './EditorStore';
 import { commitFilesToGitHub, verifyGitHubToken } from '../../utils/github';
 
@@ -11,6 +11,9 @@ export default function SaveBar() {
   const [tokenInput, setTokenInput] = useState('');
   const [tokenError, setTokenError] = useState('');
   const [isVerifyingToken, setIsVerifyingToken] = useState(false);
+
+  // Floating Edit Pencil overlay position state
+  const [pencilPos, setPencilPos] = useState<{ top: number; left: number; el: HTMLElement } | null>(null);
 
   useEffect(() => {
     setIsEditing(EditorStore.isEditMode());
@@ -28,15 +31,34 @@ export default function SaveBar() {
       const target = e.target as HTMLElement;
       const anchor = target.closest('a');
       if (anchor) {
-        // Allow header nav and footer nav to switch pages
         if (anchor.closest('header') || anchor.closest('nav') || anchor.getAttribute('href')?.startsWith('#')) {
           return;
         }
-        // Block CTA buttons from navigating so they can be edited cleanly
         e.preventDefault();
       }
     };
     document.addEventListener('click', handleGlobalClick, true);
+
+    // Floating pencil hover tracker (zero DOM impact on content elements)
+    const handleMouseOver = (e: MouseEvent) => {
+      if (!EditorStore.isEditMode()) return;
+      const target = (e.target as HTMLElement).closest('[data-editable="true"]') as HTMLElement | null;
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        setPencilPos({
+          top: rect.top + window.scrollY,
+          left: rect.right + window.scrollX,
+          el: target,
+        });
+      } else {
+        const onPencil = (e.target as HTMLElement).closest('.floating-pencil-badge');
+        if (!onPencil) {
+          setPencilPos(null);
+        }
+      }
+    };
+    window.addEventListener('mouseover', handleMouseOver);
+    window.addEventListener('scroll', () => setPencilPos(null));
 
     const handleWindowChange = () => {
       setIsEditing(EditorStore.isEditMode());
@@ -48,6 +70,7 @@ export default function SaveBar() {
       unsubscribe();
       window.removeEventListener('lia_editor_change', handleWindowChange);
       document.removeEventListener('click', handleGlobalClick, true);
+      window.removeEventListener('mouseover', handleMouseOver);
     };
   }, []);
 
@@ -55,7 +78,6 @@ export default function SaveBar() {
 
   const draftKeys = Object.keys(drafts);
   const draftCount = draftKeys.length;
-  const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   const handleSave = async () => {
     if (draftCount === 0) {
@@ -139,6 +161,31 @@ export default function SaveBar() {
 
   return (
     <>
+      {/* Non-intrusive Floating Edit Pencil Badge */}
+      {pencilPos && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            pencilPos.el.click();
+            setPencilPos(null);
+          }}
+          style={{
+            position: 'absolute',
+            top: `${pencilPos.top - 8}px`,
+            left: `${pencilPos.left}px`,
+            transform: 'translate(-100%, -100%)',
+          }}
+          className="floating-pencil-badge z-[120] pointer-events-auto bg-neutral-950 text-white text-[10px] font-sans px-2 py-0.5 rounded-full shadow-2xl flex items-center gap-1 border border-neutral-700 hover:bg-neutral-800 transition-all cursor-pointer select-none"
+        >
+          <svg className="w-2.5 h-2.5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+          <span className="font-medium tracking-normal text-[9px] uppercase">Editar</span>
+        </button>
+      )}
+
       {/* Toast Notification */}
       {statusMessage && (
         <div

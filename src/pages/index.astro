@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
 import HomeVisionEditor from '../components/editor/HomeVisionEditor';
@@ -44,7 +44,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
         contentKey="home.hero.tagline"
         defaultText="Artista Visual · Fine Art"
         as="span"
-        className="font-sans text-[11px] sm:text-xs tracking-[0.35em] text-neutral-400 uppercase font-light mb-4 block"
+        className="font-sans text-[11px] sm:text-xs tracking-[0.35em] text-neutral-400 uppercase font-light mb-4"
       />
 
       <EditableText
@@ -52,7 +52,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
         contentKey="home.hero.title"
         defaultText="Lía Paz"
         as="h1"
-        className="font-serif text-5xl sm:text-7xl md:text-8xl tracking-[0.18em] uppercase font-light text-white mb-10 leading-none block"
+        className="font-serif text-5xl sm:text-7xl md:text-8xl tracking-[0.18em] uppercase font-light text-white mb-10 leading-none"
       />
 
       <div class="flex flex-col sm:flex-row items-center gap-4">
@@ -102,7 +102,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
             contentKey="home.gallery.title"
             defaultText="Galería de Obras"
             as="h2"
-            className="font-serif text-3xl sm:text-4xl md:text-5xl text-neutral-900 font-normal tracking-wide block"
+            className="font-serif text-3xl sm:text-4xl md:text-5xl text-neutral-900 font-normal tracking-wide"
           />
         </div>
         <a
@@ -159,7 +159,7 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
             contentKey="home.services.title"
             defaultText="Retratos & Bodas"
             as="h2"
-            className="font-serif text-3xl sm:text-4xl md:text-5xl text-neutral-900 font-normal tracking-wide block"
+            className="font-serif text-3xl sm:text-4xl md:text-5xl text-neutral-900 font-normal tracking-wide"
           />
         </div>
         <a
@@ -188,21 +188,21 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
               contentKey="home.services.card1.subtitle"
               defaultText="Encargos Exclusivos"
               as="span"
-              className="font-sans text-[10px] tracking-[0.25em] uppercase text-neutral-400 font-medium block"
+              className="font-sans text-[10px] tracking-[0.25em] uppercase text-neutral-400 font-medium"
             />
             <EditableText
               client:load
               contentKey="home.services.card1.title"
               defaultText="Retratos por Encargo"
               as="h3"
-              className="font-serif text-2xl sm:text-3xl text-neutral-900 font-normal tracking-wide mt-1 mb-3 block"
+              className="font-serif text-2xl sm:text-3xl text-neutral-900 font-normal tracking-wide mt-1 mb-3"
             />
             <EditableText
               client:load
               contentKey="home.services.card1.desc"
               defaultText="Retratos individuales, parejas o familias realizados en óleo y técnicas tradicionales a partir de sesiones fotográficas o momentos significativos."
               as="p"
-              className="font-sans text-neutral-600 text-sm leading-relaxed font-light mb-6 block"
+              className="font-sans text-neutral-600 text-sm leading-relaxed font-light mb-6"
               multiline
             />
           </div>
@@ -232,21 +232,21 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
               contentKey="home.services.card2.subtitle"
               defaultText="Bodas & Celebraciones"
               as="span"
-              className="font-sans text-[10px] tracking-[0.25em] uppercase text-neutral-400 font-medium block"
+              className="font-sans text-[10px] tracking-[0.25em] uppercase text-neutral-400 font-medium"
             />
             <EditableText
               client:load
               contentKey="home.services.card2.title"
               defaultText="Wedding Live Painting"
               as="h3"
-              className="font-serif text-2xl sm:text-3xl text-neutral-900 font-normal tracking-wide mt-1 mb-3 block"
+              className="font-serif text-2xl sm:text-3xl text-neutral-900 font-normal tracking-wide mt-1 mb-3"
             />
             <EditableText
               client:load
               contentKey="home.services.card2.desc"
               defaultText="Pintura en vivo durante el evento. Los invitados presencian cómo el primer baile, la ceremonia o la recepción cobra vida sobre lienzo en tiempo real."
               as="p"
-              className="font-sans text-neutral-600 text-sm leading-relaxed font-light mb-6 block"
+              className="font-sans text-neutral-600 text-sm leading-relaxed font-light mb-6"
               multiline
             />
           </div>
@@ -280,21 +280,21 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
           contentKey="home.about.label"
           defaultText="Sobre la Artista"
           as="span"
-          className="font-sans text-[11px] tracking-[0.25em] uppercase text-neutral-400 block"
+          className="font-sans text-[11px] tracking-[0.25em] uppercase text-neutral-400"
         />
         <EditableText
           client:load
           contentKey="home.about.title"
           defaultText="Lía Paz"
           as="h3"
-          className="font-serif text-3xl sm:text-4xl text-white font-normal block"
+          className="font-serif text-3xl sm:text-4xl text-white font-normal"
         />
         <EditableText
           client:load
           contentKey="home.about.p1"
           defaultText="Artista visual enfocada en la creación plástica, pintura figurativa y memoria tangible. Con una sensibilidad enfocada en la luz y los gestos sutiles, cada pieza busca preservar lo irrepetible."
           as="p"
-          className="font-sans text-sm sm:text-base text-neutral-300 font-light leading-relaxed block"
+          className="font-sans text-sm sm:text-base text-neutral-300 font-light leading-relaxed"
           multiline
         />
         <div class="pt-2">
@@ -317,14 +317,14 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
         contentKey="services.banner.title"
         defaultText="¿Hablamos sobre un encargo de retrato o tu próxima boda?"
         as="h3"
-        className="font-serif text-3xl sm:text-4xl text-neutral-900 font-normal mb-4 block"
+        className="font-serif text-3xl sm:text-4xl text-neutral-900 font-normal mb-4"
       />
       <EditableText
         client:load
         contentKey="services.banner.desc"
         defaultText="Disponibilidad para encargos de retratos personalizados y fechas exclusivas de Wedding Live Painting. Contáctame para verificar agenda y resolver dudas."
         as="p"
-        className="font-sans text-sm text-neutral-600 font-light max-w-xl mx-auto mb-8 leading-relaxed block"
+        className="font-sans text-sm text-neutral-600 font-light max-w-xl mx-auto mb-8 leading-relaxed"
         multiline
       />
       <a
@@ -336,4 +336,3 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
     </div>
   </section>
 </BaseLayout>
-
