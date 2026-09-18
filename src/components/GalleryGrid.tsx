@@ -86,62 +86,112 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
   }, [list.length]);
 
-  // Universal Swipe Gesture handlers (Pointer + Touch support for iOS, Android & Desktop)
-  const swipeStartX = useRef<number | null>(null);
-  const swipeStartY = useRef<number | null>(null);
+  // Dedicated Safari & Chrome Mobile Swipe Controller via native non-passive listener
+  const viewportRef = useRef<HTMLDivElement | null>(null);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.isPrimary) {
-      swipeStartX.current = e.clientX;
-      swipeStartY.current = e.clientY;
-    }
-  };
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
 
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (swipeStartX.current === null || swipeStartY.current === null) return;
-    const diffX = swipeStartX.current - e.clientX;
-    const diffY = swipeStartY.current - e.clientY;
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let isSwiping = false;
 
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 25) {
-      if (diffX > 0) {
-        handleNext();
-      } else {
-        handlePrev();
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      currentX = startX;
+      currentY = startY;
+      isSwiping = true;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isSwiping || e.touches.length !== 1) return;
+      currentX = e.touches[0].clientX;
+      currentY = e.touches[0].clientY;
+      const diffX = Math.abs(currentX - startX);
+      const diffY = Math.abs(currentY - startY);
+
+      // If user is swiping horizontally, prevent Safari from triggering back/forward navigation or rubber-banding
+      if (diffX > diffY && diffX > 6) {
+        if (e.cancelable) {
+          e.preventDefault();
+        }
       }
-    }
-    swipeStartX.current = null;
-    swipeStartY.current = null;
-  };
+    };
 
-  const handlePointerCancel = () => {
-    swipeStartX.current = null;
-    swipeStartY.current = null;
-  };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!isSwiping) return;
+      isSwiping = false;
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 1) {
-      swipeStartX.current = e.touches[0].clientX;
-      swipeStartY.current = e.touches[0].clientY;
-    }
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (swipeStartX.current === null || swipeStartY.current === null) return;
-    const touch = e.changedTouches[0];
-    if (!touch) return;
-
-    const diffX = swipeStartX.current - touch.clientX;
-    const diffY = swipeStartY.current - touch.clientY;
-
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 25) {
-      if (diffX > 0) {
-        handleNext();
-      } else {
-        handlePrev();
+      if (e.changedTouches.length > 0) {
+        currentX = e.changedTouches[0].clientX;
+        currentY = e.changedTouches[0].clientY;
       }
+
+      const diffX = startX - currentX;
+      const diffY = startY - currentY;
+
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 24) {
+        if (diffX > 0) {
+          handleNext();
+        } else {
+          handlePrev();
+        }
+      }
+    };
+
+    const onTouchCancel = (e: TouchEvent) => {
+      if (!isSwiping) return;
+      isSwiping = false;
+
+      if (e.changedTouches.length > 0) {
+        currentX = e.changedTouches[0].clientX;
+        currentY = e.changedTouches[0].clientY;
+      }
+
+      const diffX = startX - currentX;
+      const diffY = startY - currentY;
+
+      // Even if Safari fired touchcancel, if user moved > 24px horizontally, execute swipe!
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 24) {
+        if (diffX > 0) {
+          handleNext();
+        } else {
+          handlePrev();
+        }
+      }
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', onTouchCancel, { passive: true });
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchCancel);
+    };
+  }, [selectedIndex, handleNext, handlePrev]);
+
+  // Mouse drag fallback for PC testing
+  const mouseStartX = useRef<number | null>(null);
+  const handleMouseDown = (e: React.MouseEvent) => {
+    mouseStartX.current = e.clientX;
+  };
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (mouseStartX.current === null) return;
+    const diff = mouseStartX.current - e.clientX;
+    if (Math.abs(diff) > 35) {
+      if (diff > 0) handleNext();
+      else handlePrev();
     }
-    swipeStartX.current = null;
-    swipeStartY.current = null;
+    mouseStartX.current = null;
   };
 
   useEffect(() => {
@@ -432,13 +482,11 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
             {/* Left: Artwork Viewport (Dominates 62-65% height on mobile, full width on PC) */}
             <div
+              ref={viewportRef}
               className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] p-3 sm:p-6 lg:p-8 select-none overflow-hidden cursor-grab active:cursor-grabbing touch-none"
               style={{ touchAction: 'none' }}
-              onPointerDown={handlePointerDown}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerCancel}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
             >
               <img
                 src={selectedItem.src}
