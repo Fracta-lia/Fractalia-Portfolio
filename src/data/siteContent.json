@@ -61,5 +61,12 @@
   "contact.avail.desc": "Las fechas para bodas son limitadas para garantizar dedicación exclusiva a cada pareja. Se recomienda reservar con varios meses de antelación.",
   "gallery.header.label": "COLECCIÓN & ARCHIVO",
   "gallery.header.title": "Galería de Obras",
-  "gallery.header.desc": "Colección completa de obras al óleo y técnicas tradicionales. Haz clic sobre cualquier obra para abrirla y consultar su ficha técnica."
+  "gallery.header.desc": "Colección completa de obras al óleo y técnicas tradicionales. Haz clic sobre cualquier obra para abrirla y consultar su ficha técnica.",
+  "home.hero.image": "/images/gallery/mares-de-silencio.webp",
+  "home.services.card1.image": "/images/gallery/retrato-nick.webp",
+  "home.services.card2.image": "/images/gallery/manos-y-anillo.webp",
+  "home.about.image": "/images/about/lia-paz.webp",
+  "services.s1.image": "/images/gallery/retrato-nick.webp",
+  "services.s2.image": "/images/gallery/manos-y-anillo.webp",
+  "about.portrait.image": "/images/about/lia-paz.webp"
 }

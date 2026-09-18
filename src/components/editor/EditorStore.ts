@@ -1,4 +1,4 @@
-﻿import type { FileChange } from '../../utils/github';
+import type { FileChange } from '../../utils/github';
 import initialSiteContent from '../../data/siteContent.json';
 
 const EDIT_MODE_KEY = 'lia_edit_mode';
@@ -107,6 +107,11 @@ export const EditorStore = {
     return all[key] !== undefined ? all[key] : fallback;
   },
 
+  getImage(key: string, fallback: string): string {
+    const all = this.getAllContent();
+    return all[key] !== undefined ? all[key] : fallback;
+  },
+
   updateText(key: string, value: string) {
     if (typeof window === 'undefined') return;
     const all = this.getAllContent();
@@ -117,6 +122,36 @@ export const EditorStore = {
     this.setDraft('src/data/siteContent.json', {
       content: JSON.stringify(all, null, 2),
       label: `Texto: ${key}`,
+    });
+    notify();
+  },
+
+  updateImage(
+    key: string,
+    imagePath: string,
+    fileData?: { base64: string; targetPath: string; localPreviewUrl?: string; label?: string }
+  ) {
+    if (typeof window === 'undefined') return;
+    const all = this.getAllContent();
+    // Use localPreviewUrl for instant reactive display during session
+    all[key] = fileData?.localPreviewUrl || imagePath;
+    localStorage.setItem(CONTENT_KEY, JSON.stringify(all));
+
+    // If there is an uploaded binary file, register the draft
+    if (fileData?.base64 && fileData.targetPath) {
+      this.setDraft(fileData.targetPath, {
+        content: fileData.base64,
+        encoding: 'base64',
+        label: fileData.label || `Imagen: ${key}`,
+      });
+    }
+
+    // Save relative image path into src/data/siteContent.json for git commit
+    const repoContent = { ...this.getAllContent() };
+    repoContent[key] = imagePath;
+    this.setDraft('src/data/siteContent.json', {
+      content: JSON.stringify(repoContent, null, 2),
+      label: `Imagen: ${key}`,
     });
     notify();
   },
