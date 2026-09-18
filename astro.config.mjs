@@ -10,6 +10,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://fractalia.art',
   output: 'static',
+  devToolbar: {
+    enabled: false,
+  },
   integrations: [react(), sitemap()],
 
   vite: {

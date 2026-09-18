@@ -86,41 +86,62 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
   }, [list.length]);
 
-  // Mobile Touch Swipe Gesture handlers (robust across iOS Safari & Android Chrome)
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
+  // Universal Swipe Gesture handlers (Pointer + Touch support for iOS, Android & Desktop)
+  const swipeStartX = useRef<number | null>(null);
+  const swipeStartY = useRef<number | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 1) {
-      touchStartX.current = e.touches[0].clientX;
-      touchStartY.current = e.touches[0].clientY;
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.isPrimary) {
+      swipeStartX.current = e.clientX;
+      swipeStartY.current = e.clientY;
     }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    const touch = e.changedTouches[0];
-    if (!touch) return;
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (swipeStartX.current === null || swipeStartY.current === null) return;
+    const diffX = swipeStartX.current - e.clientX;
+    const diffY = swipeStartY.current - e.clientY;
 
-    const diffX = touchStartX.current - touch.clientX;
-    const diffY = touchStartY.current - touch.clientY;
-
-    // Trigger swipe if horizontal displacement is greater than vertical and at least 30px
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 25) {
       if (diffX > 0) {
         handleNext();
       } else {
         handlePrev();
       }
     }
-
-    touchStartX.current = null;
-    touchStartY.current = null;
+    swipeStartX.current = null;
+    swipeStartY.current = null;
   };
 
-  const handleTouchCancel = () => {
-    touchStartX.current = null;
-    touchStartY.current = null;
+  const handlePointerCancel = () => {
+    swipeStartX.current = null;
+    swipeStartY.current = null;
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      swipeStartX.current = e.touches[0].clientX;
+      swipeStartY.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (swipeStartX.current === null || swipeStartY.current === null) return;
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+
+    const diffX = swipeStartX.current - touch.clientX;
+    const diffY = swipeStartY.current - touch.clientY;
+
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 25) {
+      if (diffX > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+    swipeStartX.current = null;
+    swipeStartY.current = null;
   };
 
   useEffect(() => {
@@ -411,10 +432,13 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
             {/* Left: Artwork Viewport (Dominates 62-65% height on mobile, full width on PC) */}
             <div
-              className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] p-3 sm:p-6 lg:p-8 select-none overflow-hidden touch-manipulation cursor-grab active:cursor-grabbing"
+              className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] p-3 sm:p-6 lg:p-8 select-none overflow-hidden cursor-grab active:cursor-grabbing touch-none"
+              style={{ touchAction: 'none' }}
+              onPointerDown={handlePointerDown}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
-              onTouchCancel={handleTouchCancel}
             >
               <img
                 src={selectedItem.src}
