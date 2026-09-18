@@ -86,28 +86,41 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
   }, [list.length]);
 
-  // Mobile Touch Swipe Gesture handlers
+  // Mobile Touch Swipe Gesture handlers (robust across iOS Safari & Android Chrome)
   const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.targetTouches[0].clientX;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStartX.current === null || touchEndX.current === null) return;
-    const diff = touchStartX.current - touchEndX.current;
-    if (diff > 45) {
-      handleNext();
-    } else if (diff < -45) {
-      handlePrev();
+    if (e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
     }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+
+    const diffX = touchStartX.current - touch.clientX;
+    const diffY = touchStartY.current - touch.clientY;
+
+    // Trigger swipe if horizontal displacement is greater than vertical and at least 30px
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+      if (diffX > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+
     touchStartX.current = null;
-    touchEndX.current = null;
+    touchStartY.current = null;
+  };
+
+  const handleTouchCancel = () => {
+    touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   useEffect(() => {
@@ -398,20 +411,21 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
             {/* Left: Artwork Viewport (Dominates 62-65% height on mobile, full width on PC) */}
             <div
-              className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] p-3 sm:p-6 lg:p-8 select-none overflow-hidden touch-pan-y"
+              className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] p-3 sm:p-6 lg:p-8 select-none overflow-hidden touch-manipulation cursor-grab active:cursor-grabbing"
               onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
+              onTouchCancel={handleTouchCancel}
             >
               <img
                 src={selectedItem.src}
                 alt={selectedItem.title}
-                className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl transition-opacity duration-300"
+                draggable={false}
+                className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl transition-opacity duration-300 pointer-events-none select-none"
               />
 
               {/* Edit Image Button (Edit Mode) */}
               {isEditing && (
-                <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20">
+                <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 pointer-events-auto">
                   <input
                     type="file"
                     ref={replaceFileInputRef}
@@ -432,12 +446,12 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 </div>
               )}
 
-              {/* Prev / Next Nav (Hidden on small mobile screens since swipe is active, visible on sm and up) */}
+              {/* Prev / Next Nav (Visible on both mobile & desktop) */}
               <button
                 type="button"
                 onClick={handlePrev}
                 aria-label="Obra anterior"
-                className="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-neutral-900/60 hover:bg-neutral-900 text-white items-center justify-center transition-colors backdrop-blur-xs rounded-full cursor-pointer"
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7" />
@@ -447,7 +461,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 type="button"
                 onClick={handleNext}
                 aria-label="Obra siguiente"
-                className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-neutral-900/60 hover:bg-neutral-900 text-white items-center justify-center transition-colors backdrop-blur-xs rounded-full cursor-pointer"
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" />
@@ -455,8 +469,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               </button>
 
               {/* Mobile swipe subtle indicator */}
-              <div className="sm:hidden absolute bottom-2 inset-x-0 flex justify-center items-center pointer-events-none">
-                <span className="text-[10px] text-white/50 tracking-wider uppercase font-sans">
+              <div className="sm:hidden absolute bottom-2 inset-x-0 flex justify-center items-center pointer-events-none z-10">
+                <span className="text-[10px] text-white/70 tracking-wider uppercase font-sans bg-black/40 px-2.5 py-0.5 rounded-full backdrop-blur-xs">
                   ← Desliza para navegar →
                 </span>
               </div>

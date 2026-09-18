@@ -88,7 +88,7 @@ export default function AboutEditor({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
       {/* Left Column: Portrait */}
-      <div className="lg:col-span-5 sticky top-28 reveal-on-scroll">
+      <div className="lg:col-span-5 relative lg:sticky lg:top-28 reveal-on-scroll">
         <div className="relative aspect-[3/4] bg-neutral-100 border border-neutral-200 overflow-hidden shadow-sm group">
           <EditableImage
             contentKey="about.portrait.image"
