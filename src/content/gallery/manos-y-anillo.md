@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Manos y Anillo"
 technique: "Óleo sobre lienzo"
 year: "2025"

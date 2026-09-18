@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Niños Chapoteando"
 technique: "Óleo sobre lienzo"
 year: "2024"

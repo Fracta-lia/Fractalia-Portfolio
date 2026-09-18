@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Vagón 9502"
 technique: "Óleo sobre lienzo"
 year: "2024"

@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Cadáver"
 technique: "Óleo sobre lienzo"
 year: "2025"

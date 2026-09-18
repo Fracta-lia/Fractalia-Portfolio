@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Rostro y Mano"
 technique: "Óleo sobre lienzo"
 year: "2025"
