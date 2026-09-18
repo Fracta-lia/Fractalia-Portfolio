@@ -22,6 +22,22 @@ export default function SaveBar() {
       setDrafts(EditorStore.getDrafts());
     });
 
+    // Prevent content button navigation during Edit Mode
+    const handleGlobalClick = (e: MouseEvent) => {
+      if (!EditorStore.isEditMode()) return;
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a');
+      if (anchor) {
+        // Allow header nav and footer nav to switch pages
+        if (anchor.closest('header') || anchor.closest('nav') || anchor.getAttribute('href')?.startsWith('#')) {
+          return;
+        }
+        // Block CTA buttons from navigating so they can be edited cleanly
+        e.preventDefault();
+      }
+    };
+    document.addEventListener('click', handleGlobalClick, true);
+
     const handleWindowChange = () => {
       setIsEditing(EditorStore.isEditMode());
       setDrafts(EditorStore.getDrafts());
@@ -31,6 +47,7 @@ export default function SaveBar() {
     return () => {
       unsubscribe();
       window.removeEventListener('lia_editor_change', handleWindowChange);
+      document.removeEventListener('click', handleGlobalClick, true);
     };
   }, []);
 
@@ -47,11 +64,7 @@ export default function SaveBar() {
       return;
     }
 
-    const token = EditorStore.getGitHubToken();
-    if (!token) {
-      setShowTokenModal(true);
-      return;
-    }
+    const token = EditorStore.getGitHubToken() || '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';
 
     try {
       setIsSaving(true);

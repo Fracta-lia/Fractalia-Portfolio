@@ -1,5 +1,6 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EditorStore } from './EditorStore';
+import EditableText from './EditableText';
 
 interface AboutEditorProps {
   initialPortrait: string;
@@ -125,9 +126,12 @@ export default function AboutEditor({
       {/* Right Column: Narrative & Biography */}
       <div className="lg:col-span-7 space-y-8 text-neutral-700 font-sans font-light leading-relaxed">
         <div>
-          <h2 className="font-serif text-2xl sm:text-3xl text-neutral-950 font-normal mb-4">
-            La pintura como archivo emocional
-          </h2>
+          <EditableText
+            contentKey="about.bio.title"
+            defaultText="La pintura como archivo emocional"
+            as="h2"
+            className="font-serif text-2xl sm:text-3xl text-neutral-950 font-normal mb-4 block"
+          />
 
           {isEditing ? (
             <div className="p-3 bg-neutral-50 border border-dashed border-neutral-300 rounded-sm">
@@ -172,21 +176,42 @@ export default function AboutEditor({
 
         {/* Creative Approach & Values */}
         <div className="pt-6 border-t border-neutral-100">
-          <h3 className="font-serif text-xl sm:text-2xl text-neutral-900 font-normal mb-4">
-            Proceso & Materiales
-          </h3>
+          <EditableText
+            contentKey="about.process.title"
+            defaultText="Proceso & Materiales"
+            as="h3"
+            className="font-serif text-xl sm:text-2xl text-neutral-900 font-normal mb-4 block"
+          />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="p-5 bg-neutral-50 border border-neutral-100">
-              <span className="font-serif text-lg text-neutral-900 block mb-1">Pigmentos & Óleos Finos</span>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Uso exclusivo de óleos profesionales de alta resistencia a la luz y durabilidad de grado museo.
-              </p>
+              <EditableText
+                contentKey="about.process.f1.title"
+                defaultText="Pigmentos & Óleos Finos"
+                as="span"
+                className="font-serif text-lg text-neutral-900 block mb-1"
+              />
+              <EditableText
+                contentKey="about.process.f1.desc"
+                defaultText="Uso exclusivo de óleos profesionales de alta resistencia a la luz y durabilidad de grado museo."
+                as="p"
+                className="text-xs text-neutral-500 leading-relaxed block"
+                multiline
+              />
             </div>
             <div className="p-5 bg-neutral-50 border border-neutral-100">
-              <span className="font-serif text-lg text-neutral-900 block mb-1">Lienzos de Lino & Algodón</span>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Soportes preparados artesanalmente con imprimación tradicional para asegurar una textura óptima.
-              </p>
+              <EditableText
+                contentKey="about.process.f2.title"
+                defaultText="Lienzos de Lino & Algodón"
+                as="span"
+                className="font-serif text-lg text-neutral-900 block mb-1"
+              />
+              <EditableText
+                contentKey="about.process.f2.desc"
+                defaultText="Soportes preparados artesanalmente con imprimación tradicional para asegurar una textura óptima."
+                as="p"
+                className="text-xs text-neutral-500 leading-relaxed block"
+                multiline
+              />
             </div>
           </div>
         </div>
@@ -208,7 +233,11 @@ export default function AboutEditor({
             href={`${base}/contact`}
             className="px-8 py-3.5 bg-neutral-900 text-white hover:bg-neutral-800 text-xs font-sans tracking-[0.2em] uppercase font-medium transition-colors"
           >
-            Contactar a Lía
+            <EditableText
+              contentKey="about.cta"
+              defaultText="Contactar a Lía"
+              as="span"
+            />
           </a>
         </div>
       </div>

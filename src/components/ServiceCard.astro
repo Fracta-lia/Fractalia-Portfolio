@@ -1,5 +1,8 @@
----
+﻿---
+import EditableText from './editor/EditableText';
+
 interface Props {
+  keyPrefix?: string;
   title: string;
   tagline: string;
   description: string;
@@ -11,6 +14,7 @@ interface Props {
 }
 
 const {
+  keyPrefix = 'services.card',
   title,
   tagline,
   description,
@@ -42,25 +46,43 @@ const fullCtaHref = ctaHref.startsWith('http') ? ctaHref : `${base}${ctaHref}`;
   {/* Content Column */}
   <div class={`lg:col-span-5 flex flex-col justify-center space-y-6 ${reversed ? 'lg:order-1' : 'lg:order-2'}`}>
     <div>
-      <span class="font-sans text-[11px] tracking-[0.25em] text-neutral-400 uppercase font-medium">
-        {tagline}
-      </span>
-      <h2 class="font-serif text-3xl sm:text-4xl text-neutral-900 tracking-wide font-normal mt-2">
-        {title}
-      </h2>
+      <EditableText
+        client:load
+        contentKey={`${keyPrefix}.tagline`}
+        defaultText={tagline}
+        as="span"
+        className="font-sans text-[11px] tracking-[0.25em] text-neutral-400 uppercase font-medium block"
+      />
+      <EditableText
+        client:load
+        contentKey={`${keyPrefix}.title`}
+        defaultText={title}
+        as="h2"
+        className="font-serif text-3xl sm:text-4xl text-neutral-900 tracking-wide font-normal mt-2 block"
+      />
     </div>
 
-    <p class="font-sans text-neutral-600 text-sm sm:text-base leading-relaxed font-light">
-      {description}
-    </p>
+    <EditableText
+      client:load
+      contentKey={`${keyPrefix}.desc`}
+      defaultText={description}
+      as="p"
+      className="font-sans text-neutral-600 text-sm sm:text-base leading-relaxed font-light block"
+      multiline
+    />
 
     {/* Highlights / Features */}
     {details && details.length > 0 && (
       <ul class="space-y-2.5 pt-2 border-t border-neutral-100">
-        {details.map(item => (
+        {details.map((item, idx) => (
           <li class="flex items-start text-xs sm:text-sm text-neutral-700 font-sans font-light">
             <span class="text-neutral-900 mr-2.5">—</span>
-            <span>{item}</span>
+            <EditableText
+              client:load
+              contentKey={`${keyPrefix}.d${idx}`}
+              defaultText={item}
+              as="span"
+            />
           </li>
         ))}
       </ul>
@@ -72,9 +94,13 @@ const fullCtaHref = ctaHref.startsWith('http') ? ctaHref : `${base}${ctaHref}`;
         href={fullCtaHref}
         class="inline-block px-7 py-3.5 border border-neutral-900 text-neutral-900 hover:bg-neutral-900 hover:text-white text-xs font-sans tracking-[0.2em] uppercase transition-all duration-300 font-medium"
       >
-        {ctaText} &rarr;
+        <EditableText
+          client:load
+          contentKey={`${keyPrefix}.cta`}
+          defaultText={ctaText}
+          as="span"
+        /> &rarr;
       </a>
     </div>
   </div>
 </div>
-
