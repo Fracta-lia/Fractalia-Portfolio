@@ -47,7 +47,7 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white p-8 sm:p-12 border border-neutral-200/80 shadow-sm">
+    <div className="w-full max-w-xl mx-auto bg-white p-6 sm:p-12 border border-neutral-200/80 shadow-sm">
       {status === 'success' ? (
         <div className="text-center py-10 space-y-4">
           <div className="w-12 h-12 mx-auto rounded-full bg-neutral-900 text-white flex items-center justify-center">
@@ -85,7 +85,7 @@ export default function ContactForm() {
               value={formData.name}
               onChange={handleChange}
               placeholder="Tu nombre y apellido"
-              className="w-full px-4 py-3 text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
+              className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
             />
           </div>
 
@@ -103,7 +103,7 @@ export default function ContactForm() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="tu@correo.com"
-                className="w-full px-4 py-3 text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
+                className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
               />
             </div>
             <div>
@@ -117,7 +117,7 @@ export default function ContactForm() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+52 ..."
-                className="w-full px-4 py-3 text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
+                className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
               />
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function ContactForm() {
               name="service"
               value={formData.service}
               onChange={handleChange}
-              className="w-full px-4 py-3 text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors cursor-pointer"
+              className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors cursor-pointer"
             >
               <option value="retrato">Retrato Personalizado por Encargo</option>
               <option value="wedding">Wedding Live Painting (Boda en Vivo)</option>
@@ -153,7 +153,7 @@ export default function ContactForm() {
                 name="eventDate"
                 value={formData.eventDate}
                 onChange={handleChange}
-                className="w-full px-4 py-3 text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
+                className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
               />
             </div>
           )}
@@ -171,7 +171,7 @@ export default function ContactForm() {
               value={formData.message}
               onChange={handleChange}
               placeholder="Cuéntame sobre la fecha, lugar o idea que tienes en mente..."
-              className="w-full px-4 py-3 text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors resize-none"
+              className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors resize-none"
             />
           </div>
 

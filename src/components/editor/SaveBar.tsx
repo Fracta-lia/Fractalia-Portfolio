@@ -189,41 +189,42 @@ export default function SaveBar() {
       )}
 
       {/* Floating Bottom Bar */}
-      <div className="fixed bottom-0 inset-x-0 z-[90] pointer-events-none pb-4 px-4 sm:px-6 flex justify-center">
-        <div className="pointer-events-auto bg-neutral-950/95 backdrop-blur-md border border-neutral-800 text-white rounded-full px-5 py-3 shadow-2xl flex flex-wrap items-center gap-4 sm:gap-6 max-w-4xl">
+      <div className="fixed bottom-0 inset-x-0 z-[90] pointer-events-none pb-3 sm:pb-4 px-3 sm:px-6 flex justify-center">
+        <div className="pointer-events-auto bg-neutral-950/95 backdrop-blur-md border border-neutral-800 text-white rounded-full px-4 py-2 sm:px-5 sm:py-3 shadow-2xl flex items-center justify-between sm:justify-start gap-2 sm:gap-6 max-w-4xl w-full sm:w-auto">
           
           {/* Mode Indicator */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-sans text-[11px] tracking-[0.2em] uppercase font-medium text-neutral-200">
-              Modo Edición
+            <span className="font-sans text-[10px] sm:text-[11px] tracking-[0.15em] sm:tracking-[0.2em] uppercase font-medium text-neutral-200 hidden xs:inline sm:inline">
+              Editor
             </span>
           </div>
 
           <div className="h-4 w-[1px] bg-neutral-800 hidden sm:block" />
 
           {/* Pending Changes Badge */}
-          <div className="text-xs font-sans text-neutral-300">
+          <div className="text-[11px] sm:text-xs font-sans text-neutral-300 truncate">
             {draftCount === 0 ? (
-              <span className="text-neutral-400">Sin cambios pendientes</span>
+              <span className="text-neutral-400 text-[11px] sm:text-xs">Sin cambios</span>
             ) : (
               <span className="font-medium text-white">
-                <span className="inline-block px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[11px] mr-1.5">
+                <span className="inline-block px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] sm:text-[11px] mr-1">
                   {draftCount}
                 </span>
-                cambio{draftCount > 1 ? 's' : ''} listo{draftCount > 1 ? 's' : ''} para guardar
+                <span className="hidden sm:inline">cambio{draftCount > 1 ? 's' : ''} listo{draftCount > 1 ? 's' : ''}</span>
+                <span className="sm:hidden">cambio{draftCount > 1 ? 's' : ''}</span>
               </span>
             )}
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-1.5 sm:gap-2 ml-auto flex-shrink-0">
             {draftCount > 0 && (
               <button
                 type="button"
                 onClick={handleDiscard}
                 disabled={isSaving}
-                className="px-3.5 py-1.5 text-xs text-neutral-400 hover:text-white uppercase tracking-wider transition-colors disabled:opacity-50"
+                className="px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs text-neutral-400 hover:text-white uppercase tracking-wider transition-colors disabled:opacity-50"
               >
                 Descartar
               </button>
@@ -233,18 +234,18 @@ export default function SaveBar() {
               type="button"
               onClick={handleSave}
               disabled={isSaving || draftCount === 0}
-              className="px-5 py-2 bg-white text-neutral-950 hover:bg-neutral-200 rounded-full text-xs font-sans tracking-[0.18em] uppercase font-medium transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-3.5 sm:px-5 py-1.5 sm:py-2 bg-white text-neutral-950 hover:bg-neutral-200 rounded-full text-[11px] sm:text-xs font-sans tracking-[0.12em] sm:tracking-[0.18em] uppercase font-medium transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 sm:gap-2"
             >
               {isSaving ? (
                 <>
-                  <svg className="animate-spin h-3.5 w-3.5 text-neutral-950" viewBox="0 0 24 24" fill="none">
+                  <svg className="animate-spin h-3 sm:h-3.5 w-3 sm:w-3.5 text-neutral-950" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
                   <span>Guardando...</span>
                 </>
               ) : (
-                <span>Guardar Cambios</span>
+                <span>Guardar</span>
               )}
             </button>
 
@@ -253,9 +254,9 @@ export default function SaveBar() {
               type="button"
               onClick={() => setShowTokenModal(true)}
               title="Configurar Llave de GitHub"
-              className="p-2 text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800"
+              className="p-1.5 sm:p-2 text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-neutral-800"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 sm:w-4 h-3.5 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
             </button>
@@ -265,9 +266,9 @@ export default function SaveBar() {
               type="button"
               onClick={handleExitEditMode}
               title="Salir del Modo Edición"
-              className="p-2 text-neutral-400 hover:text-rose-400 transition-colors rounded-full hover:bg-neutral-800"
+              className="p-1.5 sm:p-2 text-neutral-400 hover:text-rose-400 transition-colors rounded-full hover:bg-neutral-800"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 sm:w-4 h-3.5 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>

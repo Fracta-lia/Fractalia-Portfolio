@@ -86,6 +86,30 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
   }, [list.length]);
 
+  // Mobile Touch Swipe Gesture handlers
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const diff = touchStartX.current - touchEndX.current;
+    if (diff > 45) {
+      handleNext();
+    } else if (diff < -45) {
+      handlePrev();
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   useEffect(() => {
     if (selectedIndex === null) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -353,11 +377,11 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       {/* Lightbox Modal */}
       {selectedIndex !== null && selectedItem && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-neutral-950/90 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 md:p-8 bg-neutral-950/95 sm:bg-neutral-950/90 backdrop-blur-sm animate-fade-in"
           onClick={handleClose}
         >
           <div
-            className="relative w-full max-w-7xl max-h-[92vh] bg-white shadow-2xl flex flex-col lg:flex-row overflow-hidden border border-neutral-200/50"
+            className="relative w-full max-w-7xl h-full sm:h-auto sm:max-h-[92vh] bg-neutral-950 lg:bg-white shadow-2xl flex flex-col lg:flex-row overflow-hidden sm:border sm:border-neutral-200/50"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -365,24 +389,29 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               type="button"
               onClick={handleClose}
               aria-label="Cerrar modal"
-              className="absolute top-4 right-4 z-20 w-10 h-10 bg-neutral-950/80 hover:bg-neutral-950 text-white flex items-center justify-center transition-colors rounded-full"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 w-10 h-10 bg-neutral-950/80 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors rounded-full border border-neutral-700/60 shadow-lg cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            {/* Left: Artwork Viewport */}
-            <div className="relative flex-1 bg-neutral-950 flex items-center justify-center min-h-[45vh] lg:min-h-[80vh] max-h-[86vh] p-4 sm:p-8 select-none">
+            {/* Left: Artwork Viewport (Dominates 62-65% height on mobile, full width on PC) */}
+            <div
+              className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] p-3 sm:p-6 lg:p-8 select-none overflow-hidden touch-pan-y"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               <img
                 src={selectedItem.src}
                 alt={selectedItem.title}
-                className="max-w-full max-h-[82vh] w-auto h-auto object-contain shadow-2xl transition-opacity duration-300"
+                className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl transition-opacity duration-300"
               />
 
               {/* Edit Image Button (Edit Mode) */}
               {isEditing && (
-                <div className="absolute bottom-4 left-4 z-10">
+                <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20">
                   <input
                     type="file"
                     ref={replaceFileInputRef}
@@ -393,7 +422,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   <button
                     type="button"
                     onClick={() => replaceFileInputRef.current?.click()}
-                    className="px-3.5 py-1.5 bg-white/90 hover:bg-white text-neutral-900 text-xs font-sans rounded-sm shadow-md flex items-center gap-1.5 transition-colors uppercase tracking-wider font-medium"
+                    className="px-3 py-1 sm:px-3.5 sm:py-1.5 bg-white/90 hover:bg-white text-neutral-900 text-[11px] sm:text-xs font-sans rounded-sm shadow-md flex items-center gap-1.5 transition-colors uppercase tracking-wider font-medium cursor-pointer"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -403,12 +432,12 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 </div>
               )}
 
-              {/* Prev / Next Nav */}
+              {/* Prev / Next Nav (Hidden on small mobile screens since swipe is active, visible on sm and up) */}
               <button
                 type="button"
                 onClick={handlePrev}
                 aria-label="Obra anterior"
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-neutral-900/60 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors backdrop-blur-xs rounded-full"
+                className="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-neutral-900/60 hover:bg-neutral-900 text-white items-center justify-center transition-colors backdrop-blur-xs rounded-full cursor-pointer"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7" />
@@ -418,16 +447,23 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 type="button"
                 onClick={handleNext}
                 aria-label="Obra siguiente"
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-neutral-900/60 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors backdrop-blur-xs rounded-full"
+                className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-neutral-900/60 hover:bg-neutral-900 text-white items-center justify-center transition-colors backdrop-blur-xs rounded-full cursor-pointer"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
+
+              {/* Mobile swipe subtle indicator */}
+              <div className="sm:hidden absolute bottom-2 inset-x-0 flex justify-center items-center pointer-events-none">
+                <span className="text-[10px] text-white/50 tracking-wider uppercase font-sans">
+                  ← Desliza para navegar →
+                </span>
+              </div>
             </div>
 
-            {/* Right: Ficha Técnica Sidebar */}
-            <div className="lg:w-84 xl:w-96 flex-shrink-0 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto bg-white border-t lg:border-t-0 lg:border-l border-neutral-100">
+            {/* Right: Ficha Técnica Sidebar (Compact bottom sheet on mobile, full sidebar on PC) */}
+            <div className="lg:w-84 xl:w-96 flex-shrink-0 p-5 sm:p-8 flex flex-col justify-between overflow-y-auto bg-white rounded-t-2xl lg:rounded-none border-t lg:border-t-0 lg:border-l border-neutral-100 flex-1 lg:flex-initial max-h-[38vh] sm:max-h-[35vh] lg:max-h-none shadow-lg lg:shadow-none">
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium mb-3">
