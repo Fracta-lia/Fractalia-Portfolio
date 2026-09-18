@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
+import HomeVisionEditor from '../components/editor/HomeVisionEditor';
 
 const rawBase = import.meta.env.BASE_URL ?? '/';
 const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
@@ -68,20 +69,12 @@ const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guard
     </div>
   </section>
 
-  <!-- ARTIST STATEMENT / PHILOSOPHY QUOTE -->
-  <section class="py-20 md:py-28 bg-white border-b border-neutral-100">
-    <div class="max-w-3xl mx-auto px-6 text-center">
-      <span class="font-sans text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-4">
-        Visión Artística
-      </span>
-      <blockquote class="font-serif text-2xl sm:text-3xl md:text-4xl text-neutral-900 font-light italic leading-snug">
-        &ldquo;{visionQuote}&rdquo;
-      </blockquote>
-      <p class="font-sans text-xs tracking-[0.2em] uppercase text-neutral-500 mt-6">
-        — Lía Paz
-      </p>
-    </div>
-  </section>
+  <!-- ARTIST STATEMENT / PHILOSOPHY QUOTE (Editable) -->
+  <HomeVisionEditor
+    client:load
+    initialQuote={visionQuote}
+    heroImage={heroImage}
+  />
 
   <!-- 1. FEATURED GALLERY / PORTFOLIO PREVIEW (Sean Layh style: pure visual cards) -->
   <section class="py-20 md:py-28 bg-white border-b border-neutral-200/60">

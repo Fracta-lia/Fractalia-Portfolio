@@ -38,10 +38,37 @@ const currentYear = new Date().getFullYear();
       <a href={`${base}/contact`} class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Contacto</a>
     </div>
 
-    <!-- Copyright -->
-    <p class="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400 pt-4">
-      &copy; {currentYear} Lía Paz. Todos los derechos reservados.
-    </p>
+    <!-- Copyright & Editor Trigger -->
+    <div class="flex items-center justify-center gap-3 pt-4">
+      <p class="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400">
+        &copy; {currentYear} Lía Paz. Todos los derechos reservados.
+      </p>
+      <span class="text-neutral-300">·</span>
+      <button
+        id="toggle-edit-mode"
+        type="button"
+        title="Modo Editor"
+        class="text-[10px] uppercase font-sans tracking-widest text-neutral-400 hover:text-neutral-900 transition-colors flex items-center gap-1 cursor-pointer"
+      >
+        <svg class="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+        <span>Editar</span>
+      </button>
+    </div>
   </div>
 </footer>
+
+<script is:inline>
+  document.getElementById('toggle-edit-mode')?.addEventListener('click', () => {
+    const isEditing = localStorage.getItem('lia_edit_mode') === 'true';
+    if (isEditing) {
+      localStorage.removeItem('lia_edit_mode');
+    } else {
+      localStorage.setItem('lia_edit_mode', 'true');
+    }
+    window.dispatchEvent(new CustomEvent('lia_editor_change'));
+    window.location.reload();
+  });
+</script>
 
