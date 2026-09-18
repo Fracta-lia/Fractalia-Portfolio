@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EditorStore, type PendingDrafts } from './EditorStore';
 import { commitFilesToGitHub, verifyGitHubToken } from '../../utils/github';
 
@@ -24,20 +24,6 @@ export default function SaveBar() {
       setIsEditing(EditorStore.isEditMode());
       setDrafts(EditorStore.getDrafts());
     });
-
-    // Prevent content button navigation during Edit Mode
-    const handleGlobalClick = (e: MouseEvent) => {
-      if (!EditorStore.isEditMode()) return;
-      const target = e.target as HTMLElement;
-      const anchor = target.closest('a');
-      if (anchor) {
-        if (anchor.closest('header') || anchor.closest('nav') || anchor.getAttribute('href')?.startsWith('#')) {
-          return;
-        }
-        e.preventDefault();
-      }
-    };
-    document.addEventListener('click', handleGlobalClick, true);
 
     // Floating pencil hover tracker (zero DOM impact on content elements)
     const handleMouseOver = (e: MouseEvent) => {
@@ -69,7 +55,6 @@ export default function SaveBar() {
     return () => {
       unsubscribe();
       window.removeEventListener('lia_editor_change', handleWindowChange);
-      document.removeEventListener('click', handleGlobalClick, true);
       window.removeEventListener('mouseover', handleMouseOver);
     };
   }, []);
@@ -168,7 +153,7 @@ export default function SaveBar() {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            pencilPos.el.click();
+            pencilPos.el.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));
             setPencilPos(null);
           }}
           style={{
