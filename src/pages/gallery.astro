@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GalleryGrid from '../components/GalleryGrid';
 import { getCollection } from 'astro:content';
+import EditableText from '../components/editor/EditableText';
 
 const rawBase = import.meta.env.BASE_URL ?? '/';
 const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
@@ -31,15 +32,28 @@ const galleryItems = galleryEntries.map(entry => ({
   <!-- Page Header -->
   <section class="py-16 md:py-24 border-b border-neutral-100 bg-neutral-50/50">
     <div class="max-w-4xl mx-auto px-6 text-center">
-      <span class="font-sans text-[11px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-3">
-        Colección & Archivo
-      </span>
-      <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-neutral-900 font-normal tracking-wide">
-        Galería de Obras
-      </h1>
-      <p class="font-sans text-sm sm:text-base text-neutral-500 font-light max-w-xl mx-auto mt-4 leading-relaxed">
-        Colección completa de obras al óleo y técnicas tradicionales. Haz clic sobre cualquier obra para abrirla y consultar su ficha técnica.
-      </p>
+      <EditableText
+        client:load
+        contentKey="gallery.header.label"
+        defaultText="Colección & Archivo"
+        as="span"
+        className="font-sans text-[11px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-3"
+      />
+      <EditableText
+        client:load
+        contentKey="gallery.header.title"
+        defaultText="Galería de Obras"
+        as="h1"
+        className="font-serif text-4xl sm:text-5xl md:text-6xl text-neutral-900 font-normal tracking-wide block"
+      />
+      <EditableText
+        client:load
+        contentKey="gallery.header.desc"
+        defaultText="Colección completa de obras al óleo y técnicas tradicionales. Haz clic sobre cualquier obra para abrirla y consultar su ficha técnica."
+        as="p"
+        className="font-sans text-sm sm:text-base text-neutral-500 font-light max-w-xl mx-auto mt-4 leading-relaxed block"
+        multiline
+      />
     </div>
   </section>
 

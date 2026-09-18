@@ -1,8 +1,10 @@
 ﻿import type { FileChange } from '../../utils/github';
+import initialSiteContent from '../../data/siteContent.json';
 
 const EDIT_MODE_KEY = 'lia_edit_mode';
 const GITHUB_TOKEN_KEY = 'lia_github_token';
 const DRAFTS_KEY = 'lia_pending_drafts';
+const CONTENT_KEY = 'lia_site_content';
 
 export interface PendingDrafts {
   [path: string]: {
@@ -84,6 +86,38 @@ export const EditorStore = {
   clearDrafts() {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(DRAFTS_KEY);
+    localStorage.removeItem(CONTENT_KEY);
+    notify();
+  },
+
+  // Site-wide editable text store
+  getAllContent(): Record<string, string> {
+    if (typeof window === 'undefined') return initialSiteContent as Record<string, string>;
+    try {
+      const saved = localStorage.getItem(CONTENT_KEY);
+      const parsed = saved ? JSON.parse(saved) : {};
+      return { ...(initialSiteContent as Record<string, string>), ...parsed };
+    } catch {
+      return initialSiteContent as Record<string, string>;
+    }
+  },
+
+  getText(key: string, fallback: string): string {
+    const all = this.getAllContent();
+    return all[key] !== undefined ? all[key] : fallback;
+  },
+
+  updateText(key: string, value: string) {
+    if (typeof window === 'undefined') return;
+    const all = this.getAllContent();
+    all[key] = value;
+    localStorage.setItem(CONTENT_KEY, JSON.stringify(all));
+
+    // Save as draft to src/data/siteContent.json
+    this.setDraft('src/data/siteContent.json', {
+      content: JSON.stringify(all, null, 2),
+      label: `Texto: ${key}`,
+    });
     notify();
   },
 

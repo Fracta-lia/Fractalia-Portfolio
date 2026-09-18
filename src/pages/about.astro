@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getEntry } from 'astro:content';
 import AboutEditor from '../components/editor/AboutEditor';
+import EditableText from '../components/editor/EditableText';
 
 const rawBase = import.meta.env.BASE_URL ?? '/';
 const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
@@ -23,12 +24,20 @@ La experiencia del **Wedding Live Painting** nació como una forma orgánica de 
   <!-- Page Header -->
   <section class="py-16 md:py-24 border-b border-neutral-100 bg-neutral-50/50">
     <div class="max-w-4xl mx-auto px-6 text-center">
-      <span class="font-sans text-[11px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-3">
-        Perfil & Trayectoria
-      </span>
-      <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-neutral-900 font-normal tracking-wide">
-        Sobre la Artista
-      </h1>
+      <EditableText
+        client:load
+        contentKey="about.header.label"
+        defaultText="Perfil & Trayectoria"
+        as="span"
+        className="font-sans text-[11px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-3"
+      />
+      <EditableText
+        client:load
+        contentKey="about.header.title"
+        defaultText="Sobre la Artista"
+        as="h1"
+        className="font-serif text-4xl sm:text-5xl md:text-6xl text-neutral-900 font-normal tracking-wide block"
+      />
     </div>
   </section>
 

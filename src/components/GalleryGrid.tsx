@@ -19,7 +19,6 @@ interface GalleryGridProps {
 }
 
 function artworkToMarkdown(item: GalleryItem, order: number): string {
-  // If src is base64 data URL, keep original path or generate proper path
   const imagePath = item.src.startsWith('data:') ? `/images/gallery/${item.id}.webp` : item.src;
   return `---
 title: "${(item.title || '').replace(/"/g, '\\"')}"
@@ -38,6 +37,10 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Drag and Drop state
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // New artwork modal form state
   const [newTitle, setNewTitle] = useState('');
@@ -65,6 +68,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const selectedItem = selectedIndex !== null ? list[selectedIndex] : null;
 
   const handleOpen = (index: number) => {
+    if (draggedIndex !== null) return;
     setSelectedIndex(index);
   };
 
@@ -97,16 +101,41 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     };
   }, [selectedIndex, handleClose, handlePrev, handleNext]);
 
-  // Reordering helpers
-  const handleMove = (index: number, direction: 'up' | 'down', e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= list.length) return;
+  // Drag and Drop handlers
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    if (!isEditing) return;
+    e.dataTransfer.setData('text/plain', index.toString());
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    if (!isEditing || draggedIndex === null) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDragLeave = (_e: React.DragEvent, index: number) => {
+    if (dragOverIndex === index) {
+      setDragOverIndex(null);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    if (!isEditing || draggedIndex === null) return;
+    e.preventDefault();
+    if (draggedIndex === targetIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
 
     const updated = [...list];
-    const temp = updated[index];
-    updated[index] = updated[newIndex];
-    updated[newIndex] = temp;
+    const [movedItem] = updated.splice(draggedIndex, 1);
+    updated.splice(targetIndex, 0, movedItem);
 
     // Recalculate orders 1..N
     const reordered = updated.map((item, idx) => {
@@ -114,12 +143,19 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       const md = artworkToMarkdown(item, order);
       EditorStore.setDraft(`src/content/gallery/${item.id}.md`, {
         content: md,
-        label: `Orden de obra: ${item.title} (#${order})`,
+        label: `Reordenar: ${item.title} (#${order})`,
       });
       return { ...item, order };
     });
 
     setList(reordered);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   // Edit item metadata in modal
@@ -251,7 +287,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         <div className="mb-8 p-4 bg-neutral-50 border border-neutral-200 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs font-sans text-neutral-600">
             <span className="font-semibold text-neutral-900 uppercase tracking-wider">Modo Edición Galería:</span>
-            <span>Usa las flechas ▲ ▼ sobre cada cuadro para reordenar, o haz clic para editar datos.</span>
+            <span>Arrastra cualquier cuadro con el cursor para moverlo de posición, o haz clic para editar su ficha.</span>
           </div>
           <button
             type="button"
@@ -264,16 +300,28 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         </div>
       )}
 
-      {/* CSS Masonry Columns Layout (Sean Layh style) */}
+      {/* CSS Masonry Columns Layout (Sean Layh style with native Drag & Drop) */}
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 md:gap-8 [column-fill:_balance]">
         {list.map((item, index) => (
           <div
             key={item.id || index}
-            className="group relative mb-6 md:mb-8 break-inside-avoid overflow-hidden cursor-pointer bg-neutral-100 transition-all duration-300"
+            draggable={isEditing}
+            onDragStart={(e) => handleDragStart(e, index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDragLeave={(e) => handleDragLeave(e, index)}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+            className={`group relative mb-6 md:mb-8 break-inside-avoid overflow-hidden cursor-pointer bg-neutral-100 transition-all duration-300 ${
+              isEditing ? 'cursor-grab active:cursor-grabbing select-none' : ''
+            } ${
+              draggedIndex === index ? 'opacity-35 scale-95 border-2 border-dashed border-neutral-900' : ''
+            } ${
+              dragOverIndex === index ? 'ring-4 ring-neutral-950 ring-offset-2 scale-[1.015]' : ''
+            }`}
             onClick={() => handleOpen(index)}
           >
             {/* Artwork Image */}
-            <div className="w-full overflow-hidden">
+            <div className="w-full overflow-hidden pointer-events-none">
               <img
                 src={item.src}
                 alt={item.title}
@@ -283,40 +331,19 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               />
             </div>
 
-            {/* In-Situ Reordering Controls Overlay (Edit Mode only) */}
+            {/* Drag & Drop Indicator Overlay (Edit Mode only) */}
             {isEditing && (
-              <div
-                className="absolute inset-x-0 top-0 p-2 bg-gradient-to-b from-black/75 to-transparent flex items-center justify-between text-white"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span className="text-[10px] font-mono bg-black/60 px-2 py-0.5 rounded backdrop-blur-xs font-medium">
-                  #{item.order ?? index + 1}
+              <div className="absolute inset-x-0 top-0 p-2.5 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-between text-white pointer-events-none">
+                <span className="text-[10px] font-mono bg-black/75 px-2 py-0.5 rounded font-medium flex items-center gap-1.5 backdrop-blur-xs">
+                  <svg className="w-3.5 h-3.5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
+                  </svg>
+                  <span>#{item.order ?? index + 1}</span>
                 </span>
 
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    disabled={index === 0}
-                    onClick={(e) => handleMove(index, 'up', e)}
-                    title="Mover antes"
-                    className="p-1.5 bg-black/70 hover:bg-neutral-900 text-white rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    disabled={index === list.length - 1}
-                    onClick={(e) => handleMove(index, 'down', e)}
-                    title="Mover después"
-                    className="p-1.5 bg-black/70 hover:bg-neutral-900 text-white rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                </div>
+                <span className="text-[10px] uppercase font-sans tracking-wider text-neutral-300 bg-black/60 px-2 py-0.5 rounded">
+                  Arrastrar para mover
+                </span>
               </div>
             )}
           </div>
