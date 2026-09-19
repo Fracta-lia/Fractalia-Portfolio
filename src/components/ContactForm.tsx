@@ -26,11 +26,28 @@ export default function ContactForm() {
     setErrorMessage('');
 
     try {
-      // Simulate/Send to Formspree or Email API
-      // When the user provides their Formspree ID or email endpoint, it plugs in here.
-      // Default fallback handles it gracefully.
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+      const response = await fetch('https://formsubmit.co/ajax/liapazart@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          Nombre: formData.name,
+          Email: formData.email,
+          Teléfono: formData.phone || 'No proporcionado',
+          Servicio: formData.service,
+          Fecha_Evento: formData.eventDate || 'No especificada',
+          Mensaje: formData.message,
+          _subject: `Nueva consulta web: ${formData.name} · Lía Paz Art`,
+          _template: 'table',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Hubo un problema al procesar el envío.');
+      }
+
       setStatus('success');
       setFormData({
         name: '',
@@ -38,11 +55,13 @@ export default function ContactForm() {
         phone: '',
         service: 'wedding',
         eventDate: '',
-        message: ''
+        message: '',
       });
-    } catch (err) {
+    } catch (err: any) {
       setStatus('error');
-      setErrorMessage('Hubo un inconveniente al enviar tu mensaje. Por favor intenta de nuevo o contáctame por Instagram.');
+      setErrorMessage(
+        'Hubo un inconveniente al enviar tu mensaje automáticamente. Por favor escribe directamente a liapazart@gmail.com o contáctame por Instagram @fracta.lia.'
+      );
     }
   };
 
