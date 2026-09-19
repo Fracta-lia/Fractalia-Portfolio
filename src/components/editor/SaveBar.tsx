@@ -67,59 +67,92 @@ export default function SaveBar() {
   const handleSave = async () => {
     if (draftCount === 0) {
       setStatusMessage({ text: 'No tienes cambios pendientes por guardar.', type: 'info' });
-      setTimeout(() => setStatusMessage(null), 3500);
+      setTimeout(() => setStatusMessage(null), 3000);
       return;
     }
 
     const token = EditorStore.getGitHubToken() || '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';
+    const changes = Object.values(drafts);
+    const count = changes.length;
+
+    setIsSaving(true);
+    setStatusMessage({ text: 'Guardando y sincronizando cambios...', type: 'info' });
+
+    const isLocalHost =
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.startsWith('192.168.') ||
+        window.location.hostname.startsWith('10.') ||
+        window.location.hostname.endsWith('.local'));
+
+    let gitHubSuccess = false;
+    let localDiskSuccess = false;
+    let errorMessage = '';
 
     try {
-      setIsSaving(true);
-      setStatusMessage({ text: 'Guardando y publicando cambios...', type: 'info' });
+      // 1. Commit to GitHub FIRST while the page and network are 100% idle
+      try {
+        const result = await commitFilesToGitHub({
+          token,
+          message: `Actualización de contenido por Lía (${count} cambio${count > 1 ? 's' : ''})`,
+          changes,
+        });
+        if (result.success) {
+          gitHubSuccess = true;
+        } else {
+          errorMessage = result.error || 'No se pudo conectar con GitHub.';
+        }
+      } catch (ghErr: any) {
+        errorMessage = ghErr?.message || 'Error de conexión con GitHub.';
+      }
 
-      // If running in development (localhost or LAN IP), write directly to local disk
-      const isLocalHost =
-        typeof window !== 'undefined' &&
-        (window.location.hostname === 'localhost' ||
-          window.location.hostname === '127.0.0.1' ||
-          window.location.hostname.startsWith('192.168.') ||
-          window.location.hostname.startsWith('10.') ||
-          window.location.hostname.endsWith('.local'));
-
+      // 2. If running in development (localhost or LAN IP), write to local disk
       if (isLocalHost) {
         try {
-          await fetch('/api/save-local', {
+          const localRes = await fetch('/api/save-local', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ changes: Object.values(drafts) }),
+            body: JSON.stringify({ changes }),
           });
+          if (localRes.ok) {
+            localDiskSuccess = true;
+          }
         } catch (localErr) {
           console.warn('Local disk sync notice:', localErr);
         }
       }
 
-      // Publish to GitHub remote repository
-      const result = await commitFilesToGitHub({
-        token,
-        message: `Actualización de contenido por Lía (${draftCount} cambio${draftCount > 1 ? 's' : ''})`,
-        changes: Object.values(drafts),
-      });
+      // In local dev, operation succeeds if either local disk or GitHub succeeded!
+      const isSaved = isLocalHost ? (localDiskSuccess || gitHubSuccess) : gitHubSuccess;
 
-      if (!result.success) {
-        throw new Error(result.error);
+      if (!isSaved) {
+        throw new Error(errorMessage || 'No se pudieron guardar los cambios.');
       }
 
+      // 3. Clear drafts immediately so the UI counter drops to 0 instantly
       EditorStore.clearDrafts();
+      setDrafts({});
+
+      let msg = '¡Cambios guardados con éxito!';
+      if (isLocalHost && gitHubSuccess && localDiskSuccess) {
+        msg = '¡Cambios guardados en tu equipo y sincronizados con GitHub!';
+      } else if (isLocalHost && localDiskSuccess && !gitHubSuccess) {
+        msg = 'Cambios guardados en tu equipo localmente.';
+      }
+
       setStatusMessage({
-        text: '¡Cambios guardados con éxito! Tu web se actualizó correctamente.',
+        text: msg,
         type: 'success',
       });
+
+      // 4. Smooth reload after green confirmation
       setTimeout(() => {
         window.location.reload();
-      }, 1500);
+      }, 1200);
     } catch (err: any) {
-      setStatusMessage({ text: err.message || 'Error al guardar en GitHub', type: 'error' });
-      setTimeout(() => setStatusMessage(null), 6000);
+      setStatusMessage({ text: err.message || 'Error al guardar cambios', type: 'error' });
+      setTimeout(() => setStatusMessage(null), 5000);
     } finally {
       setIsSaving(false);
     }
@@ -193,19 +226,25 @@ export default function SaveBar() {
         </button>
       )}
 
-      {/* Toast Notification */}
+      {/* Status Toast */}
       {statusMessage && (
         <div
-          className={`fixed top-6 right-6 z-[100] px-5 py-3.5 shadow-2xl rounded-sm border text-xs font-sans tracking-wide transition-all animate-fade-in flex items-center gap-3 ${
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-2xl text-xs sm:text-sm font-sans flex items-center gap-2.5 animate-bounce-in border backdrop-blur-md ${
             statusMessage.type === 'success'
-              ? 'bg-neutral-900 text-white border-neutral-700'
+              ? 'bg-neutral-900/95 text-white border-emerald-500/50 shadow-emerald-950/20'
               : statusMessage.type === 'error'
-              ? 'bg-rose-950 text-rose-100 border-rose-800'
-              : 'bg-neutral-900 text-neutral-100 border-neutral-700'
+              ? 'bg-neutral-900/95 text-rose-200 border-rose-500/50 shadow-rose-950/20'
+              : 'bg-neutral-900/95 text-neutral-100 border-neutral-700/80 shadow-black/30'
           }`}
         >
-          {statusMessage.type === 'success' && <span className="text-emerald-400 font-bold">✓</span>}
-          {statusMessage.type === 'error' && <span className="text-rose-400 font-bold">✕</span>}
+          {statusMessage.type === 'success' && <span className="text-emerald-400 font-bold text-base">✓</span>}
+          {statusMessage.type === 'error' && <span className="text-rose-400 font-bold text-base">✕</span>}
+          {statusMessage.type === 'info' && (
+            <svg className="animate-spin h-3.5 w-3.5 text-neutral-400" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+          )}
           <span>{statusMessage.text}</span>
         </div>
       )}
@@ -226,14 +265,19 @@ export default function SaveBar() {
 
           {/* Pending Changes Badge */}
           <div className="text-[11px] sm:text-xs font-sans text-neutral-300 truncate">
-            {draftCount === 0 ? (
-              <span className="text-neutral-400 text-[11px] sm:text-xs">Sin cambios</span>
+            {isSaving ? (
+              <span className="text-amber-300 font-medium flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
+                <span>Guardando...</span>
+              </span>
+            ) : draftCount === 0 ? (
+              <span className="text-neutral-400 text-[11px] sm:text-xs">Todo al día</span>
             ) : (
               <span className="font-medium text-white">
-                <span className="inline-block px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] sm:text-[11px] mr-1">
+                <span className="inline-block px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] sm:text-[11px] mr-1 font-mono font-semibold">
                   {draftCount}
                 </span>
-                <span className="hidden sm:inline">cambio{draftCount > 1 ? 's' : ''} listo{draftCount > 1 ? 's' : ''}</span>
+                <span className="hidden sm:inline">cambio{draftCount > 1 ? 's' : ''} pendiente{draftCount > 1 ? 's' : ''}</span>
                 <span className="sm:hidden">cambio{draftCount > 1 ? 's' : ''}</span>
               </span>
             )}

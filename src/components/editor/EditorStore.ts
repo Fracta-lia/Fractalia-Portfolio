@@ -17,6 +17,8 @@ export interface PendingDrafts {
 }
 
 let listeners: Array<() => void> = [];
+let memoryDrafts: PendingDrafts = {};
+let sessionPreviews: Record<string, string> = {};
 
 function notify() {
   listeners.forEach((l) => l());
@@ -65,32 +67,56 @@ export const EditorStore = {
     if (typeof window === 'undefined') return {};
     try {
       const data = localStorage.getItem(DRAFTS_KEY);
-      return data ? JSON.parse(data) : {};
+      const parsed = data ? JSON.parse(data) : {};
+      return { ...parsed, ...memoryDrafts };
     } catch {
-      return {};
+      return { ...memoryDrafts };
     }
   },
 
   setDraft(path: string, draft: { content?: string; encoding?: 'utf-8' | 'base64'; delete?: boolean; label?: string }) {
     if (typeof window === 'undefined') return;
-    const drafts = this.getDrafts();
-    drafts[path] = { path, ...draft };
-    localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+    memoryDrafts[path] = { path, ...draft };
+
+    try {
+      localStorage.setItem(DRAFTS_KEY, JSON.stringify(memoryDrafts));
+    } catch (quotaErr) {
+      console.warn('LocalStorage quota warning (draft preserved in memory):', quotaErr);
+      try {
+        // Strip out large base64 strings from localStorage fallback so it never throws QuotaExceededError
+        const lightweight: PendingDrafts = {};
+        for (const k in memoryDrafts) {
+          lightweight[k] = {
+            ...memoryDrafts[k],
+            content: memoryDrafts[k].encoding === 'base64' ? '' : memoryDrafts[k].content,
+          };
+        }
+        localStorage.setItem(DRAFTS_KEY, JSON.stringify(lightweight));
+      } catch {}
+    }
     notify();
   },
 
   removeDraft(path: string) {
     if (typeof window === 'undefined') return;
-    const drafts = this.getDrafts();
-    delete drafts[path];
-    localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+    delete memoryDrafts[path];
+    try {
+      const drafts = this.getDrafts();
+      delete drafts[path];
+      localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+    } catch {}
     notify();
   },
 
   clearDrafts() {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(DRAFTS_KEY);
-    localStorage.removeItem(CONTENT_KEY);
+    memoryDrafts = {};
+    sessionPreviews = {};
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(DRAFTS_KEY);
+        localStorage.removeItem(CONTENT_KEY);
+      } catch {}
+    }
     notify();
   },
 
@@ -112,6 +138,7 @@ export const EditorStore = {
   },
 
   getImage(key: string, fallback: string): string {
+    if (sessionPreviews[key]) return sessionPreviews[key];
     const all = this.getAllContent();
     return all[key] !== undefined ? all[key] : fallback;
   },
@@ -120,7 +147,11 @@ export const EditorStore = {
     if (typeof window === 'undefined') return;
     const all = this.getAllContent();
     all[key] = value;
-    localStorage.setItem(CONTENT_KEY, JSON.stringify(all));
+    try {
+      localStorage.setItem(CONTENT_KEY, JSON.stringify(all));
+    } catch (e) {
+      console.warn('LocalStorage save error:', e);
+    }
 
     // Save as draft to src/data/siteContent.json
     this.setDraft('src/data/siteContent.json', {
@@ -136,10 +167,19 @@ export const EditorStore = {
     fileData?: { base64: string; targetPath: string; localPreviewUrl?: string; label?: string }
   ) {
     if (typeof window === 'undefined') return;
+    
+    // Store preview in memory
+    if (fileData?.localPreviewUrl) {
+      sessionPreviews[key] = fileData.localPreviewUrl;
+    }
+
     const all = this.getAllContent();
-    // Use localPreviewUrl for instant reactive display during session
-    all[key] = fileData?.localPreviewUrl || imagePath;
-    localStorage.setItem(CONTENT_KEY, JSON.stringify(all));
+    all[key] = imagePath; // Keep only the relative path in localStorage, preventing quota exceeded
+    try {
+      localStorage.setItem(CONTENT_KEY, JSON.stringify(all));
+    } catch (e) {
+      console.warn('LocalStorage image content error:', e);
+    }
 
     // If there is an uploaded binary file, register the draft
     if (fileData?.base64 && fileData.targetPath) {
@@ -151,10 +191,8 @@ export const EditorStore = {
     }
 
     // Save relative image path into src/data/siteContent.json for git commit
-    const repoContent = { ...this.getAllContent() };
-    repoContent[key] = imagePath;
     this.setDraft('src/data/siteContent.json', {
-      content: JSON.stringify(repoContent, null, 2),
+      content: JSON.stringify(all, null, 2),
       label: `Imagen: ${key}`,
     });
     notify();

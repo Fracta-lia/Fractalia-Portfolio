@@ -256,11 +256,13 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     // Recalculate orders 1..N
     const reordered = updated.map((item, idx) => {
       const order = idx + 1;
-      const md = artworkToMarkdown(item, order);
-      EditorStore.setDraft(`src/content/gallery/${item.id}.md`, {
-        content: md,
-        label: `Reordenar: ${item.title} (#${order})`,
-      });
+      if (item.order !== order) {
+        const md = artworkToMarkdown(item, order);
+        EditorStore.setDraft(`src/content/gallery/${item.id}.md`, {
+          content: md,
+          label: `Reordenar: ${item.title} (#${order})`,
+        });
+      }
       return { ...item, order };
     });
 
@@ -332,11 +334,13 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     // Recalculate remaining orders
     const reordered = updated.map((item, idx) => {
       const order = idx + 1;
-      const md = artworkToMarkdown(item, order);
-      EditorStore.setDraft(`src/content/gallery/${item.id}.md`, {
-        content: md,
-        label: `Reordenar: ${item.title}`,
-      });
+      if (item.order !== order) {
+        const md = artworkToMarkdown(item, order);
+        EditorStore.setDraft(`src/content/gallery/${item.id}.md`, {
+          content: md,
+          label: `Reordenar: ${item.title}`,
+        });
+      }
       return { ...item, order };
     });
 
