@@ -49,37 +49,86 @@ const currentYear = new Date().getFullYear();
       <a href={`${base}/contact`} class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Contacto</a>
     </div>
 
-    <!-- Copyright & Editor Trigger -->
+    <!-- Copyright & Discreet Editor Trigger -->
     <div class="flex items-center justify-center gap-3 pt-4">
-      <p class="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400">
+      <p id="footer-copyright" class="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400 select-none cursor-default" title="© Lía Paz">
         &copy; {currentYear} Lía Paz. Todos los derechos reservados.
       </p>
-      <span class="text-neutral-300">·</span>
+      <span id="footer-separator" class="text-neutral-300 hidden">·</span>
       <button
         id="toggle-edit-mode"
         type="button"
         title="Modo Editor"
-        class="text-[10px] uppercase font-sans tracking-widest text-neutral-400 hover:text-neutral-900 transition-colors flex items-center gap-1 cursor-pointer"
+        class="hidden text-[10px] uppercase font-sans tracking-widest text-neutral-400 hover:text-neutral-900 transition-colors items-center gap-1 cursor-pointer"
       >
         <svg class="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
         </svg>
-        <span>Editar</span>
+        <span id="edit-btn-label">Salir de Edición</span>
       </button>
     </div>
   </div>
 </footer>
 
 <script is:inline>
-  document.getElementById('toggle-edit-mode')?.addEventListener('click', () => {
-    const isEditing = localStorage.getItem('lia_edit_mode') === 'true';
-    if (isEditing) {
-      localStorage.removeItem('lia_edit_mode');
-    } else {
-      localStorage.setItem('lia_edit_mode', 'true');
-    }
-    window.dispatchEvent(new CustomEvent('lia_editor_change'));
-    window.location.reload();
-  });
+  (function() {
+    const editBtn = document.getElementById('toggle-edit-mode');
+    const editLabel = document.getElementById('edit-btn-label');
+    const separator = document.getElementById('footer-separator');
+    const copyrightEl = document.getElementById('footer-copyright');
+
+    const checkEditState = () => {
+      const urlHasEdit = window.location.search.includes('edit=true');
+      const isEditing = localStorage.getItem('lia_edit_mode') === 'true' || urlHasEdit;
+      if (isEditing) {
+        editBtn?.classList.remove('hidden');
+        editBtn?.classList.add('flex');
+        separator?.classList.remove('hidden');
+        if (editLabel) editLabel.textContent = 'Salir de Edición';
+      } else {
+        editBtn?.classList.add('hidden');
+        editBtn?.classList.remove('flex');
+        separator?.classList.add('hidden');
+      }
+    };
+
+    checkEditState();
+
+    editBtn?.addEventListener('click', () => {
+      const active = localStorage.getItem('lia_edit_mode') === 'true' || window.location.search.includes('edit=true');
+      if (active) {
+        localStorage.removeItem('lia_edit_mode');
+        // Remove ?edit from URL if present
+        const url = new URL(window.location.href);
+        url.searchParams.delete('edit');
+        window.location.href = url.pathname + (url.search ? url.search : '');
+      } else {
+        localStorage.setItem('lia_edit_mode', 'true');
+        window.location.reload();
+      }
+    });
+
+    // Secret shortcut: Triple-clicking the copyright triggers edit mode
+    let clickCount = 0;
+    let clickTimer = null;
+    copyrightEl?.addEventListener('click', () => {
+      clickCount++;
+      clearTimeout(clickTimer);
+      if (clickCount >= 3) {
+        clickCount = 0;
+        const active = localStorage.getItem('lia_edit_mode') === 'true';
+        if (active) {
+          localStorage.removeItem('lia_edit_mode');
+        } else {
+          localStorage.setItem('lia_edit_mode', 'true');
+        }
+        window.location.reload();
+      } else {
+        clickTimer = setTimeout(() => {
+          clickCount = 0;
+        }, 500);
+      }
+    });
+  })();
 </script>
 

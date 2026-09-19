@@ -71,13 +71,6 @@ export default function SaveBar() {
       return;
     }
 
-    const token = EditorStore.getGitHubToken() || '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';
-    const changes = Object.values(drafts);
-    const count = changes.length;
-
-    setIsSaving(true);
-    setStatusMessage({ text: 'Guardando y sincronizando cambios...', type: 'info' });
-
     const isLocalHost =
       typeof window !== 'undefined' &&
       (window.location.hostname === 'localhost' ||
@@ -86,25 +79,41 @@ export default function SaveBar() {
         window.location.hostname.startsWith('10.') ||
         window.location.hostname.endsWith('.local'));
 
+    const token = EditorStore.getGitHubToken();
+
+    if (!token && !isLocalHost) {
+      setShowTokenModal(true);
+      setStatusMessage({ text: 'Por favor ingresa tu token de GitHub para guardar los cambios.', type: 'error' });
+      return;
+    }
+
+    const changes = Object.values(drafts);
+    const count = changes.length;
+
+    setIsSaving(true);
+    setStatusMessage({ text: 'Guardando y sincronizando cambios...', type: 'info' });
+
     let gitHubSuccess = false;
     let localDiskSuccess = false;
     let errorMessage = '';
 
     try {
-      // 1. Commit to GitHub FIRST while the page and network are 100% idle
-      try {
-        const result = await commitFilesToGitHub({
-          token,
-          message: `Actualización de contenido por Lía (${count} cambio${count > 1 ? 's' : ''})`,
-          changes,
-        });
-        if (result.success) {
-          gitHubSuccess = true;
-        } else {
-          errorMessage = result.error || 'No se pudo conectar con GitHub.';
+      // 1. Commit to GitHub FIRST if token is configured
+      if (token) {
+        try {
+          const result = await commitFilesToGitHub({
+            token,
+            message: `Actualización de contenido por Lía (${count} cambio${count > 1 ? 's' : ''})`,
+            changes,
+          });
+          if (result.success) {
+            gitHubSuccess = true;
+          } else {
+            errorMessage = result.error || 'No se pudo conectar con GitHub.';
+          }
+        } catch (ghErr: any) {
+          errorMessage = ghErr?.message || 'Error de conexión con GitHub.';
         }
-      } catch (ghErr: any) {
-        errorMessage = ghErr?.message || 'Error de conexión con GitHub.';
       }
 
       // 2. If running in development (localhost or LAN IP), write to local disk

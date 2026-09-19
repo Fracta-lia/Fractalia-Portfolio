@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const rawBase = import.meta.env.BASE_URL ?? '/';
+const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
+---
+
+<BaseLayout
+  title="404 · Página no encontrada | Lía Paz"
+  description="La página que buscas no existe o ha cambiado de dirección."
+>
+  <section class="min-h-[70vh] flex items-center justify-center px-6 py-20 bg-neutral-50/50">
+    <div class="max-w-xl mx-auto text-center space-y-6">
+      <span class="inline-block text-[11px] font-sans tracking-[0.3em] uppercase text-neutral-400 font-medium">
+        Error 404 · Sala Inexistente
+      </span>
+
+      <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-neutral-900 font-normal leading-tight">
+        Esta obra no se encuentra aquí
+      </h1>
+
+      <p class="font-sans text-sm text-neutral-500 max-w-md mx-auto leading-relaxed font-light">
+        La página o pieza que intentas consultar ha sido reubicada o el enlace no es el correcto. Te invitamos a continuar descubriendo la colección.
+      </p>
+
+      <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href={`${base}/gallery`}
+          class="w-full sm:w-auto px-8 py-3.5 bg-neutral-900 text-white text-xs font-sans uppercase tracking-[0.2em] font-medium hover:bg-neutral-800 transition-all rounded-sm shadow-sm"
+        >
+          Explorar Galería
+        </a>
+        <a
+          href={`${base}/`}
+          class="w-full sm:w-auto px-8 py-3.5 border border-neutral-300 text-neutral-700 text-xs font-sans uppercase tracking-[0.2em] font-medium hover:border-neutral-900 hover:text-neutral-900 transition-all rounded-sm"
+        >
+          Volver al Inicio
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
