@@ -454,16 +454,12 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
             {/* Drag & Drop Indicator Overlay (Edit Mode only) */}
             {isEditing && (
-              <div className="absolute inset-x-0 top-0 p-2.5 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-between text-white pointer-events-none">
-                <span className="text-[10px] font-mono bg-black/75 px-2 py-0.5 rounded font-medium flex items-center gap-1.5 backdrop-blur-xs">
+              <div className="absolute inset-x-0 top-0 p-2.5 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-end text-white pointer-events-none">
+                <span className="text-[10px] uppercase font-sans tracking-wider text-neutral-200 bg-black/70 px-2.5 py-1 rounded flex items-center gap-1.5 backdrop-blur-xs">
                   <svg className="w-3.5 h-3.5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
                   </svg>
-                  <span>#{item.order ?? index + 1}</span>
-                </span>
-
-                <span className="text-[10px] uppercase font-sans tracking-wider text-neutral-300 bg-black/60 px-2 py-0.5 rounded">
-                  Arrastrar para mover
+                  <span>Arrastrar para mover</span>
                 </span>
               </div>
             )}
@@ -593,11 +589,6 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 </div>
 
                 <div className="space-y-3 pt-4 border-t border-neutral-100 text-sm font-sans">
-                  <div className="flex justify-between items-center py-1 border-b border-neutral-100">
-                    <span className="text-neutral-400 uppercase text-xs tracking-wider">Artista</span>
-                    <span className="text-neutral-900 font-medium">Lía Paz</span>
-                  </div>
-
                   {/* Technique */}
                   <div className="flex justify-between items-center py-1 border-b border-neutral-100">
                     <span className="text-neutral-400 uppercase text-xs tracking-wider">Técnica</span>
@@ -627,21 +618,6 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                       <span className="text-neutral-900">{selectedItem.year}</span>
                     )}
                   </div>
-
-                  {/* Order Number (Editable in Edit Mode) */}
-                  {isEditing && (
-                    <div className="flex justify-between items-center py-1 border-b border-neutral-100">
-                      <span className="text-neutral-400 uppercase text-xs tracking-wider">Posición #</span>
-                      <input
-                        type="number"
-                        min="1"
-                        max={list.length}
-                        value={selectedItem.order ?? selectedIndex + 1}
-                        onChange={(e) => handleUpdateItemField('order', parseInt(e.target.value, 10) || 1)}
-                        className="text-right text-xs font-mono w-16 border-b border-neutral-300 focus:border-neutral-900 pb-0.5 focus:outline-none text-neutral-900 font-semibold"
-                      />
-                    </div>
-                  )}
 
                   <div className="flex justify-between py-1">
                     <span className="text-neutral-400 uppercase text-xs tracking-wider">Tipo</span>
