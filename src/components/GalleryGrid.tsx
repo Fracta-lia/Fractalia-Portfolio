@@ -599,7 +599,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                       src={prevItem.src}
                       alt={prevItem.title}
                       draggable={false}
-                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl pointer-events-none select-none opacity-50 transition-opacity duration-300"
+                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl pointer-events-none select-none"
                     />
                   )}
                 </div>
@@ -623,7 +623,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                       src={nextItem.src}
                       alt={nextItem.title}
                       draggable={false}
-                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl pointer-events-none select-none opacity-50 transition-opacity duration-300"
+                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl pointer-events-none select-none"
                     />
                   )}
                 </div>
