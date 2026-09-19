@@ -1,9 +1,9 @@
 ---
 title: "Dolomitas"
-technique: "pastel"
+technique: "Pastel"
 year: "2026"
 image: "/images/gallery/dolomitas.webp"
-width: 2400
-height: 2400
+width: 3565
+height: 2625
 order: 10
 ---

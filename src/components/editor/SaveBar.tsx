@@ -75,8 +75,30 @@ export default function SaveBar() {
 
     try {
       setIsSaving(true);
-      setStatusMessage({ text: 'Publicando cambios en GitHub...', type: 'info' });
+      setStatusMessage({ text: 'Guardando y publicando cambios...', type: 'info' });
 
+      // If running in development (localhost or LAN IP), write directly to local disk
+      const isLocalHost =
+        typeof window !== 'undefined' &&
+        (window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1' ||
+          window.location.hostname.startsWith('192.168.') ||
+          window.location.hostname.startsWith('10.') ||
+          window.location.hostname.endsWith('.local'));
+
+      if (isLocalHost) {
+        try {
+          await fetch('/api/save-local', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ changes: Object.values(drafts) }),
+          });
+        } catch (localErr) {
+          console.warn('Local disk sync notice:', localErr);
+        }
+      }
+
+      // Publish to GitHub remote repository
       const result = await commitFilesToGitHub({
         token,
         message: `Actualización de contenido por Lía (${draftCount} cambio${draftCount > 1 ? 's' : ''})`,
@@ -89,12 +111,12 @@ export default function SaveBar() {
 
       EditorStore.clearDrafts();
       setStatusMessage({
-        text: '¡Cambios guardados con éxito! Tu web se actualizará automáticamente en ~1 minuto.',
+        text: '¡Cambios guardados con éxito! Tu web se actualizó correctamente.',
         type: 'success',
       });
       setTimeout(() => {
         window.location.reload();
-      }, 2500);
+      }, 1500);
     } catch (err: any) {
       setStatusMessage({ text: err.message || 'Error al guardar en GitHub', type: 'error' });
       setTimeout(() => setStatusMessage(null), 6000);

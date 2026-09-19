@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { EditorStore } from './editor/EditorStore';
+import { processImageFile, type ProcessedImage } from '../utils/imageProcess';
 
 export interface GalleryItem {
   id: string;
@@ -19,7 +20,10 @@ interface GalleryGridProps {
 }
 
 function artworkToMarkdown(item: GalleryItem, order: number): string {
-  const imagePath = item.src.startsWith('data:') ? `/images/gallery/${item.id}.webp` : item.src;
+  let imagePath = item.src;
+  if (item.src.startsWith('data:')) {
+    imagePath = `/images/gallery/${item.id}.webp`;
+  }
   return `---
 title: "${(item.title || '').replace(/"/g, '\\"')}"
 technique: "${(item.technique || 'Óleo sobre lienzo').replace(/"/g, '\\"')}"
@@ -47,6 +51,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const [newTechnique, setNewTechnique] = useState('Óleo sobre lienzo');
   const [newYear, setNewYear] = useState(new Date().getFullYear().toString());
   const [newImageDataUrl, setNewImageDataUrl] = useState<string | null>(null);
+  const [newProcessedImage, setNewProcessedImage] = useState<ProcessedImage | null>(null);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
@@ -283,26 +289,28 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   };
 
   // Replace image in modal
-  const handleReplaceImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleReplaceImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || selectedIndex === null || !selectedItem) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      const base64Data = result.split(',')[1];
-      const imagePath = `public/images/gallery/${selectedItem.id}.webp`;
+    try {
+      const processed = await processImageFile(file);
+      const ext = processed.extension;
+      const imagePath = `public/images/gallery/${selectedItem.id}.${ext}`;
 
-      // Update in drafts
       EditorStore.setDraft(imagePath, {
-        content: base64Data,
+        content: processed.base64,
         encoding: 'base64',
         label: `Nueva imagen para: ${selectedItem.title}`,
       });
 
-      handleUpdateItemField('src', result);
-    };
-    reader.readAsDataURL(file);
+      handleUpdateItemField('src', processed.dataUrl);
+      handleUpdateItemField('width', processed.width);
+      handleUpdateItemField('height', processed.height);
+      handleUpdateItemField('aspectRatio', processed.aspectRatio);
+    } catch (err: any) {
+      alert(err?.message || 'Error al procesar la imagen seleccionada.');
+    }
   };
 
   // Delete item
@@ -352,22 +360,26 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
     const id = slug || `obra-${Date.now()}`;
     const nextOrder = list.length + 1;
-    const imagePath = `/images/gallery/${id}.webp`;
+    const ext = newProcessedImage?.extension || 'webp';
+    const imagePath = `/images/gallery/${id}.${ext}`;
+    const width = newProcessedImage?.width || 2000;
+    const height = newProcessedImage?.height || 2000;
+    const aspectRatio = newProcessedImage?.aspectRatio || width / height;
 
     const newItem: GalleryItem = {
       id,
       title: newTitle.trim(),
       technique: newTechnique.trim() || 'Óleo sobre lienzo',
       year: newYear.trim() || new Date().getFullYear().toString(),
-      src: newImageDataUrl,
-      width: 2400,
-      height: 2400,
-      aspectRatio: 1,
+      src: newProcessedImage?.dataUrl || newImageDataUrl,
+      width,
+      height,
+      aspectRatio,
       order: nextOrder,
     };
 
-    // Save image draft
-    const base64Data = newImageDataUrl.split(',')[1];
+    // Save image draft with true WebP content
+    const base64Data = newProcessedImage?.base64 || newImageDataUrl.split(',')[1];
     EditorStore.setDraft(`public${imagePath}`, {
       content: base64Data,
       encoding: 'base64',
@@ -385,6 +397,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setShowAddModal(false);
     setNewTitle('');
     setNewImageDataUrl(null);
+    setNewProcessedImage(null);
     setNewImageFile(null);
   };
 
@@ -708,10 +721,15 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   Fotografía de la Obra *
                 </label>
                 <div
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => !isProcessingImage && fileInputRef.current?.click()}
                   className="border-2 border-dashed border-neutral-300 hover:border-neutral-900 rounded-sm p-6 text-center cursor-pointer transition-colors bg-neutral-50"
                 >
-                  {newImageDataUrl ? (
+                  {isProcessingImage ? (
+                    <div className="py-8 space-y-2 text-neutral-500">
+                      <div className="w-6 h-6 border-2 border-neutral-400 border-t-neutral-900 rounded-full animate-spin mx-auto"></div>
+                      <span className="text-xs">Optimizando imagen...</span>
+                    </div>
+                  ) : newImageDataUrl ? (
                     <div className="space-y-2">
                       <img
                         src={newImageDataUrl}
@@ -732,13 +750,22 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   <input
                     type="file"
                     ref={fileInputRef}
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
                       setNewImageFile(file);
-                      const reader = new FileReader();
-                      reader.onload = () => setNewImageDataUrl(reader.result as string);
-                      reader.readAsDataURL(file);
+                      setIsProcessingImage(true);
+                      try {
+                        const processed = await processImageFile(file);
+                        setNewProcessedImage(processed);
+                        setNewImageDataUrl(processed.dataUrl);
+                      } catch (err: any) {
+                        const reader = new FileReader();
+                        reader.onload = () => setNewImageDataUrl(reader.result as string);
+                        reader.readAsDataURL(file);
+                      } finally {
+                        setIsProcessingImage(false);
+                      }
                     }}
                     accept="image/*"
                     className="hidden"
