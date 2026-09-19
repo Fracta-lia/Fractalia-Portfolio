@@ -1,4 +1,4 @@
-﻿export interface FileChange {
+export interface FileChange {
   path: string;
   content?: string; // utf-8 or base64
   encoding?: 'utf-8' | 'base64';
@@ -14,8 +14,8 @@ export interface CommitOptions {
   changes: FileChange[];
 }
 
-const DEFAULT_OWNER = 'MiguelAyala25';
-const DEFAULT_REPO = 'PaginaL-a';
+const DEFAULT_OWNER = 'Fracta-lia';
+const DEFAULT_REPO = 'Fractalia-Portfolio';
 const DEFAULT_BRANCH = 'master';
 
 export async function verifyGitHubToken(token: string, owner = DEFAULT_OWNER, repo = DEFAULT_REPO): Promise<{ success: boolean; error?: string; username?: string }> {
