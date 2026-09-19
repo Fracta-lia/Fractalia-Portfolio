@@ -73,7 +73,12 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      filter: (page) => !page.includes('/404'),
+    }),
+  ],
 
   vite: {
     plugins: [tailwindcss(), localDevSavePlugin()]

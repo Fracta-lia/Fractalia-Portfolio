@@ -15,11 +15,28 @@ const bio = aboutEntry?.body ?? `Hola, soy **Lía Paz**. Mi pasión reside en tr
 A lo largo de mi trayectoria he explorado diversas disciplinas plásticas, consolidando mi enfoque en la pintura figurativa contemporánea, el estudio anatómico y la captura de instantes fugaces en vivo.
 
 La experiencia del **Wedding Live Painting** nació como una forma orgánica de unir la celebración más significativa de una pareja con el proceso alquímico de la pintura en tiempo real. Ver cómo una obra evoluciona frente a los ojos de los novios e invitados transforma el evento en un recuerdo tangible que perdurará por generaciones.`;
+
+const siteUrl = 'https://fractalia.art';
+const aboutSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  '@id': `${siteUrl}/about#webpage`,
+  url: `${siteUrl}/about`,
+  name: 'Sobre Lía Paz · Biografía y Trayectoria Artística',
+  description: 'Biografía, trayectoria y filosofía pictórica de la artista visual mexicana Lía Paz.',
+  isPartOf: { '@id': `${siteUrl}/#website` },
+  mainEntity: { '@id': `${siteUrl}/#artist` },
+  inLanguage: 'es-MX',
+};
 ---
 
 <BaseLayout
-  title="Sobre Lía Paz · Biografía & Filosofía Artística"
-  description="Conoce más sobre Lía Paz, artista visual y pintora especializada en live paintings de bodas y retratos clásicos contemporáneos."
+  title="Sobre Lía Paz · Biografía y Filosofía Artística | Fractalia"
+  description="Conoce la trayectoria, visión plástica y filosofía de la artista visual Lía Paz (Fractalia). Pintura figurativa contemporánea y el arte de inmortalizar instantes."
+  image={portrait}
+  imageAlt="Retrato de la artista visual Lía Paz"
+  ogType="profile"
+  jsonLd={aboutSchema}
 >
   <!-- Page Header -->
   <section class="py-12 sm:py-16 md:py-24 border-b border-neutral-100 bg-neutral-50/50">

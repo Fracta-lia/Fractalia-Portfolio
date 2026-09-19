@@ -8,17 +8,71 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
+  ogType?: 'website' | 'profile' | 'article';
+  noindex?: boolean;
+  jsonLd?: Record<string, any> | Array<Record<string, any>>;
 }
 
 const {
-  title = 'Lía Paz · Fine Art & Live Paintings',
-  description = 'Obra pictórica, live painting para bodas y retratos personalizados por la artista visual Lía Paz.',
-  image = '/images/hero/hero-main.svg'
+  title = 'Lía Paz · Fine Art & Live Wedding Paintings | Fractalia',
+  description = 'Portafolio de la artista visual Lía Paz (Fractalia). Pintura al óleo figurativa, live wedding paintings para bodas y retratos personalizados por encargo.',
+  image = '/images/gallery/mares-de-silencio.webp',
+  imageAlt = 'Lía Paz · Arte Visual & Live Painting',
+  ogType = 'website',
+  noindex = false,
+  jsonLd,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
-const siteUrl = Astro.site ? Astro.site.toString() : 'https://fractalia.art';
-const canonicalURL = new URL(currentPath, siteUrl);
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://fractalia.art';
+const cleanPath = currentPath.replace(/\/$/, '') || '/';
+const canonicalURL = cleanPath === '/' ? `${siteUrl}/` : `${siteUrl}${cleanPath}`;
+const absoluteImage = image.startsWith('http') ? image : `${siteUrl}${image.startsWith('/') ? '' : '/'}${image}`;
+
+// Global Base Structured Data: VisualArtist + WebSite
+const defaultArtistSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['Person', 'VisualArtist'],
+  '@id': `${siteUrl}/#artist`,
+  name: 'Lía Paz',
+  alternateName: ['Fractalia', 'Lía Paz Art', 'Lia Paz'],
+  url: `${siteUrl}/`,
+  image: `${siteUrl}/images/about/lia-paz.webp`,
+  description: 'Artista visual mexicana especializada en pintura al óleo figurativa contemporánea, live wedding paintings para bodas y retratos por encargo.',
+  jobTitle: 'Artista Visual & Pintora en Vivo',
+  sameAs: ['https://www.instagram.com/fracta.lia/'],
+  email: 'mailto:liapazart@gmail.com',
+  knowsAbout: [
+    'Pintura al óleo',
+    'Live Wedding Painting',
+    'Retratos al óleo personalizados',
+    'Arte contemporáneo',
+    'Bellas artes'
+  ],
+  homeLocation: {
+    '@type': 'Place',
+    name: 'México'
+  }
+};
+
+const defaultWebSiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${siteUrl}/#website`,
+  url: `${siteUrl}/`,
+  name: 'Lía Paz · Fine Art & Live Paintings',
+  alternateName: 'Fractalia',
+  description: 'Portafolio oficial y servicios de pintura en vivo para bodas y retratos por la artista visual Lía Paz.',
+  publisher: { '@id': `${siteUrl}/#artist` },
+  inLanguage: 'es-MX'
+};
+
+const structuredDataArray = [
+  defaultArtistSchema,
+  defaultWebSiteSchema,
+  ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])
+];
 ---
 
 <!doctype html>
@@ -26,26 +80,51 @@ const canonicalURL = new URL(currentPath, siteUrl);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Favicons & App Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#141414" />
+    <meta name="color-scheme" content="light" />
 
     <!-- SEO Meta Tags -->
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+    {noindex ? (
+      <meta name="robots" content="noindex, nofollow" />
+    ) : (
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    )}
 
     <!-- Open Graph / Social Media -->
-    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lía Paz · Arte Visual" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(image, siteUrl)} />
+    <meta property="og:image" content={absoluteImage} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta property="og:locale" content="es_MX" />
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(image, siteUrl)} />
+    <meta name="twitter:image" content={absoluteImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+
+    <!-- AI & GEO Discovery Links -->
+    <link rel="author" href={`${siteUrl}/about`} />
+    <link rel="help" type="text/plain" href={`${siteUrl}/llms.txt`} title="LLM Context Document" />
+
+    <!-- Structured Data (JSON-LD) -->
+    {structuredDataArray.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
 
     <!-- Google Fonts: Cormorant Garamond & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

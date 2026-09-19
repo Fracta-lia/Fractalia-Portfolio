@@ -24,11 +24,45 @@ const galleryItems = galleryEntries.map(entry => ({
   aspectRatio: entry.data.width / entry.data.height,
   order: entry.data.order,
 }));
+
+const siteUrl = 'https://fractalia.art';
+const gallerySchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  '@id': `${siteUrl}/gallery#webpage`,
+  url: `${siteUrl}/gallery`,
+  name: 'Galería de Obras al Óleo · Lía Paz',
+  description: 'Colección completa de obras originales al óleo, estudios figurativos y pinturas en vivo creadas por la artista visual Lía Paz.',
+  isPartOf: { '@id': `${siteUrl}/#website` },
+  about: { '@id': `${siteUrl}/#artist` },
+  inLanguage: 'es-MX',
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: galleryItems.length,
+    itemListElement: galleryItems.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'VisualArtwork',
+        name: item.title,
+        image: item.src.startsWith('http') ? item.src : `${siteUrl}${item.src}`,
+        creator: { '@id': `${siteUrl}/#artist` },
+        artMedium: item.technique || 'Óleo sobre lienzo',
+        artform: 'Pintura',
+        dateCreated: item.year,
+        ...(item.dimensions ? { size: item.dimensions } : {}),
+      },
+    })),
+  },
+};
 ---
 
 <BaseLayout
-  title="Galería de Obras · Lía Paz | Colección de Pintura"
-  description="Colección de obras originales, wedding live paintings y retratos al óleo creados por la artista Lía Paz."
+  title="Galería de Obras al Óleo · Lía Paz | Colección de Arte"
+  description="Colección completa de obras originales al óleo, estudios figurativos y pinturas en vivo creadas por la artista visual Lía Paz (Fractalia)."
+  image={galleryItems[0]?.src || '/images/gallery/mares-de-silencio.webp'}
+  imageAlt="Colección de obras al óleo de Lía Paz"
+  jsonLd={gallerySchema}
 >
   <!-- Page Header -->
   <section class="py-16 md:py-24 border-b border-neutral-100 bg-neutral-50/50">

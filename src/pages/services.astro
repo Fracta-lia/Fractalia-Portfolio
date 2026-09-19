@@ -5,11 +5,56 @@ import EditableText from '../components/editor/EditableText';
 
 const rawBase = import.meta.env.BASE_URL ?? '/';
 const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
+
+const siteUrl = 'https://fractalia.art';
+const servicesSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${siteUrl}/services#business`,
+  name: 'Lía Paz · Wedding Live Painting & Fine Art',
+  url: `${siteUrl}/services`,
+  image: `${siteUrl}/images/services/wedding-live.svg`,
+  email: 'liapazart@gmail.com',
+  priceRange: '$$$',
+  currenciesAccepted: 'MXN, USD',
+  areaServed: [
+    { '@type': 'Country', name: 'México' },
+    { '@type': 'Country', name: 'Internacional' }
+  ],
+  provider: { '@id': `${siteUrl}/#artist` },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de Arte por Encargo y en Vivo',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Wedding Live Painting (Pintura en Vivo para Bodas)',
+          description: 'Creación de una obra pictórica al óleo en tiempo real durante la ceremonia o fiesta de bodas, capturando a los novios y el ambiente del evento.',
+          provider: { '@id': `${siteUrl}/#artist` }
+        }
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Retratos al Óleo por Encargo',
+          description: 'Retratos personalizados de autor trabajados al óleo sobre lienzo con rigor anatómico y sensibilidad lumínica a partir de sesiones o referencias.',
+          provider: { '@id': `${siteUrl}/#artist` }
+        }
+      }
+    ]
+  }
+};
 ---
 
 <BaseLayout
-  title="Servicios Artísticos · Lía Paz | Retratos & Wedding Live Paintings"
-  description="Servicio exclusivo de encargo de retratos personalizados al óleo y pintura en vivo para bodas (Wedding Live Painting) por la artista Lía Paz."
+  title="Wedding Live Painting & Retratos al Óleo · Lía Paz | Servicios"
+  description="Servicios artísticos exclusivos: pintura en vivo para bodas (Wedding Live Painting) y encargo de retratos al óleo sobre lienzo por la artista visual Lía Paz."
+  image="/images/services/wedding-live.svg"
+  imageAlt="Wedding Live Painting y Retratos al Óleo por Lía Paz"
+  jsonLd={servicesSchema}
 >
   <!-- Page Header -->
   <section class="py-12 sm:py-16 md:py-24 border-b border-neutral-100 bg-neutral-50/50">

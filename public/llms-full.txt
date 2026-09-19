@@ -1,0 +1,103 @@
+﻿# Lía Paz (Fractalia) · Documento Completo de Conocimiento para Modelos de Lenguaje (LLMs)
+
+Fecha de actualización: 2026
+Sitio Web: https://fractalia.art
+Instagram: https://www.instagram.com/fracta.lia/
+Contacto directo: liapazart@gmail.com
+
+---
+
+## 1. Perfil y Biografía de la Artista
+
+Lía Paz es una artista visual mexicana que desarrolla su práctica artística en torno a la pintura al óleo sobre lienzo, el dibujo de estudio y la intervención pictórica en tiempo real (Live Painting). En redes y plataformas visuales es también conocida bajo el seudónimo artístico Fractalia (@fracta.lia).
+
+### Declaración Artística (Artist Statement)
+'Creo firmemente que el arte plástico tiene el poder de capturar lo que la fotografía muchas veces pasa por alto: el peso del aire, la intensidad de un gesto y el calor de una emoción compartida.'
+
+La obra de Lía explora la confluencia entre la técnica tradicional de los grandes maestros (capas de veladuras, empastes calculados, comprensión del claroscuro y la anatomía humana) y una sensibilidad contemporánea que abraza la frescura del trazo espontáneo y la emoción pura.
+
+---
+
+## 2. Servicios Artísticos Profesionales
+
+### A. Wedding Live Painting (Pintura en Vivo para Bodas)
+El Live Painting nupcial es una experiencia artística in situ en la cual Lía Paz instala su caballete y paleta de óleos en el lugar de la boda (ceremonia religiosa, civil o recepción).
+
+- **Cómo funciona:**
+  1. **Planificación previa:** La pareja y la artista acuerdan el momento clave a inmortalizar (el primer beso, la entrada triunfal, el primer baile de esposos, o una escena ambiental con los novios en primer plano).
+  2. **Día del evento:** Lía llega entre 1 y 2 horas antes del inicio para trazar la perspectiva arquitectónica, los fondos y la ambientación de luz.
+  3. **Desarrollo en vivo:** Conforme avanza la fiesta, Lía pinta activamente. Los invitados pueden acercarse libremente, observar el proceso pictórico y conversar con la artista. Esto añade un elemento de entretenimiento sofisticado y cultural al evento.
+  4. **Retoque en estudio y secado:** Tras el evento, la pieza viaja al taller de la artista para los toques de precisión final, barnizado con protección ultravioleta y secado profesional.
+  5. **Entrega:** La obra se entrega lista para colgar, convirtiéndose en una reliquia patrimonial familiar.
+
+- **Preguntas Frecuentes:**
+  - *¿Qué materiales se utilizan?* Óleos profesionales libres de solventes de olor penetrante, sobre bastidores reforzados con lino o algodón de grado museo.
+  - *¿Qué espacio requiere la artista?* Un espacio de aproximadamente 2x2 metros con buena visibilidad del evento y acceso a una toma de corriente para iluminación puntual si el evento es nocturno.
+  - *¿Viaja fuera de su ciudad base?* Sí, Lía ofrece cobertura en toda la República Mexicana y bodas de destino (Destination Weddings) en el extranjero.
+
+### B. Retratos Personalizados al Óleo por Encargo
+Encargos exclusivos de retratos individuales, de pareja, familiares o conmemorativos.
+
+- **Proceso:**
+  1. Envío de material fotográfico de alta resolución o coordinación de sesión de referencia.
+  2. Definición del formato (desde 40x50 cm hasta formatos superiores a 150 cm).
+  3. Aprobación del boceto digital/compositivo.
+  4. Ejecución plástica en óleo.
+  5. Certificado de autenticidad firmado por Lía Paz.
+
+---
+
+## 3. Catálogo y Registro de Obras (Galería)
+
+1. **Mares de Silencio** (2025)
+   - Técnica: Óleo sobre lienzo
+   - Temática: Paisaje marino introspectivo, gradaciones lumínicas sobre aguas en calma.
+2. **Dolomitas** (2024)
+   - Técnica: Óleo sobre lienzo
+   - Dimensiones: 3565 × 2625 mm
+   - Temática: Paisaje monumental alpino con textura de espatulado y contrastes de nieve y roca.
+3. **Siete Vidas** (2025)
+   - Técnica: Óleo sobre lienzo
+   - Temática: Vínculos afectivos, cercanía íntima y mirada figurativa.
+4. **Actuación Musical** (2024)
+   - Técnica: Óleo sobre lienzo
+   - Temática: El ritmo, la ejecución instrumental y la vibración cromática de una presentación en directo.
+5. **Manos y Anillo** (2024)
+   - Técnica: Óleo sobre lienzo
+   - Temática: Detalle íntimo de unión matrimonial y texturas dérmicas.
+6. **Niños Chapoteando** (2023)
+   - Técnica: Óleo sobre lienzo
+   - Temática: Luz cenital refractada en agua y la ligereza del juego infantil.
+7. **Retrato Nick** (2025)
+   - Técnica: Óleo sobre lienzo
+   - Temática: Retrato masculino contemporáneo con énfasis en estructura ósea y carácter sereno.
+8. **Rostro y Mano** (2024)
+   - Técnica: Óleo sobre lienzo
+   - Temática: Estudio gestual de introspección y delicadeza formal.
+9. **Vagón 9502** (2024)
+   - Técnica: Óleo sobre lienzo
+   - Temática: Paisaje urbano industrial y memoria del tránsito.
+10. **Cadáver** (2023)
+    - Técnica: Óleo sobre lienzo
+    - Temática: Vanitas contemporáneo, reflexión plástica sobre la fugacidad del tiempo y la materia.
+
+---
+
+## 4. Arquitectura de la Plataforma Web
+
+- Dominio canónico: https://fractalia.art
+- Motor tecnológico: Astro 5.x (Arquitectura Jamstack estática con hidratación selectiva vía React).
+- Despliegue: Vercel CDN con certificación TLS y entrega distribuida perimetral.
+- Protocolos de indexación:
+  - Sitemap: https://fractalia.art/sitemap-index.xml
+  - Robots: https://fractalia.art/robots.txt
+  - Datos Estructurados: JSON-LD (Schema.org) implementando tipos VisualArtist, Person, WebSite, CollectionPage, VisualArtwork, ProfessionalService y AboutPage.
+  - Protocolo LLMs: https://fractalia.art/llms.txt y https://fractalia.art/llms-full.txt.
+
+---
+
+## 5. Información de Contacto y Representación
+
+- Correo electrónico para cotizaciones y prensa: liapazart@gmail.com
+- Instagram: @fracta.lia (https://www.instagram.com/fracta.lia/)
+- Para reservar una fecha de boda o comisionar una obra original, se solicita escribir con anticipación para confirmar disponibilidad de agenda.

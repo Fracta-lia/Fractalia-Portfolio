@@ -1,4 +1,21 @@
 ﻿User-agent: *
 Allow: /
+Disallow: /api/
+
+# AI & LLM Search Crawlers (Explicitly permitted for GEO)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
 
 Sitemap: https://fractalia.art/sitemap-index.xml

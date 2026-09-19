@@ -20,11 +20,25 @@ const featuredWorks = galleryEntries.slice(0, 4).map(entry => ({
 const homeEntry = await getEntry('pages', 'home');
 const heroImage = homeEntry?.data.heroImage ?? '/images/gallery/mares-de-silencio.webp';
 const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guarda un latido.';
+const homePageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': 'https://fractalia.art/#webpage',
+  url: 'https://fractalia.art/',
+  name: 'Lía Paz · Fine Art & Live Wedding Paintings',
+  description: 'Portafolio oficial de la artista plástica Lía Paz. Obras en óleo, live painting para bodas y retratos por encargo.',
+  isPartOf: { '@id': 'https://fractalia.art/#website' },
+  about: { '@id': 'https://fractalia.art/#artist' },
+  inLanguage: 'es-MX',
+};
 ---
 
 <BaseLayout
-  title="Lía Paz · Artista Visual | Fine Art & Live Paintings"
-  description="Página oficial de Lía Paz. Pintura en vivo para bodas (Wedding Live Paintings), retratos personalizados por encargo y obra en óleo."
+  title="Lía Paz · Fine Art & Live Wedding Paintings | Fractalia"
+  description="Portafolio oficial de Lía Paz (Fractalia). Artista visual especializada en pintura al óleo, wedding live paintings para bodas y retratos personalizados por encargo."
+  image={heroImage}
+  imageAlt="Lía Paz · Fine Art & Live Paintings"
+  jsonLd={homePageSchema}
 >
   <!-- HERO SECTION (Sean Layh style: minimal, spacious, impactful) -->
   <section class="relative min-h-[82vh] md:min-h-[88vh] flex items-center justify-center bg-neutral-950 text-white overflow-hidden px-6">

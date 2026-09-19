@@ -2,11 +2,33 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactForm from '../components/ContactForm';
 import EditableText from '../components/editor/EditableText';
+
+const siteUrl = 'https://fractalia.art';
+const contactSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  '@id': `${siteUrl}/contact#webpage`,
+  url: `${siteUrl}/contact`,
+  name: 'Contacto & Reservas · Lía Paz',
+  description: 'Canal directo para cotizar pintura en vivo para bodas y encargos de retratos al óleo con Lía Paz.',
+  isPartOf: { '@id': `${siteUrl}/#website` },
+  mainEntity: {
+    '@type': 'Person',
+    name: 'Lía Paz',
+    email: 'liapazart@gmail.com',
+    url: siteUrl,
+    sameAs: ['https://www.instagram.com/fracta.lia/']
+  },
+  inLanguage: 'es-MX'
+};
 ---
 
 <BaseLayout
-  title="Contacto & Reservas · Lía Paz | Consultas de Arte y Bodas"
-  description="Ponte en contacto con la artista visual Lía Paz para cotizar tu Wedding Live Painting, encargo de retrato al óleo o consultas generales."
+  title="Contacto & Cotizaciones · Lía Paz | Live Painting y Obras"
+  description="Cotiza tu pintura en vivo para bodas o encarga un retrato al óleo personalizado. Envía tu consulta directamente a la artista visual Lía Paz."
+  image="/images/about/lia-paz.webp"
+  imageAlt="Contacto y cotizaciones Lía Paz Art"
+  jsonLd={contactSchema}
 >
   <!-- Page Header -->
   <section class="py-12 sm:py-16 md:py-24 border-b border-neutral-100 bg-neutral-50/50">

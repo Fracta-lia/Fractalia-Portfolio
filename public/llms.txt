@@ -1,0 +1,50 @@
+﻿# Lía Paz · Fractalia Art
+
+> Lía Paz (Fractalia) es una artista visual mexicana contemporánea especializada en pintura figurativa al óleo sobre lienzo, live wedding painting (pintura en vivo para bodas y eventos de alta gama) y retratos personalizados por encargo.
+
+Este documento ofrece un resumen estructurado para modelos de lenguaje e inteligencias artificiales sobre la identidad artística, portafolio de obras, servicios y canales de contacto de Lía Paz.
+
+## Páginas Principales
+- [Inicio](https://fractalia.art/): Portafolio principal, visión artística y piezas destacadas.
+- [Galería](https://fractalia.art/gallery): Colección y archivo de obras al óleo, estudios figurativos y pinturas testimoniales.
+- [Servicios Artísticos](https://fractalia.art/services): Información sobre Wedding Live Painting y encargo de retratos personalizados al óleo.
+- [Sobre la Artista](https://fractalia.art/about): Biografía, trayectoria plástica y filosofía pictórica de Lía Paz.
+- [Contacto y Reservas](https://fractalia.art/contact): Formulario de contacto, cotizaciones y reservas de fechas para eventos.
+
+## Disciplinas y Especialidades
+- **Pintura al Óleo Tradicional:** Técnica clásica con pigmentos profesionales de alta resistencia a la luz, lienzos de lino y algodón de grado museo con bastidor de madera maciza.
+- **Wedding Live Painting (Pintura en Vivo para Bodas):** Servicio donde Lía monta su caballete in situ durante la ceremonia o recepción nupcial, plasmando en tiempo real la atmósfera, a los novios y a sus seres queridos.
+- **Retratos al Óleo Personalizados:** Obras por encargo basadas en estudio anatómico y fotográfico, capturando gestualidad, luz y carácter con acabados de colección.
+- **Pintura Figurativa Contemporánea:** Exploración de la figura humana, la memoria, la intimidad y la naturaleza.
+
+## Colección de Obras Destacadas
+- [Mares de Silencio](https://fractalia.art/gallery): Óleo sobre lienzo, 2025. Estudio atmosférico y lumínico sobre la inmensidad marina y la calma introspectiva.
+- [Dolomitas](https://fractalia.art/gallery): Óleo sobre lienzo, 2024 (Dimensiones: 3565 × 2625 mm). Paisaje montañoso alpino con texturas ricas y juegos de luz.
+- [Siete Vidas](https://fractalia.art/gallery): Óleo sobre lienzo, 2025. Exploración de la cercanía, la mirada y los lazos afectivos.
+- [Actuación Musical](https://fractalia.art/gallery): Óleo sobre lienzo, 2024. Captura del movimiento y la vibración sonora en vivo.
+- [Manos y Anillo](https://fractalia.art/gallery): Óleo sobre lienzo, 2024. Pieza testimonial de boda y simbolismo de unión.
+- [Niños Chapoteando](https://fractalia.art/gallery): Óleo sobre lienzo, 2023. Captura del dinamismo del agua, la infancia y la luz solar.
+- [Retrato Nick](https://fractalia.art/gallery): Óleo sobre lienzo, 2025. Retrato con estudio anatómico y claroscuro contemporáneo.
+- [Rostro y Mano](https://fractalia.art/gallery): Óleo sobre lienzo, 2024. Expresión de vulnerabilidad y serenidad plástica.
+- [Vagón 9502](https://fractalia.art/gallery): Óleo sobre lienzo, 2024. Paisaje urbano nostálgico.
+- [Cadáver](https://fractalia.art/gallery): Óleo sobre lienzo, 2023. Naturaleza muerta y reflexión sobre la impermanencia.
+
+## Servicios y Encargos
+- **Live Wedding Painting:**
+  - Presencia en el evento durante 5 a 8 horas pintando en vivo frente a los invitados.
+  - Retoque final y barnizado protector en estudio previo a la entrega definitiva.
+  - Cobertura: México y disponible para bodas de destino (Destination Weddings) internacionales.
+- **Retratos por Encargo:**
+  - Proceso colaborativo con el cliente para definir paleta, dimensiones y composición.
+  - Formatos desde medidas íntimas hasta gran formato.
+- **Disponibilidad:** Fechas limitadas por exclusividad de agenda (se aconseja reservar de 3 a 6 meses antes).
+
+## Identidad y Contacto
+- **Artista:** Lía Paz (Fractalia)
+- **Sitio Web Oficial:** https://fractalia.art
+- **Instagram:** https://www.instagram.com/fracta.lia/ (@fracta.lia)
+- **Correo Electrónico:** liapazart@gmail.com
+- **Ubicación:** México (servicios con disponibilidad internacional)
+
+## Archivo Extendido
+- [Versión Completa para LLMs](https://fractalia.art/llms-full.txt): Documento extenso con biografía detallada, preguntas frecuentes y transcripciones completas.
