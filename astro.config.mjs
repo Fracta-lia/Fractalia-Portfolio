@@ -68,7 +68,7 @@ function localDevSavePlugin() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://fractalia.art',
+  site: 'https://fractalia-iota.vercel.app',
   output: 'static',
   devToolbar: {
     enabled: false,

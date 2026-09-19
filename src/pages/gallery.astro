@@ -25,7 +25,7 @@ const galleryItems = galleryEntries.map(entry => ({
   order: entry.data.order,
 }));
 
-const siteUrl = 'https://fractalia.art';
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://fractalia-iota.vercel.app';
 const gallerySchema = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',

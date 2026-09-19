@@ -1,7 +1,7 @@
 ﻿# Lía Paz (Fractalia) · Documento Completo de Conocimiento para Modelos de Lenguaje (LLMs)
 
 Fecha de actualización: 2026
-Sitio Web: https://fractalia.art
+Sitio Web: https://fractalia-iota.vercel.app
 Instagram: https://www.instagram.com/fracta.lia/
 Contacto directo: liapazart@gmail.com
 
@@ -85,14 +85,14 @@ Encargos exclusivos de retratos individuales, de pareja, familiares o conmemorat
 
 ## 4. Arquitectura de la Plataforma Web
 
-- Dominio canónico: https://fractalia.art
+- Dominio canónico: https://fractalia-iota.vercel.app
 - Motor tecnológico: Astro 5.x (Arquitectura Jamstack estática con hidratación selectiva vía React).
 - Despliegue: Vercel CDN con certificación TLS y entrega distribuida perimetral.
 - Protocolos de indexación:
-  - Sitemap: https://fractalia.art/sitemap-index.xml
-  - Robots: https://fractalia.art/robots.txt
+  - Sitemap: https://fractalia-iota.vercel.app/sitemap-index.xml
+  - Robots: https://fractalia-iota.vercel.app/robots.txt
   - Datos Estructurados: JSON-LD (Schema.org) implementando tipos VisualArtist, Person, WebSite, CollectionPage, VisualArtwork, ProfessionalService y AboutPage.
-  - Protocolo LLMs: https://fractalia.art/llms.txt y https://fractalia.art/llms-full.txt.
+  - Protocolo LLMs: https://fractalia-iota.vercel.app/llms.txt y https://fractalia-iota.vercel.app/llms-full.txt.
 
 ---
 

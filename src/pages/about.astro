@@ -16,7 +16,7 @@ A lo largo de mi trayectoria he explorado diversas disciplinas plásticas, conso
 
 La experiencia del **Wedding Live Painting** nació como una forma orgánica de unir la celebración más significativa de una pareja con el proceso alquímico de la pintura en tiempo real. Ver cómo una obra evoluciona frente a los ojos de los novios e invitados transforma el evento en un recuerdo tangible que perdurará por generaciones.`;
 
-const siteUrl = 'https://fractalia.art';
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://fractalia-iota.vercel.app';
 const aboutSchema = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
