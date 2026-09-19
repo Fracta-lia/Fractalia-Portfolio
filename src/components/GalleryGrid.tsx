@@ -75,6 +75,20 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
   const selectedItem = selectedIndex !== null ? list[selectedIndex] : null;
 
+  // Track & 3-Slide Carousel animation refs
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const isAnimatingRef = useRef<boolean>(false);
+
+  const prevItem =
+    selectedIndex !== null && list.length > 1
+      ? list[(selectedIndex - 1 + list.length) % list.length]
+      : null;
+  const nextItem =
+    selectedIndex !== null && list.length > 1
+      ? list[(selectedIndex + 1) % list.length]
+      : null;
+
   const handleOpen = (index: number) => {
     if (draggedIndex !== null) return;
     setSelectedIndex(index);
@@ -84,123 +98,189 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setSelectedIndex(null);
   }, []);
 
-  const handlePrev = useCallback((e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setSelectedIndex((prev) => (prev !== null ? (prev - 1 + list.length) % list.length : null));
-  }, [list.length]);
+  const handlePrev = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (list.length <= 1 || isAnimatingRef.current) return;
+      isAnimatingRef.current = true;
 
-  const handleNext = useCallback((e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
-  }, [list.length]);
+      const track = trackRef.current;
+      if (track) {
+        track.style.transition = 'transform 0.36s cubic-bezier(0.16, 1, 0.3, 1)';
+        track.style.transform = 'translate3d(0%, 0, 0)';
 
-  // Dedicated Safari & Chrome Mobile Swipe Controller via native non-passive listener
-  const viewportRef = useRef<HTMLDivElement | null>(null);
+        setTimeout(() => {
+          setSelectedIndex((prev) => (prev !== null ? (prev - 1 + list.length) % list.length : null));
+          if (trackRef.current) {
+            trackRef.current.style.transition = 'none';
+            trackRef.current.style.transform = 'translate3d(-33.333333%, 0, 0)';
+          }
+          isAnimatingRef.current = false;
+        }, 360);
+      } else {
+        setSelectedIndex((prev) => (prev !== null ? (prev - 1 + list.length) % list.length : null));
+        isAnimatingRef.current = false;
+      }
+    },
+    [list.length]
+  );
 
+  const handleNext = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (list.length <= 1 || isAnimatingRef.current) return;
+      isAnimatingRef.current = true;
+
+      const track = trackRef.current;
+      if (track) {
+        track.style.transition = 'transform 0.36s cubic-bezier(0.16, 1, 0.3, 1)';
+        track.style.transform = 'translate3d(-66.666666%, 0, 0)';
+
+        setTimeout(() => {
+          setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
+          if (trackRef.current) {
+            trackRef.current.style.transition = 'none';
+            trackRef.current.style.transform = 'translate3d(-33.333333%, 0, 0)';
+          }
+          isAnimatingRef.current = false;
+        }, 360);
+      } else {
+        setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
+        isAnimatingRef.current = false;
+      }
+    },
+    [list.length]
+  );
+
+  // Dedicated Safari & Chrome Mobile Touch Swipe + Desktop Mouse Drag with real-time physical track glide
   useEffect(() => {
     const el = viewportRef.current;
-    if (!el) return;
+    if (!el || selectedIndex === null) return;
 
     let startX = 0;
     let startY = 0;
     let currentX = 0;
-    let currentY = 0;
     let isSwiping = false;
+    let hasDeterminedDirection = false;
+    let isHorizontalSwipe = false;
 
     const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
+      if (e.touches.length !== 1 || isAnimatingRef.current) return;
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       currentX = startX;
-      currentY = startY;
       isSwiping = true;
+      hasDeterminedDirection = false;
+      isHorizontalSwipe = false;
+
+      if (trackRef.current) {
+        trackRef.current.style.transition = 'none';
+      }
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!isSwiping || e.touches.length !== 1) return;
+      if (!isSwiping || e.touches.length !== 1 || isAnimatingRef.current) return;
       currentX = e.touches[0].clientX;
-      currentY = e.touches[0].clientY;
-      const diffX = Math.abs(currentX - startX);
-      const diffY = Math.abs(currentY - startY);
+      const diffX = currentX - startX;
+      const diffY = e.touches[0].clientY - startY;
 
-      // If user is swiping horizontally, prevent Safari from triggering back/forward navigation or rubber-banding
-      if (diffX > diffY && diffX > 6) {
+      if (!hasDeterminedDirection && (Math.abs(diffX) > 6 || Math.abs(diffY) > 6)) {
+        hasDeterminedDirection = true;
+        isHorizontalSwipe = Math.abs(diffX) > Math.abs(diffY);
+      }
+
+      if (isHorizontalSwipe) {
         if (e.cancelable) {
           e.preventDefault();
         }
-      }
-    };
-
-    const onTouchEnd = (e: TouchEvent) => {
-      if (!isSwiping) return;
-      isSwiping = false;
-
-      if (e.changedTouches.length > 0) {
-        currentX = e.changedTouches[0].clientX;
-        currentY = e.changedTouches[0].clientY;
-      }
-
-      const diffX = startX - currentX;
-      const diffY = startY - currentY;
-
-      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 24) {
-        if (diffX > 0) {
-          handleNext();
-        } else {
-          handlePrev();
+        if (trackRef.current) {
+          trackRef.current.style.transform = `translate3d(calc(-33.333333% + ${diffX}px), 0, 0)`;
         }
       }
     };
 
-    const onTouchCancel = (e: TouchEvent) => {
+    const onTouchEnd = () => {
       if (!isSwiping) return;
       isSwiping = false;
 
-      if (e.changedTouches.length > 0) {
-        currentX = e.changedTouches[0].clientX;
-        currentY = e.changedTouches[0].clientY;
+      if (!isHorizontalSwipe || !trackRef.current || isAnimatingRef.current) {
+        return;
       }
 
-      const diffX = startX - currentX;
-      const diffY = startY - currentY;
+      const diffX = currentX - startX;
+      const threshold = 40;
 
-      // Even if Safari fired touchcancel, if user moved > 24px horizontally, execute swipe!
-      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 24) {
-        if (diffX > 0) {
-          handleNext();
-        } else {
-          handlePrev();
-        }
+      if (diffX < -threshold) {
+        handleNext();
+      } else if (diffX > threshold) {
+        handlePrev();
+      } else {
+        trackRef.current.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        trackRef.current.style.transform = 'translate3d(-33.333333%, 0, 0)';
       }
     };
 
     el.addEventListener('touchstart', onTouchStart, { passive: true });
     el.addEventListener('touchmove', onTouchMove, { passive: false });
     el.addEventListener('touchend', onTouchEnd, { passive: true });
-    el.addEventListener('touchcancel', onTouchCancel, { passive: true });
+    el.addEventListener('touchcancel', onTouchEnd, { passive: true });
+
+    // Mouse drag support for PC
+    let isMouseDown = false;
+    let mouseStartX = 0;
+    let mouseCurrentX = 0;
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0 || isAnimatingRef.current) return;
+      isMouseDown = true;
+      mouseStartX = e.clientX;
+      mouseCurrentX = mouseStartX;
+      if (trackRef.current) {
+        trackRef.current.style.transition = 'none';
+      }
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isMouseDown || isAnimatingRef.current) return;
+      mouseCurrentX = e.clientX;
+      const diffX = mouseCurrentX - mouseStartX;
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translate3d(calc(-33.333333% + ${diffX}px), 0, 0)`;
+      }
+    };
+
+    const onMouseUp = () => {
+      if (!isMouseDown) return;
+      isMouseDown = false;
+      if (!trackRef.current || isAnimatingRef.current) return;
+
+      const diffX = mouseCurrentX - mouseStartX;
+      const threshold = 45;
+
+      if (diffX < -threshold) {
+        handleNext();
+      } else if (diffX > threshold) {
+        handlePrev();
+      } else {
+        trackRef.current.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        trackRef.current.style.transform = 'translate3d(-33.333333%, 0, 0)';
+      }
+    };
+
+    el.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
 
     return () => {
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchmove', onTouchMove);
       el.removeEventListener('touchend', onTouchEnd);
-      el.removeEventListener('touchcancel', onTouchCancel);
+      el.removeEventListener('touchcancel', onTouchEnd);
+      el.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
     };
   }, [selectedIndex, handleNext, handlePrev]);
-
-  // Mouse drag fallback for PC testing
-  const mouseStartX = useRef<number | null>(null);
-  const handleMouseDown = (e: React.MouseEvent) => {
-    mouseStartX.current = e.clientX;
-  };
-  const handleMouseUp = (e: React.MouseEvent) => {
-    if (mouseStartX.current === null) return;
-    const diff = mouseStartX.current - e.clientX;
-    if (Math.abs(diff) > 35) {
-      if (diff > 0) handleNext();
-      else handlePrev();
-    }
-    mouseStartX.current = null;
-  };
 
   useEffect(() => {
     if (selectedIndex === null) return;
@@ -497,20 +577,57 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               </svg>
             </button>
 
-            {/* Left: Artwork Viewport (Dominates 62-65% height on mobile, full width on PC) */}
+            {/* Left: Artwork Viewport with 3-Slide Carousel Track */}
             <div
               ref={viewportRef}
-              className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] p-3 sm:p-6 lg:p-8 select-none overflow-hidden cursor-grab active:cursor-grabbing touch-none"
+              className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] select-none overflow-hidden cursor-grab active:cursor-grabbing touch-none"
               style={{ touchAction: 'none' }}
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
             >
-              <img
-                src={selectedItem.src}
-                alt={selectedItem.title}
-                draggable={false}
-                className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl transition-opacity duration-300 pointer-events-none select-none"
-              />
+              {/* 3-Slide Carousel Track for 60fps/120fps physical swipe */}
+              <div
+                ref={trackRef}
+                className="flex w-[300%] h-full flex-shrink-0"
+                style={{
+                  transform: 'translate3d(-33.333333%, 0, 0)',
+                  willChange: 'transform',
+                }}
+              >
+                {/* Slide 0: Previous Artwork */}
+                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8">
+                  {prevItem && (
+                    <img
+                      src={prevItem.src}
+                      alt={prevItem.title}
+                      draggable={false}
+                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl pointer-events-none select-none opacity-50 transition-opacity duration-300"
+                    />
+                  )}
+                </div>
+
+                {/* Slide 1: Current Artwork */}
+                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8">
+                  {selectedItem && (
+                    <img
+                      src={selectedItem.src}
+                      alt={selectedItem.title}
+                      draggable={false}
+                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl pointer-events-none select-none"
+                    />
+                  )}
+                </div>
+
+                {/* Slide 2: Next Artwork */}
+                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8">
+                  {nextItem && (
+                    <img
+                      src={nextItem.src}
+                      alt={nextItem.title}
+                      draggable={false}
+                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl pointer-events-none select-none opacity-50 transition-opacity duration-300"
+                    />
+                  )}
+                </div>
+              </div>
 
               {/* Edit Image Button (Edit Mode) */}
               {isEditing && (
@@ -535,12 +652,12 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 </div>
               )}
 
-              {/* Prev / Next Nav (Visible on both mobile & desktop) */}
+              {/* Prev / Next Nav (Visible on both mobile & desktop with juicy hover/active spring) */}
               <button
                 type="button"
                 onClick={handlePrev}
                 aria-label="Obra anterior"
-                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7" />
@@ -550,7 +667,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 type="button"
                 onClick={handleNext}
                 aria-label="Obra siguiente"
-                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" />
@@ -567,7 +684,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
             {/* Right: Ficha Técnica Sidebar (Compact bottom sheet on mobile, full sidebar on PC) */}
             <div className="lg:w-84 xl:w-96 flex-shrink-0 p-5 sm:p-8 flex flex-col justify-between overflow-y-auto bg-white rounded-t-2xl lg:rounded-none border-t lg:border-t-0 lg:border-l border-neutral-100 flex-1 lg:flex-initial max-h-[38vh] sm:max-h-[35vh] lg:max-h-none shadow-lg lg:shadow-none">
-              <div className="space-y-6">
+              <div key={selectedItem.id} className="animate-slide-fade-up space-y-6">
                 <div>
                   <div className="flex items-center justify-between text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium mb-3">
                     <span>Ficha Técnica</span>
