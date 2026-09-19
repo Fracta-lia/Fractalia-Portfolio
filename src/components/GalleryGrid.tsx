@@ -27,6 +27,7 @@ function artworkToMarkdown(item: GalleryItem, order: number): string {
   return `---
 title: "${(item.title || '').replace(/"/g, '\\"')}"
 technique: "${(item.technique || 'Óleo sobre lienzo').replace(/"/g, '\\"')}"
+dimensions: "${(item.dimensions || '').replace(/"/g, '\\"')}"
 year: "${item.year || new Date().getFullYear().toString()}"
 image: "${imagePath}"
 width: ${item.width || 2000}
@@ -49,6 +50,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   // New artwork modal form state
   const [newTitle, setNewTitle] = useState('');
   const [newTechnique, setNewTechnique] = useState('Óleo sobre lienzo');
+  const [newDimensions, setNewDimensions] = useState('');
   const [newYear, setNewYear] = useState(new Date().getFullYear().toString());
   const [newImageDataUrl, setNewImageDataUrl] = useState<string | null>(null);
   const [newProcessedImage, setNewProcessedImage] = useState<ProcessedImage | null>(null);
@@ -370,6 +372,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       id,
       title: newTitle.trim(),
       technique: newTechnique.trim() || 'Óleo sobre lienzo',
+      dimensions: newDimensions.trim(),
       year: newYear.trim() || new Date().getFullYear().toString(),
       src: newProcessedImage?.dataUrl || newImageDataUrl,
       width,
@@ -396,6 +399,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setList([...list, newItem]);
     setShowAddModal(false);
     setNewTitle('');
+    setNewDimensions('');
     setNewImageDataUrl(null);
     setNewProcessedImage(null);
     setNewImageFile(null);
@@ -604,6 +608,24 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                     )}
                   </div>
 
+                  {/* Dimensions */}
+                  {(selectedItem.dimensions || isEditing) && (
+                    <div className="flex justify-between items-center py-1 border-b border-neutral-100">
+                      <span className="text-neutral-400 uppercase text-xs tracking-wider">Dimensiones</span>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={selectedItem.dimensions || ''}
+                          placeholder="Ej. 60 × 80 cm"
+                          onChange={(e) => handleUpdateItemField('dimensions', e.target.value)}
+                          className="text-right text-xs font-sans border-b border-neutral-300 focus:border-neutral-900 pb-0.5 focus:outline-none text-neutral-900 placeholder:text-neutral-300"
+                        />
+                      ) : (
+                        <span className="text-neutral-900">{selectedItem.dimensions}</span>
+                      )}
+                    </div>
+                  )}
+
                   {/* Year */}
                   <div className="flex justify-between items-center py-1 border-b border-neutral-100">
                     <span className="text-neutral-400 uppercase text-xs tracking-wider">Año</span>
@@ -764,16 +786,31 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 />
               </div>
 
-              {/* Technique & Year */}
+              {/* Technique */}
+              <div>
+                <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
+                  Técnica
+                </label>
+                <input
+                  type="text"
+                  value={newTechnique}
+                  onChange={(e) => setNewTechnique(e.target.value)}
+                  placeholder="Ej. Óleo sobre lienzo"
+                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
+                />
+              </div>
+
+              {/* Dimensions & Year */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
-                    Técnica
+                    Dimensiones
                   </label>
                   <input
                     type="text"
-                    value={newTechnique}
-                    onChange={(e) => setNewTechnique(e.target.value)}
+                    value={newDimensions}
+                    onChange={(e) => setNewDimensions(e.target.value)}
+                    placeholder="Ej. 60 × 80 cm"
                     className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
                   />
                 </div>

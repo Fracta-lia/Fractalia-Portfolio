@@ -1,4 +1,4 @@
-﻿import { defineCollection, z } from 'astro:content';
+import { defineCollection, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 
 const gallery = defineCollection({
@@ -6,6 +6,7 @@ const gallery = defineCollection({
   schema: z.object({
     title: z.string(),
     technique: z.string().default('Óleo sobre lienzo'),
+    dimensions: z.string().optional(),
     year: z.string(),
     image: z.string(),
     width: z.number(),
