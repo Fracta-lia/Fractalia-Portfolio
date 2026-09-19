@@ -107,13 +107,13 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       const track = trackRef.current;
       if (track) {
         track.style.transition = 'transform 0.36s cubic-bezier(0.16, 1, 0.3, 1)';
-        track.style.transform = 'translate3d(0%, 0, 0)';
+        track.style.transform = 'translateX(0%)';
 
         setTimeout(() => {
           setSelectedIndex((prev) => (prev !== null ? (prev - 1 + list.length) % list.length : null));
           if (trackRef.current) {
             trackRef.current.style.transition = 'none';
-            trackRef.current.style.transform = 'translate3d(-33.333333%, 0, 0)';
+            trackRef.current.style.transform = 'translateX(-33.333333%)';
           }
           isAnimatingRef.current = false;
         }, 360);
@@ -134,13 +134,13 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       const track = trackRef.current;
       if (track) {
         track.style.transition = 'transform 0.36s cubic-bezier(0.16, 1, 0.3, 1)';
-        track.style.transform = 'translate3d(-66.666666%, 0, 0)';
+        track.style.transform = 'translateX(-66.666666%)';
 
         setTimeout(() => {
           setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
           if (trackRef.current) {
             trackRef.current.style.transition = 'none';
-            trackRef.current.style.transform = 'translate3d(-33.333333%, 0, 0)';
+            trackRef.current.style.transform = 'translateX(-33.333333%)';
           }
           isAnimatingRef.current = false;
         }, 360);
@@ -194,7 +194,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
           e.preventDefault();
         }
         if (trackRef.current) {
-          trackRef.current.style.transform = `translate3d(calc(-33.333333% + ${diffX}px), 0, 0)`;
+          trackRef.current.style.transform = `translateX(calc(-33.333333% + ${diffX}px))`;
         }
       }
     };
@@ -216,7 +216,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         handlePrev();
       } else {
         trackRef.current.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        trackRef.current.style.transform = 'translate3d(-33.333333%, 0, 0)';
+        trackRef.current.style.transform = 'translateX(-33.333333%)';
       }
     };
 
@@ -245,7 +245,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       mouseCurrentX = e.clientX;
       const diffX = mouseCurrentX - mouseStartX;
       if (trackRef.current) {
-        trackRef.current.style.transform = `translate3d(calc(-33.333333% + ${diffX}px), 0, 0)`;
+        trackRef.current.style.transform = `translateX(calc(-33.333333% + ${diffX}px))`;
       }
     };
 
@@ -263,7 +263,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         handlePrev();
       } else {
         trackRef.current.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        trackRef.current.style.transform = 'translate3d(-33.333333%, 0, 0)';
+        trackRef.current.style.transform = 'translateX(-33.333333%)';
       }
     };
 
@@ -580,7 +580,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
             {/* Left: Artwork Viewport with 3-Slide Carousel Track */}
             <div
               ref={viewportRef}
-              className="relative flex-1 bg-neutral-950 flex items-center justify-center h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] select-none overflow-hidden cursor-grab active:cursor-grabbing touch-none"
+              className="relative flex-1 bg-neutral-950 flex items-center justify-start h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] select-none overflow-hidden cursor-grab active:cursor-grabbing touch-none"
               style={{ touchAction: 'none' }}
             >
               {/* 3-Slide Carousel Track for 60fps/120fps physical swipe */}
@@ -588,7 +588,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 ref={trackRef}
                 className="flex w-[300%] h-full flex-shrink-0"
                 style={{
-                  transform: 'translate3d(-33.333333%, 0, 0)',
+                  transform: 'translateX(-33.333333%)',
                   willChange: 'transform',
                 }}
               >
@@ -656,6 +656,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               <button
                 type="button"
                 onClick={handlePrev}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
                 aria-label="Obra anterior"
                 className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
               >
@@ -666,6 +668,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               <button
                 type="button"
                 onClick={handleNext}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
                 aria-label="Obra siguiente"
                 className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
               >
