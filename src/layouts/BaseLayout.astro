@@ -71,6 +71,11 @@ const canonicalURL = new URL(currentPath, siteUrl);
           const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           const isEditMode = window.location.search.includes('edit=true') || localStorage.getItem('lia_edit_mode') === 'true';
 
+          if (isEditMode) {
+            document.body.classList.add('is-edit-mode');
+            document.body.setAttribute('data-edit-mode', 'true');
+          }
+
           const elements = document.querySelectorAll('.reveal-on-scroll');
           if (isReducedMotion || isEditMode) {
             elements.forEach(el => el.classList.add('is-revealed'));

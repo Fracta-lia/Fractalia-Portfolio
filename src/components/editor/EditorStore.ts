@@ -40,8 +40,12 @@ export const EditorStore = {
     if (typeof window === 'undefined') return;
     if (enabled) {
       localStorage.setItem(EDIT_MODE_KEY, 'true');
+      document.body.classList.add('is-edit-mode');
+      document.body.setAttribute('data-edit-mode', 'true');
     } else {
       localStorage.removeItem(EDIT_MODE_KEY);
+      document.body.classList.remove('is-edit-mode');
+      document.body.removeAttribute('data-edit-mode');
     }
     notify();
   },

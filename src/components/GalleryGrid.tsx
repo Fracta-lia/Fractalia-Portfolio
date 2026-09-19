@@ -419,7 +419,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
             onDragLeave={(e) => handleDragLeave(e, index)}
             onDrop={(e) => handleDrop(e, index)}
             onDragEnd={handleDragEnd}
-            className={`group relative mb-6 md:mb-8 break-inside-avoid overflow-hidden cursor-pointer bg-neutral-100 transition-all duration-300 reveal-on-scroll ${
+            className={`group relative mb-6 md:mb-8 break-inside-avoid overflow-hidden cursor-pointer bg-neutral-100 transition-all duration-300 ${
               isEditing ? 'cursor-grab active:cursor-grabbing select-none' : ''
             } ${
               draggedIndex === index ? 'opacity-35 scale-95 border-2 border-dashed border-neutral-900' : ''

@@ -82,3 +82,12 @@ body {
     transition: none !important;
   }
 }
+
+/* In edit mode, all content must always be 100% visible immediately - never hide anything */
+body.is-edit-mode .reveal-on-scroll,
+body[data-edit-mode="true"] .reveal-on-scroll,
+[data-edit-mode="true"] .reveal-on-scroll {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
