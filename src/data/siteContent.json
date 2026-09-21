@@ -43,7 +43,7 @@
   "services.header.desc": "Obras de arte hechas a mano que celebran los lazos humanos y momentos irrepetibles.",
   "services.s1.title": "Retratos Personalizados",
   "services.s1.tagline": "Comisiones & Arte Figurativo",
-  "services.s1.desc": "Retratos al acrílico, óleo o carboncillo sobre lienzo o cartón con tela que buscan captar la esencia del retratado, con pinceladas gestuales y dinámicas . Perfecto como homenaje personal, regalo de aniversario o legado familiar atemporal.",
+  "services.s1.desc": "Retratos al óleo sobre lienzo o lino que buscan captar la esencia, mirada y carácter del retratado. Perfecto como homenaje personal, regalo de aniversario o legado familiar atemporal.",
   "services.s1.cta": "Cotizar mi Retrato",
   "services.s2.title": "Wedding Live Paintings",
   "services.s2.tagline": "Experiencia en Vivo para Bodas",
@@ -68,7 +68,5 @@
   "home.about.image": "/images/about/lia-paz.webp",
   "services.s1.image": "/images/uploads/services_s1_image.jpg",
   "services.s2.image": "/images/uploads/services_s2_image.jpeg",
-  "about.portrait.image": "/images/about/lia-paz.webp",
-  "services.s1.d3": ".",
-  "services.s1.d2": "."
+  "about.portrait.image": "/images/about/lia-paz.webp"
 }
