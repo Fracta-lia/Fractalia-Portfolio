@@ -7,5 +7,4 @@ image: "/images/gallery/rostro-y-mano.webp"
 width: 1611
 height: 2400
 order: 3
-series: "Figura & Miradas"
 ---

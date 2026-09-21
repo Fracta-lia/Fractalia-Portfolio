@@ -7,5 +7,4 @@ image: "/images/gallery/mares-de-silencio.webp"
 width: 1591
 height: 1600
 order: 1
-series: "Dolomitas & Horizontes"
 ---

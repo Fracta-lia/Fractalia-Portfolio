@@ -7,5 +7,4 @@ image: "/images/gallery/cadaver.webp"
 width: 2400
 height: 1753
 order: 8
-series: "Archivo General"
 ---
