@@ -1,7 +1,7 @@
 ---
 title: "Siete Vidas"
-technique: "Óleo sobre lienzo"
-dimensions: ""
+technique: "Pastel sobre papel"
+dimensions: "25 x 25 cm"
 year: "2025"
 image: "/images/gallery/siete-vidas.webp"
 width: 2400

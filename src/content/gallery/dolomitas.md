@@ -1,7 +1,7 @@
 ---
 title: "Dolomitas"
-technique: "Pastel"
-dimensions: ""
+technique: "Pastel sobre papel"
+dimensions: "130 x90cm"
 year: "2026"
 image: "/images/gallery/dolomitas.webp"
 width: 3565

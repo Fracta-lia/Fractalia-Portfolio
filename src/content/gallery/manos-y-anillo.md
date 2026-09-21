@@ -1,7 +1,7 @@
 ---
-title: "Manos y Anillo"
+title: "Alena"
 technique: "Óleo sobre lienzo"
-dimensions: ""
+dimensions: "40 x 60 cm"
 year: "2025"
 image: "/images/gallery/manos-y-anillo.webp"
 width: 2400

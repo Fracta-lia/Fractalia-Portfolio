@@ -1,7 +1,7 @@
 ---
-title: "Cadáver"
+title: "Evidencias de un umbral II"
 technique: "Óleo sobre lienzo"
-dimensions: ""
+dimensions: "122  x 90 cm"
 year: "2025"
 image: "/images/gallery/cadaver.webp"
 width: 2400
