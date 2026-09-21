@@ -7,4 +7,5 @@ image: "/images/gallery/retrato-nick.webp"
 width: 1600
 height: 1173
 order: 10
+series: "Figura & Miradas"
 ---

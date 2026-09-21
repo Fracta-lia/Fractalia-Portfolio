@@ -7,4 +7,5 @@ image: "/images/gallery/dolomitas.webp"
 width: 3565
 height: 2625
 order: 9
+series: "Dolomitas & Horizontes"
 ---

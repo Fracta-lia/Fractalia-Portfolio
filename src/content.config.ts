@@ -13,6 +13,7 @@ const gallery = defineCollection({
     height: z.number(),
     order: z.number(),
     description: z.string().optional(),
+    series: z.string().optional(),
   }),
 });
 

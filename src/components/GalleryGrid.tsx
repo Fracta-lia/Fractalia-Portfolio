@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { EditorStore } from './editor/EditorStore';
 import { processImageFile, type ProcessedImage } from '../utils/imageProcess';
 
@@ -13,6 +13,7 @@ export interface GalleryItem {
   height?: number;
   aspectRatio?: number;
   order?: number;
+  series?: string;
 }
 
 interface GalleryGridProps {
@@ -24,6 +25,7 @@ function artworkToMarkdown(item: GalleryItem, order: number): string {
   if (item.src.startsWith('data:')) {
     imagePath = `/images/gallery/${item.id}.webp`;
   }
+  const seriesLine = item.series ? `\nseries: "${(item.series || '').replace(/"/g, '\\"')}"` : '';
   return `---
 title: "${(item.title || '').replace(/"/g, '\\"')}"
 technique: "${(item.technique || 'Óleo sobre lienzo').replace(/"/g, '\\"')}"
@@ -32,7 +34,7 @@ year: "${item.year || new Date().getFullYear().toString()}"
 image: "${imagePath}"
 width: ${item.width || 2000}
 height: ${item.height || 2000}
-order: ${order}
+order: ${order}${seriesLine}
 ---
 `;
 }
@@ -42,6 +44,10 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Series Filtering State (Option 1: Minimalist Museum Tab Bar)
+  const [activeSeries, setActiveSeries] = useState<string>('all');
+  const [isTabTransitioning, setIsTabTransitioning] = useState<boolean>(false);
 
   // Drag and Drop state
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -73,7 +79,34 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setList(sorted);
   }, [items]);
 
-  const selectedItem = selectedIndex !== null ? list[selectedIndex] : null;
+  // Compute unique series categories from list
+  const seriesCategories = useMemo(() => {
+    const set = new Set<string>();
+    list.forEach((item) => {
+      if (item.series && item.series.trim()) {
+        set.add(item.series.trim());
+      }
+    });
+    return Array.from(set);
+  }, [list]);
+
+  // Filtered artworks based on active series tab
+  const filteredList = useMemo(() => {
+    if (activeSeries === 'all') return list;
+    return list.filter((item) => (item.series || 'Archivo General') === activeSeries);
+  }, [list, activeSeries]);
+
+  const handleSelectSeries = (seriesName: string) => {
+    if (seriesName === activeSeries) return;
+    setIsTabTransitioning(true);
+    setTimeout(() => {
+      setActiveSeries(seriesName);
+      setSelectedIndex(null);
+      setIsTabTransitioning(false);
+    }, 180);
+  };
+
+  const selectedItem = selectedIndex !== null ? filteredList[selectedIndex] : null;
 
   // Track & 3-Slide Carousel animation refs
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -81,12 +114,12 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const isAnimatingRef = useRef<boolean>(false);
 
   const prevItem =
-    selectedIndex !== null && list.length > 1
-      ? list[(selectedIndex - 1 + list.length) % list.length]
+    selectedIndex !== null && filteredList.length > 1
+      ? filteredList[(selectedIndex - 1 + filteredList.length) % filteredList.length]
       : null;
   const nextItem =
-    selectedIndex !== null && list.length > 1
-      ? list[(selectedIndex + 1) % list.length]
+    selectedIndex !== null && filteredList.length > 1
+      ? filteredList[(selectedIndex + 1) % filteredList.length]
       : null;
 
   const handleOpen = (index: number) => {
@@ -101,7 +134,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const handlePrev = useCallback(
     (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (list.length <= 1 || isAnimatingRef.current) return;
+      if (filteredList.length <= 1 || isAnimatingRef.current) return;
       isAnimatingRef.current = true;
 
       const track = trackRef.current;
@@ -110,7 +143,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         track.style.transform = 'translateX(0%)';
 
         setTimeout(() => {
-          setSelectedIndex((prev) => (prev !== null ? (prev - 1 + list.length) % list.length : null));
+          setSelectedIndex((prev) => (prev !== null ? (prev - 1 + filteredList.length) % filteredList.length : null));
           if (trackRef.current) {
             trackRef.current.style.transition = 'none';
             trackRef.current.style.transform = 'translateX(-33.333333%)';
@@ -118,17 +151,17 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
           isAnimatingRef.current = false;
         }, 360);
       } else {
-        setSelectedIndex((prev) => (prev !== null ? (prev - 1 + list.length) % list.length : null));
+        setSelectedIndex((prev) => (prev !== null ? (prev - 1 + filteredList.length) % filteredList.length : null));
         isAnimatingRef.current = false;
       }
     },
-    [list.length]
+    [filteredList.length]
   );
 
   const handleNext = useCallback(
     (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (list.length <= 1 || isAnimatingRef.current) return;
+      if (filteredList.length <= 1 || isAnimatingRef.current) return;
       isAnimatingRef.current = true;
 
       const track = trackRef.current;
@@ -137,7 +170,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         track.style.transform = 'translateX(-66.666666%)';
 
         setTimeout(() => {
-          setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
+          setSelectedIndex((prev) => (prev !== null ? (prev + 1) % filteredList.length : null));
           if (trackRef.current) {
             trackRef.current.style.transition = 'none';
             trackRef.current.style.transform = 'translateX(-33.333333%)';
@@ -145,11 +178,11 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
           isAnimatingRef.current = false;
         }, 360);
       } else {
-        setSelectedIndex((prev) => (prev !== null ? (prev + 1) % list.length : null));
+        setSelectedIndex((prev) => (prev !== null ? (prev + 1) % filteredList.length : null));
         isAnimatingRef.current = false;
       }
     },
-    [list.length]
+    [filteredList.length]
   );
 
   // Dedicated Safari & Chrome Mobile Touch Swipe + Desktop Mouse Drag with real-time physical track glide
@@ -509,12 +542,76 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         </div>
       )}
 
+      {/* Series Filter Tabs (Hauser & Wirth / Museum Contemporary Style) */}
+      <nav aria-label="Filtro por Series" className="mb-8 sm:mb-12 border-b border-neutral-200/70">
+        <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth px-1">
+          <button
+            type="button"
+            onClick={() => handleSelectSeries('all')}
+            className={`group relative pb-3.5 px-3 sm:px-4 text-[11px] sm:text-xs font-sans tracking-[0.22em] uppercase transition-all flex items-center gap-2 cursor-pointer flex-shrink-0 ${
+              activeSeries === 'all'
+                ? 'text-neutral-900 font-medium'
+                : 'text-neutral-400 hover:text-neutral-800 font-light'
+            }`}
+          >
+            <span>Todas</span>
+            <span
+              className={`text-[10px] tracking-normal px-2 py-0.5 rounded-full transition-colors ${
+                activeSeries === 'all'
+                  ? 'bg-neutral-900 text-white font-medium'
+                  : 'bg-neutral-100 text-neutral-500 group-hover:bg-neutral-200'
+              }`}
+            >
+              {list.length}
+            </span>
+            {activeSeries === 'all' && (
+              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-neutral-900 animate-fade-in" />
+            )}
+          </button>
+
+          {seriesCategories.map((seriesName) => {
+            const count = list.filter((i) => (i.series || 'Archivo General') === seriesName).length;
+            const isActive = activeSeries === seriesName;
+            return (
+              <button
+                key={seriesName}
+                type="button"
+                onClick={() => handleSelectSeries(seriesName)}
+                className={`group relative pb-3.5 px-3 sm:px-4 text-[11px] sm:text-xs font-sans tracking-[0.22em] uppercase transition-all flex items-center gap-2 cursor-pointer flex-shrink-0 ${
+                  isActive
+                    ? 'text-neutral-900 font-medium'
+                    : 'text-neutral-400 hover:text-neutral-800 font-light'
+                }`}
+              >
+                <span>{seriesName}</span>
+                <span
+                  className={`text-[10px] tracking-normal px-2 py-0.5 rounded-full transition-colors ${
+                    isActive
+                      ? 'bg-neutral-900 text-white font-medium'
+                      : 'bg-neutral-100 text-neutral-500 group-hover:bg-neutral-200'
+                  }`}
+                >
+                  {count}
+                </span>
+                {isActive && (
+                  <span className="absolute bottom-0 inset-x-0 h-[2px] bg-neutral-900 animate-fade-in" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
       {/* CSS Masonry Columns Layout (Sean Layh style with native Drag & Drop) */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 md:gap-8 [column-fill:_balance]">
-        {list.map((item, index) => (
+      <div
+        className={`columns-1 sm:columns-2 lg:columns-3 gap-6 md:gap-8 [column-fill:_balance] transition-opacity duration-200 ${
+          isTabTransitioning ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
+        {filteredList.map((item, index) => (
           <div
             key={item.id || index}
-            draggable={isEditing}
+            draggable={isEditing && activeSeries === 'all'}
             onDragStart={(e) => handleDragStart(e, index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragLeave={(e) => handleDragLeave(e, index)}
@@ -541,7 +638,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
             </div>
 
             {/* Drag & Drop Indicator Overlay (Edit Mode only) */}
-            {isEditing && (
+            {isEditing && activeSeries === 'all' && (
               <div className="absolute inset-x-0 top-0 p-2.5 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-end text-white pointer-events-none">
                 <span className="text-[10px] uppercase font-sans tracking-wider text-neutral-200 bg-black/70 px-2.5 py-1 rounded flex items-center gap-1.5 backdrop-blur-xs">
                   <svg className="w-3.5 h-3.5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -693,9 +790,19 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   <div className="flex items-center justify-between text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium mb-3">
                     <span>Ficha Técnica</span>
                     <span>
-                      {(selectedIndex ?? 0) + 1} de {list.length}
+                      {(selectedIndex ?? 0) + 1} de {filteredList.length}
                     </span>
                   </div>
+
+                  {/* Series Badge (if assigned) */}
+                  {selectedItem.series && (
+                    <div className="mb-2">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-neutral-100 text-neutral-600 text-[10px] tracking-[0.2em] uppercase font-sans font-medium rounded-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+                        <span>Serie · {selectedItem.series}</span>
+                      </span>
+                    </div>
+                  )}
 
                   {/* Title (Editable in Edit Mode) */}
                   {isEditing ? (

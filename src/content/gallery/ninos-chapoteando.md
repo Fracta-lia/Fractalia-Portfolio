@@ -7,4 +7,5 @@ image: "/images/gallery/ninos-chapoteando.webp"
 width: 2400
 height: 1514
 order: 2
+series: "Luz & Vivencias"
 ---

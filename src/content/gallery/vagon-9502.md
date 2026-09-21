@@ -7,4 +7,5 @@ image: "/images/gallery/vagon-9502.webp"
 width: 1018
 height: 1600
 order: 4
+series: "Dolomitas & Horizontes"
 ---

@@ -116,3 +116,12 @@ body[data-edit-mode="true"] .reveal-on-scroll,
 .animate-slide-fade-up {
   animation: slideFadeUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Hide scrollbar for clean horizontal tab bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

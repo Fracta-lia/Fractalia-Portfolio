@@ -23,6 +23,7 @@ const galleryItems = galleryEntries.map(entry => ({
   height: entry.data.height,
   aspectRatio: entry.data.width / entry.data.height,
   order: entry.data.order,
+  series: entry.data.series || '',
 }));
 
 const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://fractalia-iota.vercel.app';

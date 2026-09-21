@@ -7,4 +7,5 @@ image: "/images/gallery/siete-vidas.webp"
 width: 2400
 height: 2400
 order: 5
+series: "Figura & Miradas"
 ---
