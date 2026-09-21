@@ -551,9 +551,17 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       }
     };
 
-    const onMouseUp = () => {
+    const onMouseUp = (e: MouseEvent) => {
       if (isMousePanningZoom) {
         isMousePanningZoom = false;
+        const totalMovement = Math.hypot(e.clientX - mouseStartX, e.clientY - mouseStartY);
+
+        // Clean single click while zoomed in: zoom out back to 1x!
+        if (totalMovement < 6) {
+          resetZoom();
+          return;
+        }
+
         const scale = zoomRef.current.scale;
         const vpRect = el.getBoundingClientRect();
         const maxPanX = (vpRect.width * (scale - 1)) / 2;
@@ -575,6 +583,17 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       if (!trackRef.current || isAnimatingRef.current) return;
 
       const diffX = mouseCurrentX - mouseStartX;
+      const totalMovement = Math.hypot(e.clientX - mouseStartX, e.clientY - mouseStartY);
+
+      // Clean single click on artwork image while unzoomed: zoom in!
+      if (totalMovement < 6) {
+        const target = e.target as HTMLElement | null;
+        if (target && (target === currentImageRef.current || currentImageRef.current?.contains(target))) {
+          zoomTo(2.5, e.clientX, e.clientY);
+          return;
+        }
+      }
+
       const threshold = 45;
 
       if (diffX < -threshold) {
@@ -891,23 +910,55 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
             className="relative w-full max-w-7xl h-full sm:h-auto sm:max-h-[92vh] bg-neutral-950 lg:bg-white shadow-2xl flex flex-col lg:flex-row overflow-hidden sm:border sm:border-neutral-200/50"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={handleClose}
-              aria-label="Cerrar modal"
-              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 w-10 h-10 bg-neutral-950/80 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors rounded-full border border-neutral-700/60 shadow-lg cursor-pointer"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            {/* Top Right Modal Controls */}
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 flex items-center gap-2">
+              {/* Zoom Button (Standard PhotoSwipe style toolbar button) */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (isZoomed) {
+                    resetZoom();
+                  } else {
+                    zoomTo(2.5);
+                  }
+                }}
+                aria-label={isZoomed ? "Alejar imagen" : "Acercar imagen"}
+                title={isZoomed ? "Alejar imagen" : "Acercar imagen"}
+                className={`w-10 h-10 bg-neutral-950/80 hover:bg-neutral-900 text-white flex items-center justify-center transition-all duration-200 rounded-full border shadow-lg cursor-pointer ${
+                  isZoomed ? 'border-amber-400/80 text-amber-300' : 'border-neutral-700/60'
+                }`}
+              >
+                {isZoomed ? (
+                  /* Zoom Out icon (-) */
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+                  </svg>
+                ) : (
+                  /* Zoom In icon (+) */
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={handleClose}
+                aria-label="Cerrar modal"
+                className="w-10 h-10 bg-neutral-950/80 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors rounded-full border border-neutral-700/60 shadow-lg cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
             {/* Left: Artwork Viewport with 3-Slide Carousel Track */}
             <div
               ref={viewportRef}
               className={`relative flex-1 bg-neutral-950 flex items-center justify-start h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] select-none overflow-hidden touch-none ${
-                isZoomed ? 'cursor-move active:cursor-grabbing' : 'cursor-grab active:cursor-grabbing'
+                isZoomed ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
               }`}
               style={{ touchAction: 'none' }}
             >
@@ -932,7 +983,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   )}
                 </div>
 
-                {/* Slide 1: Current Artwork (Supports pinch-to-zoom & double-tap) */}
+                {/* Slide 1: Current Artwork (Supports pinch-to-zoom & single click on PC) */}
                 <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8 overflow-hidden">
                   {selectedItem && (
                     <img
@@ -940,14 +991,9 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                       src={selectedItem.src}
                       alt={selectedItem.title}
                       draggable={false}
-                      onDoubleClick={(e) => {
-                        if (zoomRef.current.scale > 1.1) {
-                          resetZoom();
-                        } else {
-                          zoomTo(2.5, e.clientX, e.clientY);
-                        }
-                      }}
-                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl select-none will-change-transform"
+                      className={`max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl select-none will-change-transform ${
+                        isZoomed ? 'cursor-grab active:cursor-grabbing' : 'cursor-zoom-in'
+                      }`}
                     />
                   )}
                 </div>
@@ -964,22 +1010,6 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   )}
                 </div>
               </div>
-
-              {/* Zoom Reset Button (Appears only when zoomed in) */}
-              {isZoomed && (
-                <button
-                  type="button"
-                  onClick={resetZoom}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
-                  className="absolute top-3 left-3 sm:top-4 sm:left-4 z-30 px-3 py-1.5 bg-neutral-900/80 hover:bg-neutral-900 active:scale-95 text-white text-[11px] sm:text-xs font-sans tracking-wider uppercase rounded-full border border-white/20 shadow-lg flex items-center gap-1.5 backdrop-blur-xs transition-all duration-200 cursor-pointer"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  <span>Restablecer zoom</span>
-                </button>
-              )}
 
               {/* Edit Image Button (Edit Mode) */}
               {isEditing && (
