@@ -7,4 +7,6 @@ image: "/images/gallery/cadaver.webp"
 width: 2400
 height: 1753
 order: 7
+artworkType: "Obra original"
+description: "Pieza original realizada al pastel con pigmentos de alta permanencia sobre papel canson mi teintes."
 ---

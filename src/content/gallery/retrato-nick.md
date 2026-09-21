@@ -7,4 +7,6 @@ image: "/images/gallery/retrato-nick.webp"
 width: 1600
 height: 1173
 order: 10
+artworkType: "Obra original"
+description: "Pieza original realizada al óleo con pigmentos de alta permanencia sobre papel canson mi teintes."
 ---

@@ -7,4 +7,6 @@ image: "/images/gallery/vagon-9502.webp"
 width: 1018
 height: 1600
 order: 4
+artworkType: "Obra original"
+description: "Pieza original realizada al pastel con pigmentos de alta permanencia sobre papel canson mi teintes."
 ---

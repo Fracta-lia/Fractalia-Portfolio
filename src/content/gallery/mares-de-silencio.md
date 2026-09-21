@@ -7,4 +7,6 @@ image: "/images/gallery/mares-de-silencio.webp"
 width: 1591
 height: 1600
 order: 1
+artworkType: "Obra original"
+description: "Pieza original realizada al acrílico con pigmentos de alta permanencia sobre soporte preparado artesanalmente."
 ---
