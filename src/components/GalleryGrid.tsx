@@ -102,9 +102,13 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const resetZoom = useCallback(() => {
     zoomRef.current = { scale: 1, panX: 0, panY: 0 };
     setIsZoomed(false);
+    if (viewportRef.current) {
+      viewportRef.current.style.cursor = 'zoom-in';
+    }
     if (currentImageRef.current) {
       currentImageRef.current.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
       currentImageRef.current.style.transform = 'translate(0px, 0px) scale(1)';
+      currentImageRef.current.style.cursor = 'zoom-in';
     }
   }, []);
 
@@ -137,6 +141,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     zoomRef.current = { scale: targetScale, panX: clampedX, panY: clampedY };
     setIsZoomed(true);
 
+    viewport.style.cursor = 'grab';
+    img.style.cursor = 'grab';
     img.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
     img.style.transform = `translate(${clampedX}px, ${clampedY}px) scale(${targetScale})`;
   }, [resetZoom]);
@@ -509,11 +515,13 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         if (currentImageRef.current) {
           currentImageRef.current.style.transition = 'none';
         }
+        if (el) el.style.cursor = 'grabbing';
         return;
       }
 
       isMouseDown = true;
       mouseStartX = e.clientX;
+      mouseStartY = e.clientY;
       mouseCurrentX = mouseStartX;
       if (trackRef.current) {
         trackRef.current.style.transition = 'none';
@@ -554,6 +562,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     const onMouseUp = (e: MouseEvent) => {
       if (isMousePanningZoom) {
         isMousePanningZoom = false;
+        if (el) el.style.cursor = 'grab';
         const totalMovement = Math.hypot(e.clientX - mouseStartX, e.clientY - mouseStartY);
 
         // Clean single click while zoomed in: zoom out back to 1x!
@@ -585,10 +594,10 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       const diffX = mouseCurrentX - mouseStartX;
       const totalMovement = Math.hypot(e.clientX - mouseStartX, e.clientY - mouseStartY);
 
-      // Clean single click on artwork image while unzoomed: zoom in!
+      // Clean single click while unzoomed: zoom in!
       if (totalMovement < 6) {
         const target = e.target as HTMLElement | null;
-        if (target && (target === currentImageRef.current || currentImageRef.current?.contains(target))) {
+        if (target && !target.closest('button') && !target.closest('input')) {
           zoomTo(2.5, e.clientX, e.clientY);
           return;
         }
@@ -904,7 +913,6 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       {selectedIndex !== null && selectedItem && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 md:p-8 bg-neutral-950/95 sm:bg-neutral-950/90 backdrop-blur-sm animate-fade-in"
-          onClick={handleClose}
         >
           <div
             className="relative w-full max-w-7xl h-full sm:h-auto sm:max-h-[92vh] bg-neutral-950 lg:bg-white shadow-2xl flex flex-col lg:flex-row overflow-hidden sm:border sm:border-neutral-200/50"
@@ -957,10 +965,11 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
             {/* Left: Artwork Viewport with 3-Slide Carousel Track */}
             <div
               ref={viewportRef}
-              className={`relative flex-1 bg-neutral-950 flex items-center justify-start h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] select-none overflow-hidden touch-none ${
-                isZoomed ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
-              }`}
-              style={{ touchAction: 'none' }}
+              className="relative flex-1 bg-neutral-950 flex items-center justify-start h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] select-none overflow-hidden touch-none"
+              style={{
+                touchAction: 'none',
+                cursor: isZoomed ? 'grab' : 'zoom-in',
+              }}
             >
               {/* 3-Slide Carousel Track for 60fps/120fps physical swipe */}
               <div
@@ -984,16 +993,22 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 </div>
 
                 {/* Slide 1: Current Artwork (Supports pinch-to-zoom & single click on PC) */}
-                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8 overflow-hidden">
+                <div
+                  className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8 overflow-hidden"
+                  style={{
+                    cursor: isZoomed ? 'grab' : 'zoom-in',
+                  }}
+                >
                   {selectedItem && (
                     <img
                       ref={currentImageRef}
                       src={selectedItem.src}
                       alt={selectedItem.title}
                       draggable={false}
-                      className={`max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl select-none will-change-transform ${
-                        isZoomed ? 'cursor-grab active:cursor-grabbing' : 'cursor-zoom-in'
-                      }`}
+                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl select-none will-change-transform"
+                      style={{
+                        cursor: isZoomed ? 'grab' : 'zoom-in',
+                      }}
                     />
                   )}
                 </div>
