@@ -92,6 +92,67 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const isAnimatingRef = useRef<boolean>(false);
 
+  // Zoom & Swipe Hint State & Refs
+  const currentImageRef = useRef<HTMLImageElement | null>(null);
+  const zoomRef = useRef({ scale: 1, panX: 0, panY: 0 });
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const hasSeenSwipeHintRef = useRef(false);
+
+  const resetZoom = useCallback(() => {
+    zoomRef.current = { scale: 1, panX: 0, panY: 0 };
+    setIsZoomed(false);
+    if (currentImageRef.current) {
+      currentImageRef.current.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+      currentImageRef.current.style.transform = 'translate(0px, 0px) scale(1)';
+    }
+  }, []);
+
+  const zoomTo = useCallback((targetScale: number, clientX?: number, clientY?: number) => {
+    const img = currentImageRef.current;
+    const viewport = viewportRef.current;
+    if (!img || !viewport) return;
+
+    if (targetScale <= 1.05) {
+      resetZoom();
+      return;
+    }
+
+    const vpRect = viewport.getBoundingClientRect();
+    const centerX = clientX !== undefined ? clientX - vpRect.left : vpRect.width / 2;
+    const centerY = clientY !== undefined ? clientY - vpRect.top : vpRect.height / 2;
+
+    const relX = centerX - vpRect.width / 2;
+    const relY = centerY - vpRect.height / 2;
+
+    const newPanX = -relX * (targetScale - 1);
+    const newPanY = -relY * (targetScale - 1);
+
+    const maxPanX = (vpRect.width * (targetScale - 1)) / 2;
+    const maxPanY = (vpRect.height * (targetScale - 1)) / 2;
+
+    const clampedX = Math.max(-maxPanX, Math.min(maxPanX, newPanX));
+    const clampedY = Math.max(-maxPanY, Math.min(maxPanY, newPanY));
+
+    zoomRef.current = { scale: targetScale, panX: clampedX, panY: clampedY };
+    setIsZoomed(true);
+
+    img.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    img.style.transform = `translate(${clampedX}px, ${clampedY}px) scale(${targetScale})`;
+  }, [resetZoom]);
+
+  // Momentary swipe hint on first artwork open in session
+  useEffect(() => {
+    if (selectedIndex !== null && !hasSeenSwipeHintRef.current) {
+      hasSeenSwipeHintRef.current = true;
+      setShowSwipeHint(true);
+      const timer = setTimeout(() => {
+        setShowSwipeHint(false);
+      }, 2400);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedIndex]);
+
   const prevItem =
     selectedIndex !== null && list.length > 1
       ? list[(selectedIndex - 1 + list.length) % list.length]
@@ -103,16 +164,20 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
   const handleOpen = (index: number) => {
     if (draggedIndex !== null) return;
+    resetZoom();
     setSelectedIndex(index);
   };
 
   const handleClose = useCallback(() => {
+    resetZoom();
     setSelectedIndex(null);
-  }, []);
+  }, [resetZoom]);
 
   const handlePrev = useCallback(
     (e?: React.MouseEvent) => {
       e?.stopPropagation();
+      resetZoom();
+      setShowSwipeHint(false);
       if (list.length <= 1 || isAnimatingRef.current) return;
       isAnimatingRef.current = true;
 
@@ -134,12 +199,14 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         isAnimatingRef.current = false;
       }
     },
-    [list.length]
+    [list.length, resetZoom]
   );
 
   const handleNext = useCallback(
     (e?: React.MouseEvent) => {
       e?.stopPropagation();
+      resetZoom();
+      setShowSwipeHint(false);
       if (list.length <= 1 || isAnimatingRef.current) return;
       isAnimatingRef.current = true;
 
@@ -161,10 +228,10 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         isAnimatingRef.current = false;
       }
     },
-    [list.length]
+    [list.length, resetZoom]
   );
 
-  // Dedicated Safari & Chrome Mobile Touch Swipe + Desktop Mouse Drag with real-time physical track glide
+  // Dedicated Safari & Chrome Mobile Touch Swipe + Pinch Zoom + Desktop Mouse Drag
   useEffect(() => {
     const el = viewportRef.current;
     if (!el || selectedIndex === null) return;
@@ -176,59 +243,242 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     let hasDeterminedDirection = false;
     let isHorizontalSwipe = false;
 
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1 || isAnimatingRef.current) return;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      currentX = startX;
-      isSwiping = true;
-      hasDeterminedDirection = false;
-      isHorizontalSwipe = false;
+    // Zoom & Pan touch tracking
+    let touchStartDistance = 0;
+    let touchStartScale = 1;
+    let touchStartPanX = 0;
+    let touchStartPanY = 0;
+    let touchStartCenter = { x: 0, y: 0 };
+    let isPinching = false;
+    let isPanningZoom = false;
+    let panStartX = 0;
+    let panStartY = 0;
+    let lastTapTime = 0;
+    let lastTapPos = { x: 0, y: 0 };
 
-      if (trackRef.current) {
-        trackRef.current.style.transition = 'none';
+    const dismissHint = () => {
+      setShowSwipeHint(false);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      dismissHint();
+      if (isAnimatingRef.current) return;
+
+      // 1. Two-finger Pinch to Zoom
+      if (e.touches.length === 2) {
+        isSwiping = false;
+        isPinching = true;
+        isPanningZoom = false;
+
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        touchStartDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        touchStartScale = zoomRef.current.scale;
+        touchStartPanX = zoomRef.current.panX;
+        touchStartPanY = zoomRef.current.panY;
+        touchStartCenter = {
+          x: (t1.clientX + t2.clientX) / 2,
+          y: (t1.clientY + t2.clientY) / 2,
+        };
+
+        if (currentImageRef.current) {
+          currentImageRef.current.style.transition = 'none';
+        }
+        return;
+      }
+
+      // 2. One-finger touch
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const now = Date.now();
+        const timeSinceLastTap = now - lastTapTime;
+        const distSinceLastTap = Math.hypot(touch.clientX - lastTapPos.x, touch.clientY - lastTapPos.y);
+
+        // Double-tap detection
+        if (timeSinceLastTap < 320 && distSinceLastTap < 30) {
+          lastTapTime = 0;
+          if (zoomRef.current.scale > 1.1) {
+            resetZoom();
+          } else {
+            zoomTo(2.5, touch.clientX, touch.clientY);
+          }
+          return;
+        }
+        lastTapTime = now;
+        lastTapPos = { x: touch.clientX, y: touch.clientY };
+
+        // If currently zoomed in: 1-finger panning
+        if (zoomRef.current.scale > 1.05) {
+          isPanningZoom = true;
+          isSwiping = false;
+          panStartX = touch.clientX;
+          panStartY = touch.clientY;
+          touchStartPanX = zoomRef.current.panX;
+          touchStartPanY = zoomRef.current.panY;
+
+          if (currentImageRef.current) {
+            currentImageRef.current.style.transition = 'none';
+          }
+          return;
+        }
+
+        // Normal carousel swipe start
+        startX = touch.clientX;
+        startY = touch.clientY;
+        currentX = startX;
+        isSwiping = true;
+        hasDeterminedDirection = false;
+        isHorizontalSwipe = false;
+
+        if (trackRef.current) {
+          trackRef.current.style.transition = 'none';
+        }
       }
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!isSwiping || e.touches.length !== 1 || isAnimatingRef.current) return;
-      currentX = e.touches[0].clientX;
-      const diffX = currentX - startX;
-      const diffY = e.touches[0].clientY - startY;
+      if (isAnimatingRef.current) return;
 
-      if (!hasDeterminedDirection && (Math.abs(diffX) > 6 || Math.abs(diffY) > 6)) {
-        hasDeterminedDirection = true;
-        isHorizontalSwipe = Math.abs(diffX) > Math.abs(diffY);
+      // Pinch zoom with 2 fingers
+      if (isPinching && e.touches.length === 2) {
+        if (e.cancelable) e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        if (touchStartDistance > 0) {
+          const scaleFactor = dist / touchStartDistance;
+          const rawScale = touchStartScale * scaleFactor;
+          const scale = Math.max(0.7, Math.min(4.5, rawScale));
+
+          const currentCenter = {
+            x: (t1.clientX + t2.clientX) / 2,
+            y: (t1.clientY + t2.clientY) / 2,
+          };
+          const centerDiffX = currentCenter.x - touchStartCenter.x;
+          const centerDiffY = currentCenter.y - touchStartCenter.y;
+
+          const panX = touchStartPanX + centerDiffX;
+          const panY = touchStartPanY + centerDiffY;
+
+          zoomRef.current = { scale, panX, panY };
+
+          if (currentImageRef.current) {
+            currentImageRef.current.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+          }
+        }
+        return;
       }
 
-      if (isHorizontalSwipe) {
-        if (e.cancelable) {
-          e.preventDefault();
+      // Pan while zoomed in with 1 finger
+      if (isPanningZoom && e.touches.length === 1) {
+        if (e.cancelable) e.preventDefault();
+        const touch = e.touches[0];
+        const diffX = touch.clientX - panStartX;
+        const diffY = touch.clientY - panStartY;
+
+        const vpRect = el.getBoundingClientRect();
+        const scale = zoomRef.current.scale;
+        const maxPanX = (vpRect.width * (scale - 1)) / 2 + 60;
+        const maxPanY = (vpRect.height * (scale - 1)) / 2 + 60;
+
+        const panX = Math.max(-maxPanX, Math.min(maxPanX, touchStartPanX + diffX));
+        const panY = Math.max(-maxPanY, Math.min(maxPanY, touchStartPanY + diffY));
+
+        zoomRef.current.panX = panX;
+        zoomRef.current.panY = panY;
+
+        if (currentImageRef.current) {
+          currentImageRef.current.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
         }
-        if (trackRef.current) {
-          trackRef.current.style.transform = `translateX(calc(-33.333333% + ${diffX}px))`;
+        return;
+      }
+
+      // Normal 1-finger horizontal carousel swipe
+      if (isSwiping && e.touches.length === 1) {
+        currentX = e.touches[0].clientX;
+        const diffX = currentX - startX;
+        const diffY = e.touches[0].clientY - startY;
+
+        if (!hasDeterminedDirection && (Math.abs(diffX) > 6 || Math.abs(diffY) > 6)) {
+          hasDeterminedDirection = true;
+          isHorizontalSwipe = Math.abs(diffX) > Math.abs(diffY);
+        }
+
+        if (isHorizontalSwipe) {
+          if (e.cancelable) e.preventDefault();
+          if (trackRef.current) {
+            trackRef.current.style.transform = `translateX(calc(-33.333333% + ${diffX}px))`;
+          }
         }
       }
     };
 
-    const onTouchEnd = () => {
-      if (!isSwiping) return;
-      isSwiping = false;
+    const onTouchEnd = (e: TouchEvent) => {
+      // End of pinch
+      if (isPinching) {
+        if (e.touches.length < 2) {
+          isPinching = false;
+          const currentScale = zoomRef.current.scale;
+          if (currentScale <= 1.05) {
+            resetZoom();
+          } else {
+            const clampedScale = Math.min(4, Math.max(1.05, currentScale));
+            setIsZoomed(true);
+            const vpRect = el.getBoundingClientRect();
+            const maxPanX = (vpRect.width * (clampedScale - 1)) / 2;
+            const maxPanY = (vpRect.height * (clampedScale - 1)) / 2;
+            const clampedPanX = Math.max(-maxPanX, Math.min(maxPanX, zoomRef.current.panX));
+            const clampedPanY = Math.max(-maxPanY, Math.min(maxPanY, zoomRef.current.panY));
 
-      if (!isHorizontalSwipe || !trackRef.current || isAnimatingRef.current) {
+            zoomRef.current = { scale: clampedScale, panX: clampedPanX, panY: clampedPanY };
+            if (currentImageRef.current) {
+              currentImageRef.current.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+              currentImageRef.current.style.transform = `translate(${clampedPanX}px, ${clampedPanY}px) scale(${clampedScale})`;
+            }
+          }
+        }
         return;
       }
 
-      const diffX = currentX - startX;
-      const threshold = 40;
+      // End of pan while zoomed
+      if (isPanningZoom) {
+        if (e.touches.length === 0) {
+          isPanningZoom = false;
+          const scale = zoomRef.current.scale;
+          const vpRect = el.getBoundingClientRect();
+          const maxPanX = (vpRect.width * (scale - 1)) / 2;
+          const maxPanY = (vpRect.height * (scale - 1)) / 2;
+          const clampedPanX = Math.max(-maxPanX, Math.min(maxPanX, zoomRef.current.panX));
+          const clampedPanY = Math.max(-maxPanY, Math.min(maxPanY, zoomRef.current.panY));
 
-      if (diffX < -threshold) {
-        handleNext();
-      } else if (diffX > threshold) {
-        handlePrev();
-      } else {
-        trackRef.current.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        trackRef.current.style.transform = 'translateX(-33.333333%)';
+          zoomRef.current.panX = clampedPanX;
+          zoomRef.current.panY = clampedPanY;
+          if (currentImageRef.current) {
+            currentImageRef.current.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+            currentImageRef.current.style.transform = `translate(${clampedPanX}px, ${clampedPanY}px) scale(${scale})`;
+          }
+        }
+        return;
+      }
+
+      // End of normal carousel swipe
+      if (isSwiping) {
+        isSwiping = false;
+        if (!isHorizontalSwipe || !trackRef.current || isAnimatingRef.current) {
+          return;
+        }
+
+        const diffX = currentX - startX;
+        const threshold = 40;
+
+        if (diffX < -threshold) {
+          handleNext();
+        } else if (diffX > threshold) {
+          handlePrev();
+        } else {
+          trackRef.current.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+          trackRef.current.style.transform = 'translateX(-33.333333%)';
+        }
       }
     };
 
@@ -237,13 +487,31 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     el.addEventListener('touchend', onTouchEnd, { passive: true });
     el.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
-    // Mouse drag support for PC
+    // Mouse drag support for PC (supports panning if zoomed)
     let isMouseDown = false;
     let mouseStartX = 0;
+    let mouseStartY = 0;
     let mouseCurrentX = 0;
+    let isMousePanningZoom = false;
+    let mouseStartPanX = 0;
+    let mouseStartPanY = 0;
 
     const onMouseDown = (e: MouseEvent) => {
+      dismissHint();
       if (e.button !== 0 || isAnimatingRef.current) return;
+
+      if (zoomRef.current.scale > 1.05) {
+        isMousePanningZoom = true;
+        mouseStartX = e.clientX;
+        mouseStartY = e.clientY;
+        mouseStartPanX = zoomRef.current.panX;
+        mouseStartPanY = zoomRef.current.panY;
+        if (currentImageRef.current) {
+          currentImageRef.current.style.transition = 'none';
+        }
+        return;
+      }
+
       isMouseDown = true;
       mouseStartX = e.clientX;
       mouseCurrentX = mouseStartX;
@@ -253,7 +521,29 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (!isMouseDown || isAnimatingRef.current) return;
+      if (isAnimatingRef.current) return;
+
+      if (isMousePanningZoom) {
+        const diffX = e.clientX - mouseStartX;
+        const diffY = e.clientY - mouseStartY;
+        const vpRect = el.getBoundingClientRect();
+        const scale = zoomRef.current.scale;
+        const maxPanX = (vpRect.width * (scale - 1)) / 2 + 50;
+        const maxPanY = (vpRect.height * (scale - 1)) / 2 + 50;
+
+        const panX = Math.max(-maxPanX, Math.min(maxPanX, mouseStartPanX + diffX));
+        const panY = Math.max(-maxPanY, Math.min(maxPanY, mouseStartPanY + diffY));
+
+        zoomRef.current.panX = panX;
+        zoomRef.current.panY = panY;
+
+        if (currentImageRef.current) {
+          currentImageRef.current.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        }
+        return;
+      }
+
+      if (!isMouseDown) return;
       mouseCurrentX = e.clientX;
       const diffX = mouseCurrentX - mouseStartX;
       if (trackRef.current) {
@@ -262,6 +552,24 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     };
 
     const onMouseUp = () => {
+      if (isMousePanningZoom) {
+        isMousePanningZoom = false;
+        const scale = zoomRef.current.scale;
+        const vpRect = el.getBoundingClientRect();
+        const maxPanX = (vpRect.width * (scale - 1)) / 2;
+        const maxPanY = (vpRect.height * (scale - 1)) / 2;
+        const clampedPanX = Math.max(-maxPanX, Math.min(maxPanX, zoomRef.current.panX));
+        const clampedPanY = Math.max(-maxPanY, Math.min(maxPanY, zoomRef.current.panY));
+
+        zoomRef.current.panX = clampedPanX;
+        zoomRef.current.panY = clampedPanY;
+        if (currentImageRef.current) {
+          currentImageRef.current.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+          currentImageRef.current.style.transform = `translate(${clampedPanX}px, ${clampedPanY}px) scale(${scale})`;
+        }
+        return;
+      }
+
       if (!isMouseDown) return;
       isMouseDown = false;
       if (!trackRef.current || isAnimatingRef.current) return;
@@ -292,7 +600,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };
-  }, [selectedIndex, handleNext, handlePrev]);
+  }, [selectedIndex, handleNext, handlePrev, resetZoom, zoomTo]);
 
   useEffect(() => {
     if (selectedIndex === null) return;
@@ -598,7 +906,9 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
             {/* Left: Artwork Viewport with 3-Slide Carousel Track */}
             <div
               ref={viewportRef}
-              className="relative flex-1 bg-neutral-950 flex items-center justify-start h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] select-none overflow-hidden cursor-grab active:cursor-grabbing touch-none"
+              className={`relative flex-1 bg-neutral-950 flex items-center justify-start h-[62vh] sm:h-[65vh] lg:h-auto lg:min-h-[80vh] lg:max-h-[86vh] select-none overflow-hidden touch-none ${
+                isZoomed ? 'cursor-move active:cursor-grabbing' : 'cursor-grab active:cursor-grabbing'
+              }`}
               style={{ touchAction: 'none' }}
             >
               {/* 3-Slide Carousel Track for 60fps/120fps physical swipe */}
@@ -611,7 +921,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 }}
               >
                 {/* Slide 0: Previous Artwork */}
-                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8">
+                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8 overflow-hidden">
                   {prevItem && (
                     <img
                       src={prevItem.src}
@@ -622,20 +932,28 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   )}
                 </div>
 
-                {/* Slide 1: Current Artwork */}
-                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8">
+                {/* Slide 1: Current Artwork (Supports pinch-to-zoom & double-tap) */}
+                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8 overflow-hidden">
                   {selectedItem && (
                     <img
+                      ref={currentImageRef}
                       src={selectedItem.src}
                       alt={selectedItem.title}
                       draggable={false}
-                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl pointer-events-none select-none"
+                      onDoubleClick={(e) => {
+                        if (zoomRef.current.scale > 1.1) {
+                          resetZoom();
+                        } else {
+                          zoomTo(2.5, e.clientX, e.clientY);
+                        }
+                      }}
+                      className="max-w-full max-h-full lg:max-h-[82vh] w-auto h-auto object-contain shadow-2xl select-none will-change-transform"
                     />
                   )}
                 </div>
 
                 {/* Slide 2: Next Artwork */}
-                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8">
+                <div className="w-1/3 h-full flex-shrink-0 flex items-center justify-center p-3 sm:p-6 lg:p-8 overflow-hidden">
                   {nextItem && (
                     <img
                       src={nextItem.src}
@@ -646,6 +964,22 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   )}
                 </div>
               </div>
+
+              {/* Zoom Reset Button (Appears only when zoomed in) */}
+              {isZoomed && (
+                <button
+                  type="button"
+                  onClick={resetZoom}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  className="absolute top-3 left-3 sm:top-4 sm:left-4 z-30 px-3 py-1.5 bg-neutral-900/80 hover:bg-neutral-900 active:scale-95 text-white text-[11px] sm:text-xs font-sans tracking-wider uppercase rounded-full border border-white/20 shadow-lg flex items-center gap-1.5 backdrop-blur-xs transition-all duration-200 cursor-pointer"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span>Restablecer zoom</span>
+                </button>
+              )}
 
               {/* Edit Image Button (Edit Mode) */}
               {isEditing && (
@@ -670,35 +1004,43 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 </div>
               )}
 
-              {/* Prev / Next Nav (Visible on both mobile & desktop with juicy hover/active spring) */}
-              <button
-                type="button"
-                onClick={handlePrev}
-                onMouseDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
-                aria-label="Obra anterior"
-                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                onMouseDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
-                aria-label="Obra siguiente"
-                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+              {/* Prev / Next Nav (Hidden while zoomed to avoid obstructing view) */}
+              {!isZoomed && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePrev}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    aria-label="Obra anterior"
+                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    aria-label="Obra siguiente"
+                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </>
+              )}
 
-              {/* Mobile swipe subtle indicator */}
-              <div className="sm:hidden absolute bottom-2 inset-x-0 flex justify-center items-center pointer-events-none z-10">
-                <span className="text-[10px] text-white/70 tracking-wider uppercase font-sans bg-black/40 px-2.5 py-0.5 rounded-full backdrop-blur-xs">
+              {/* Mobile swipe subtle indicator (momentary on first entry only) */}
+              <div
+                className={`sm:hidden absolute bottom-3 inset-x-0 flex justify-center items-center pointer-events-none z-10 transition-all duration-700 ${
+                  showSwipeHint ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+                }`}
+              >
+                <span className="text-[10px] text-white/80 tracking-wider uppercase font-sans bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10 shadow-lg">
                   ← Desliza para navegar →
                 </span>
               </div>
