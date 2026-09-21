@@ -23,6 +23,10 @@ const galleryItems = galleryEntries.map(entry => ({
   height: entry.data.height,
   aspectRatio: entry.data.width / entry.data.height,
   order: entry.data.order,
+  artworkType: entry.data.artworkType || entry.data.type || 'Obra original',
+  description: entry.data.description !== undefined
+    ? entry.data.description
+    : 'Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.',
 }));
 
 const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://fractalia-iota.vercel.app';

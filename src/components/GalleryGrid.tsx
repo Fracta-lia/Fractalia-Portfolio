@@ -13,6 +13,8 @@ export interface GalleryItem {
   height?: number;
   aspectRatio?: number;
   order?: number;
+  artworkType?: string;
+  description?: string;
 }
 
 interface GalleryGridProps {
@@ -24,6 +26,12 @@ function artworkToMarkdown(item: GalleryItem, order: number): string {
   if (item.src.startsWith('data:')) {
     imagePath = `/images/gallery/${item.id}.webp`;
   }
+  const artworkType = item.artworkType || 'Obra original';
+  const description =
+    item.description !== undefined
+      ? item.description
+      : 'Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.';
+
   return `---
 title: "${(item.title || '').replace(/"/g, '\\"')}"
 technique: "${(item.technique || 'Óleo sobre lienzo').replace(/"/g, '\\"')}"
@@ -33,6 +41,8 @@ image: "${imagePath}"
 width: ${item.width || 2000}
 height: ${item.height || 2000}
 order: ${order}
+artworkType: "${artworkType.replace(/"/g, '\\"')}"
+description: "${description.replace(/"/g, '\\"').replace(/\r?\n/g, ' ')}"
 ---
 `;
 }
@@ -52,6 +62,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const [newTechnique, setNewTechnique] = useState('Óleo sobre lienzo');
   const [newDimensions, setNewDimensions] = useState('');
   const [newYear, setNewYear] = useState(new Date().getFullYear().toString());
+  const [newArtworkType, setNewArtworkType] = useState('Obra original');
+  const [newDescription, setNewDescription] = useState('Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.');
   const [newImageDataUrl, setNewImageDataUrl] = useState<string | null>(null);
   const [newProcessedImage, setNewProcessedImage] = useState<ProcessedImage | null>(null);
   const [isProcessingImage, setIsProcessingImage] = useState(false);
@@ -458,6 +470,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       technique: newTechnique.trim() || 'Óleo sobre lienzo',
       dimensions: newDimensions.trim(),
       year: newYear.trim() || new Date().getFullYear().toString(),
+      artworkType: newArtworkType.trim() || 'Obra original',
+      description: newDescription.trim(),
       src: newProcessedImage?.dataUrl || newImageDataUrl,
       width,
       height,
@@ -483,7 +497,11 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     setList([...list, newItem]);
     setShowAddModal(false);
     setNewTitle('');
+    setNewTechnique('Óleo sobre lienzo');
     setNewDimensions('');
+    setNewYear(new Date().getFullYear().toString());
+    setNewArtworkType('Obra original');
+    setNewDescription('Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.');
     setNewImageDataUrl(null);
     setNewProcessedImage(null);
     setNewImageFile(null);
@@ -766,15 +784,54 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                     )}
                   </div>
 
-                  <div className="flex justify-between py-1">
+                  {/* Tipo */}
+                  <div className="flex justify-between items-center py-1 border-b border-neutral-100">
                     <span className="text-neutral-400 uppercase text-xs tracking-wider">Tipo</span>
-                    <span className="text-neutral-900">Obra original</span>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedItem.artworkType || 'Obra original'}
+                        placeholder="Ej. Obra original"
+                        onChange={(e) => handleUpdateItemField('artworkType', e.target.value)}
+                        className="text-right text-xs font-sans border-b border-neutral-300 focus:border-neutral-900 pb-0.5 focus:outline-none text-neutral-900 placeholder:text-neutral-300"
+                      />
+                    ) : (
+                      <span className="text-neutral-900">{selectedItem.artworkType || 'Obra original'}</span>
+                    )}
                   </div>
                 </div>
 
-                <p className="text-xs text-neutral-500 font-sans font-light leading-relaxed pt-2">
-                  Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.
-                </p>
+                {/* Descripción / Nota de la pieza */}
+                <div className="pt-2">
+                  {isEditing ? (
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] uppercase font-sans tracking-wider text-neutral-400">
+                        Descripción de la pieza
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={
+                          selectedItem.description !== undefined
+                            ? selectedItem.description
+                            : 'Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.'
+                        }
+                        onChange={(e) => handleUpdateItemField('description', e.target.value)}
+                        placeholder="Descripción o nota curatorial de la pieza..."
+                        className="w-full text-xs font-sans font-light text-neutral-800 p-2.5 border border-neutral-300 rounded-sm focus:border-neutral-900 focus:outline-none resize-none leading-relaxed bg-neutral-50/60"
+                      />
+                    </div>
+                  ) : (
+                    (selectedItem.description !== undefined
+                      ? selectedItem.description
+                      : 'Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.') && (
+                      <p className="text-xs text-neutral-500 font-sans font-light leading-relaxed">
+                        {selectedItem.description !== undefined
+                          ? selectedItem.description
+                          : 'Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.'}
+                      </p>
+                    )
+                  )}
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -950,6 +1007,34 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                     className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
                   />
                 </div>
+              </div>
+
+              {/* Artwork Type */}
+              <div>
+                <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
+                  Tipo de Obra
+                </label>
+                <input
+                  type="text"
+                  value={newArtworkType}
+                  onChange={(e) => setNewArtworkType(e.target.value)}
+                  placeholder="Ej. Obra original, Estudio, Boceto"
+                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
+                  Descripción / Nota de la Pieza
+                </label>
+                <textarea
+                  rows={2}
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  placeholder="Descripción o nota curatorial de la pieza..."
+                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900 resize-none"
+                />
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100">

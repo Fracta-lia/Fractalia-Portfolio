@@ -12,6 +12,8 @@ const gallery = defineCollection({
     width: z.number(),
     height: z.number(),
     order: z.number(),
+    artworkType: z.string().optional().default('Obra original'),
+    type: z.string().optional(),
     description: z.string().optional(),
   }),
 });
