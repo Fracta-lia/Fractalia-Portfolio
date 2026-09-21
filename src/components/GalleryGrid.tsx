@@ -259,8 +259,6 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     let isPanningZoom = false;
     let panStartX = 0;
     let panStartY = 0;
-    let lastTapTime = 0;
-    let lastTapPos = { x: 0, y: 0 };
 
     const dismissHint = () => {
       setShowSwipeHint(false);
@@ -293,25 +291,9 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
         return;
       }
 
-      // 2. One-finger touch
+      // 2. One-finger touch (swiping or panning when zoomed, no double-tap)
       if (e.touches.length === 1) {
         const touch = e.touches[0];
-        const now = Date.now();
-        const timeSinceLastTap = now - lastTapTime;
-        const distSinceLastTap = Math.hypot(touch.clientX - lastTapPos.x, touch.clientY - lastTapPos.y);
-
-        // Double-tap detection
-        if (timeSinceLastTap < 320 && distSinceLastTap < 30) {
-          lastTapTime = 0;
-          if (zoomRef.current.scale > 1.1) {
-            resetZoom();
-          } else {
-            zoomTo(2.5, touch.clientX, touch.clientY);
-          }
-          return;
-        }
-        lastTapTime = now;
-        lastTapPos = { x: touch.clientX, y: touch.clientY };
 
         // If currently zoomed in: 1-finger panning
         if (zoomRef.current.scale > 1.05) {
