@@ -627,6 +627,20 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
     };
   }, [selectedIndex, handleClose, handlePrev, handleNext]);
 
+  // Lock body scroll and handle Escape for Add Artwork modal
+  useEffect(() => {
+    if (!showAddModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowAddModal(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [showAddModal]);
+
   // Drag and Drop handlers
   const handleDragStart = (e: React.DragEvent, index: number) => {
     if (!isEditing) return;
@@ -1247,176 +1261,192 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       {/* Add Artwork Modal */}
       {showAddModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
-          onClick={() => setShowAddModal(false)}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-fade-in"
         >
           <div
-            className="bg-white border border-neutral-200 max-w-lg w-full p-6 sm:p-8 rounded-sm shadow-2xl space-y-6"
+            className="bg-white border border-neutral-200 max-w-lg w-full max-h-[90vh] flex flex-col rounded-sm shadow-2xl overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div>
-              <span className="text-[11px] font-sans tracking-[0.25em] uppercase text-neutral-400 font-medium block mb-1">
-                Nueva Obra
-              </span>
-              <h3 className="font-serif text-2xl text-neutral-900">
-                Agregar Pintura a la Galería
-              </h3>
+            {/* Modal Header */}
+            <div className="flex items-start justify-between p-6 sm:p-7 pb-4 border-b border-neutral-100 flex-shrink-0">
+              <div>
+                <span className="text-[11px] font-sans tracking-[0.25em] uppercase text-neutral-400 font-medium block mb-1">
+                  Nueva Obra
+                </span>
+                <h3 className="font-serif text-2xl text-neutral-900">
+                  Agregar Pintura a la Galería
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                className="text-neutral-400 hover:text-neutral-900 p-1 -mr-2 transition-colors cursor-pointer"
+                aria-label="Cerrar modal"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
-            <form onSubmit={handleAddNewArtwork} className="space-y-4">
-              {/* Image Upload Area */}
-              <div>
-                <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1.5">
-                  Fotografía de la Obra *
-                </label>
-                <div
-                  onClick={() => !isProcessingImage && fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-neutral-300 hover:border-neutral-900 rounded-sm p-6 text-center cursor-pointer transition-colors bg-neutral-50"
-                >
-                  {isProcessingImage ? (
-                    <div className="py-8 space-y-2 text-neutral-500">
-                      <div className="w-6 h-6 border-2 border-neutral-400 border-t-neutral-900 rounded-full animate-spin mx-auto"></div>
-                      <span className="text-xs">Optimizando imagen...</span>
-                    </div>
-                  ) : newImageDataUrl ? (
-                    <div className="space-y-2">
-                      <img
-                        src={newImageDataUrl}
-                        alt="Previsualización"
-                        className="max-h-48 mx-auto object-contain rounded-sm"
-                      />
-                      <span className="text-xs text-neutral-500 block underline">Hacer clic para cambiar</span>
-                    </div>
-                  ) : (
-                    <div className="space-y-1 text-neutral-500">
-                      <svg className="w-8 h-8 mx-auto text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" />
-                      </svg>
-                      <span className="text-xs font-medium block">Seleccionar imagen desde tu computadora</span>
-                      <span className="text-[11px] text-neutral-400 block">Formatos: JPG, PNG, WEBP</span>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setNewImageFile(file);
-                      setIsProcessingImage(true);
-                      try {
-                        const processed = await processImageFile(file);
-                        setNewProcessedImage(processed);
-                        setNewImageDataUrl(processed.dataUrl);
-                      } catch (err: any) {
-                        const reader = new FileReader();
-                        reader.onload = () => setNewImageDataUrl(reader.result as string);
-                        reader.readAsDataURL(file);
-                      } finally {
-                        setIsProcessingImage(false);
-                      }
-                    }}
-                    accept="image/*"
-                    className="hidden"
-                  />
+            <form onSubmit={handleAddNewArtwork} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              {/* Scrollable Form Body */}
+              <div className="p-6 sm:p-7 overflow-y-auto space-y-4 flex-1 overscroll-contain">
+                {/* Image Upload Area */}
+                <div>
+                  <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1.5">
+                    Fotografía de la Obra *
+                  </label>
+                  <div
+                    onClick={() => !isProcessingImage && fileInputRef.current?.click()}
+                    className="border-2 border-dashed border-neutral-300 hover:border-neutral-900 rounded-sm p-6 text-center cursor-pointer transition-colors bg-neutral-50"
+                  >
+                    {isProcessingImage ? (
+                      <div className="py-8 space-y-2 text-neutral-500">
+                        <div className="w-6 h-6 border-2 border-neutral-400 border-t-neutral-900 rounded-full animate-spin mx-auto"></div>
+                        <span className="text-xs">Optimizando imagen...</span>
+                      </div>
+                    ) : newImageDataUrl ? (
+                      <div className="space-y-2">
+                        <img
+                          src={newImageDataUrl}
+                          alt="Previsualización"
+                          className="max-h-48 mx-auto object-contain rounded-sm"
+                        />
+                        <span className="text-xs text-neutral-500 block underline">Hacer clic para cambiar</span>
+                      </div>
+                    ) : (
+                      <div className="space-y-1 text-neutral-500">
+                        <svg className="w-8 h-8 mx-auto text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span className="text-xs font-medium block">Seleccionar imagen desde tu computadora</span>
+                        <span className="text-[11px] text-neutral-400 block">Formatos: JPG, PNG, WEBP</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setNewImageFile(file);
+                        setIsProcessingImage(true);
+                        try {
+                          const processed = await processImageFile(file);
+                          setNewProcessedImage(processed);
+                          setNewImageDataUrl(processed.dataUrl);
+                        } catch (err: any) {
+                          const reader = new FileReader();
+                          reader.onload = () => setNewImageDataUrl(reader.result as string);
+                          reader.readAsDataURL(file);
+                        } finally {
+                          setIsProcessingImage(false);
+                        }
+                      }}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Title */}
-              <div>
-                <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
-                  Título de la Obra *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="Ej. Sinfonía en Óleo"
-                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
-                />
-              </div>
-
-              {/* Technique */}
-              <div>
-                <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
-                  Técnica
-                </label>
-                <input
-                  type="text"
-                  value={newTechnique}
-                  onChange={(e) => setNewTechnique(e.target.value)}
-                  placeholder="Ej. Óleo sobre lienzo"
-                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
-                />
-              </div>
-
-              {/* Dimensions & Year */}
-              <div className="grid grid-cols-2 gap-4">
+                {/* Title */}
                 <div>
                   <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
-                    Dimensiones
+                    Título de la Obra *
                   </label>
                   <input
                     type="text"
-                    value={newDimensions}
-                    onChange={(e) => setNewDimensions(e.target.value)}
-                    placeholder="Ej. 60 × 80 cm"
+                    required
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="Ej. Sinfonía en Óleo"
                     className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
                   />
                 </div>
+
+                {/* Technique */}
                 <div>
                   <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
-                    Año
+                    Técnica
                   </label>
                   <input
                     type="text"
-                    value={newYear}
-                    onChange={(e) => setNewYear(e.target.value)}
+                    value={newTechnique}
+                    onChange={(e) => setNewTechnique(e.target.value)}
+                    placeholder="Ej. Óleo sobre lienzo"
                     className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
+                  />
+                </div>
+
+                {/* Dimensions & Year */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
+                      Dimensiones
+                    </label>
+                    <input
+                      type="text"
+                      value={newDimensions}
+                      onChange={(e) => setNewDimensions(e.target.value)}
+                      placeholder="Ej. 60 × 80 cm"
+                      className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
+                      Año
+                    </label>
+                    <input
+                      type="text"
+                      value={newYear}
+                      onChange={(e) => setNewYear(e.target.value)}
+                      className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
+                    />
+                  </div>
+                </div>
+
+                {/* Artwork Type */}
+                <div>
+                  <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
+                    Tipo de Obra
+                  </label>
+                  <input
+                    type="text"
+                    value={newArtworkType}
+                    onChange={(e) => setNewArtworkType(e.target.value)}
+                    placeholder="Ej. Obra original, Estudio, Boceto"
+                    className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
+                    Descripción / Nota de la Pieza
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={newDescription}
+                    onChange={(e) => setNewDescription(e.target.value)}
+                    placeholder="Descripción o nota curatorial de la pieza..."
+                    className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900 resize-none"
                   />
                 </div>
               </div>
 
-              {/* Artwork Type */}
-              <div>
-                <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
-                  Tipo de Obra
-                </label>
-                <input
-                  type="text"
-                  value={newArtworkType}
-                  onChange={(e) => setNewArtworkType(e.target.value)}
-                  placeholder="Ej. Obra original, Estudio, Boceto"
-                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-[11px] font-sans tracking-wider uppercase text-neutral-500 mb-1">
-                  Descripción / Nota de la Pieza
-                </label>
-                <textarea
-                  rows={2}
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                  placeholder="Descripción o nota curatorial de la pieza..."
-                  className="w-full px-3.5 py-2 text-sm border border-neutral-300 rounded-sm focus:outline-none focus:border-neutral-900 resize-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100">
+              {/* Pinned Action Buttons Footer */}
+              <div className="flex items-center justify-end gap-3 p-4 sm:px-7 sm:py-4 bg-neutral-50/95 backdrop-blur-xs border-t border-neutral-200 flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-xs font-sans uppercase tracking-wider text-neutral-500 hover:text-neutral-900"
+                  className="px-4 py-2 text-xs font-sans uppercase tracking-wider text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-neutral-900 text-white hover:bg-neutral-800 text-xs font-sans tracking-[0.2em] uppercase font-medium rounded-sm shadow-sm"
+                  className="px-6 py-2.5 bg-neutral-900 text-white hover:bg-neutral-800 text-xs font-sans tracking-[0.2em] uppercase font-medium rounded-sm shadow-sm transition-colors cursor-pointer"
                 >
                   Añadir a Galería
                 </button>
