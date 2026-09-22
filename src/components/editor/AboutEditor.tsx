@@ -5,32 +5,35 @@ import EditableImage from './EditableImage';
 
 interface AboutEditorProps {
   initialPortrait: string;
-  initialQuote: string;
-  initialBio: string;
+  initialStatement: string;
+  initialSemblanza: string;
+  initialQuote?: string;
+  initialBio?: string;
   base?: string;
 }
 
-function serializeAbout(quote: string, portrait: string, bio: string): string {
+function serializeAbout(statement: string, semblanza: string, portrait: string): string {
   return `---
 title: "Sobre la Artista"
-quote: "${quote.replace(/"/g, '\\"')}"
 portrait: "${portrait}"
+statement: ${JSON.stringify(statement.trim())}
+quote: ${JSON.stringify(statement.trim())}
 ---
 
-${bio.trim()}
+${semblanza.trim()}
 `;
 }
 
 export default function AboutEditor({
   initialPortrait,
-  initialQuote,
-  initialBio,
+  initialStatement,
+  initialSemblanza,
   base = '',
 }: AboutEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [portrait, setPortrait] = useState(initialPortrait);
-  const [quote, setQuote] = useState(initialQuote);
-  const [bio, setBio] = useState(initialBio);
+  const [statement, setStatement] = useState(initialStatement);
+  const [semblanza, setSemblanza] = useState(initialSemblanza);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -41,24 +44,24 @@ export default function AboutEditor({
     return () => unsubscribe();
   }, []);
 
-  const updateDraft = (newQuote: string, newPortrait: string, newBio: string) => {
-    const md = serializeAbout(newQuote, newPortrait, newBio);
+  const updateDraft = (newStatement: string, newSemblanza: string, newPortrait: string) => {
+    const md = serializeAbout(newStatement, newSemblanza, newPortrait);
     EditorStore.setDraft('src/content/pages/about.md', {
       content: md,
-      label: 'Página Sobre la Artista (Bio/Cita)',
+      label: 'Página Sobre la Artista (Statement / Semblanza)',
     });
   };
 
-  const handleQuoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleStatementChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
-    setQuote(val);
-    updateDraft(val, portrait, bio);
+    setStatement(val);
+    updateDraft(val, semblanza, portrait);
   };
 
-  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleSemblanzaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
-    setBio(val);
-    updateDraft(quote, portrait, val);
+    setSemblanza(val);
+    updateDraft(statement, val, portrait);
   };
 
   const handlePortraitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +81,7 @@ export default function AboutEditor({
       });
 
       setPortrait(result);
-      updateDraft(quote, portraitPath, bio);
+      updateDraft(statement, semblanza, portraitPath);
     };
     reader.readAsDataURL(file);
   };
@@ -105,59 +108,77 @@ export default function AboutEditor({
         </p>
       </div>
 
-      {/* Right Column: Narrative & Biography */}
-      <div className="lg:col-span-7 space-y-8 text-neutral-700 font-sans font-light leading-relaxed reveal-on-scroll delay-150">
-        <div>
+      {/* Right Column: Statement & Semblanza */}
+      <div className="lg:col-span-7 space-y-10 text-neutral-700 font-sans font-light leading-relaxed reveal-on-scroll delay-150">
+        {/* Section 1: Statement */}
+        <div className="space-y-4">
           <EditableText
-            contentKey="about.bio.title"
-            defaultText="La pintura como archivo emocional"
+            contentKey="about.statement.title"
+            defaultText="Statement"
             as="h2"
-            className="font-serif text-2xl sm:text-3xl text-neutral-950 font-normal mb-4 block"
+            className="font-serif text-3xl sm:text-4xl text-neutral-950 font-normal tracking-tight block"
           />
 
           {isEditing ? (
-            <div className="p-3 bg-neutral-50 border border-dashed border-neutral-300 rounded-sm">
-              <label className="block text-[10px] uppercase tracking-widest text-neutral-400 mb-1 font-medium">
-                Cita Filosófica (Haz clic para editar):
+            <div className="p-4 bg-neutral-50 border border-dashed border-neutral-300 rounded-sm space-y-2">
+              <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium">
+                Statement de la Artista (Haz clic para editar / saltos de línea permitidos):
               </label>
               <textarea
-                value={quote}
-                onChange={handleQuoteChange}
-                rows={3}
-                className="w-full text-base sm:text-lg text-neutral-800 font-serif italic bg-transparent focus:outline-none resize-y"
+                value={statement}
+                onChange={handleStatementChange}
+                rows={5}
+                placeholder="Escribe tu statement de artista..."
+                className="w-full text-base sm:text-lg text-neutral-900 font-serif italic bg-transparent focus:outline-none resize-y leading-relaxed"
               />
             </div>
           ) : (
-            <p className="text-base sm:text-lg text-neutral-800 leading-relaxed font-normal font-serif italic">
-              &ldquo;{quote}&rdquo;
-            </p>
+            <div className="border-l-2 border-neutral-900/70 pl-5 sm:pl-6 py-1">
+              <div className="text-base sm:text-lg text-neutral-800 leading-relaxed font-serif italic whitespace-pre-line space-y-2">
+                {statement}
+              </div>
+            </div>
           )}
         </div>
 
-        <div>
+        {/* Section 2: Semblanza */}
+        <div className="space-y-4 pt-8 border-t border-neutral-100">
+          <EditableText
+            contentKey="about.semblanza.title"
+            defaultText="Semblanza"
+            as="h2"
+            className="font-serif text-3xl sm:text-4xl text-neutral-950 font-normal tracking-tight block"
+          />
+
           {isEditing ? (
-            <div className="p-3 bg-neutral-50 border border-dashed border-neutral-300 rounded-sm">
-              <label className="block text-[10px] uppercase tracking-widest text-neutral-400 mb-1 font-medium">
-                Texto de Biografía (Markdown permitido):
+            <div className="p-4 bg-neutral-50 border border-dashed border-neutral-300 rounded-sm space-y-2">
+              <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium">
+                Semblanza Curricular / Trayectoria (Haz clic para editar / párrafos o markdown):
               </label>
               <textarea
-                value={bio}
-                onChange={handleBioChange}
-                rows={10}
+                value={semblanza}
+                onChange={handleSemblanzaChange}
+                rows={8}
+                placeholder="Escribe tu semblanza o trayectoria..."
                 className="w-full text-sm sm:text-base text-neutral-700 font-sans leading-relaxed bg-transparent focus:outline-none resize-y"
               />
             </div>
           ) : (
-            <div className="space-y-4 text-sm sm:text-base text-neutral-600">
-              {bio.split('\n\n').map((paragraph, idx) => (
-                <p key={idx} dangerouslySetInnerHTML={{ __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+            <div className="space-y-4 text-sm sm:text-base text-neutral-600 font-sans leading-relaxed font-light whitespace-pre-line">
+              {semblanza.split('\n\n').map((paragraph, idx) => (
+                <p
+                  key={idx}
+                  dangerouslySetInnerHTML={{
+                    __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
+                  }}
+                />
               ))}
             </div>
           )}
         </div>
 
         {/* Creative Approach & Values */}
-        <div className="pt-6 border-t border-neutral-100">
+        <div className="pt-8 border-t border-neutral-100">
           <EditableText
             contentKey="about.process.title"
             defaultText="Proceso & Materiales"

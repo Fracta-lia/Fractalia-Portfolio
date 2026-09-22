@@ -28,6 +28,8 @@ const pages = defineCollection({
     // About fields
     quote: z.string().optional(),
     portrait: z.string().optional(),
+    statement: z.string().optional(),
+    semblanza: z.string().optional(),
   }),
 });
 
