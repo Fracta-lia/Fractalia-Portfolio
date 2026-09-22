@@ -122,21 +122,26 @@ export default function AboutEditor({
           {isEditing ? (
             <div className="p-4 bg-neutral-50 border border-dashed border-neutral-300 rounded-sm space-y-2">
               <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium">
-                Statement de la Artista (Haz clic para editar / saltos de línea permitidos):
+                Statement de la Artista (Haz clic para editar / párrafos o markdown):
               </label>
               <textarea
                 value={statement}
                 onChange={handleStatementChange}
-                rows={5}
+                rows={8}
                 placeholder="Escribe tu statement de artista..."
-                className="w-full text-base sm:text-lg text-neutral-900 font-serif italic bg-transparent focus:outline-none resize-y leading-relaxed"
+                className="w-full text-sm sm:text-base text-neutral-700 font-sans leading-relaxed bg-transparent focus:outline-none resize-y"
               />
             </div>
           ) : (
-            <div className="border-l-2 border-neutral-900/70 pl-5 sm:pl-6 py-1">
-              <div className="text-base sm:text-lg text-neutral-800 leading-relaxed font-serif italic whitespace-pre-line space-y-2">
-                {statement}
-              </div>
+            <div className="space-y-4 text-sm sm:text-base text-neutral-600 font-sans leading-relaxed font-light whitespace-pre-line">
+              {statement.split('\n\n').map((paragraph, idx) => (
+                <p
+                  key={idx}
+                  dangerouslySetInnerHTML={{
+                    __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
+                  }}
+                />
+              ))}
             </div>
           )}
         </div>
