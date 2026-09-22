@@ -7,6 +7,6 @@ image: "/images/gallery/siete-vidas.webp"
 width: 2400
 height: 2400
 order: 5
-artworkType: "Obra original"
+artworkType: "Portada de sencillo"
 description: "Pieza original realizada al pastel con pigmentos de alta permanencia sobre papel canson mi teintes."
 ---
