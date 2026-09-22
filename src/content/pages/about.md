@@ -4,6 +4,10 @@ quote: "Creo firmemente que el arte plástico tiene el poder de capturar lo que 
 portrait: "/images/about/lia-paz.webp"
 ---
 
-**Statement** Estar vivo es una experiencia escalofriante; efímera. Estar vivo es un acto político.
+**Statement** Estar vivo es una experiencia escalofriante; 
+efímera. 
+Estar vivo es un acto político.
+
 Yo estoy viva, mi arte habla de vivir cerca de la muerte.
+
 Mi producción se inclina al campo de lo figurativo, centrándose en la representación del rostro como territorio donde la fragilidad y la fuerza conviven, construyendo imágenes intensas que dialogan con la salud mental, la tensión interna, la fugacidad del momento: Carpe Diem, et Memento Mori.
