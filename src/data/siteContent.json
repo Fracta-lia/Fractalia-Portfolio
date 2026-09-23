@@ -66,7 +66,9 @@
   "home.services.card1.image": "/images/gallery/retrato-nick.webp",
   "home.services.card2.image": "/images/gallery/manos-y-anillo.webp",
   "home.about.image": "/images/about/lia-paz.webp",
-  "services.s1.image": "/images/uploads/services_s1_image.jpg",
+  "services.s1.image": "/images/uploads/services_s1_image.jpeg",
   "services.s2.image": "/images/uploads/services_s2_image.jpeg",
-  "about.portrait.image": "/images/about/lia-paz.webp"
+  "about.portrait.image": "/images/about/lia-paz.webp",
+  "services.s1.d0": "1 Completa el formulario con la información necesaria y cuéntame tu idea",
+  "services.s1.d1": "2 Mandé varias fotografías de alta resolución o sesión guiada"
 }
