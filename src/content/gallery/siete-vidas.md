@@ -1,7 +1,7 @@
 ---
 title: "Siete Vidas"
 technique: "Pastel sobre papel"
-dimensions: "25 x 25 cm"
+dimensions: "30 x 30 cm"
 year: "2025"
 image: "/images/gallery/siete-vidas.webp"
 width: 2400
