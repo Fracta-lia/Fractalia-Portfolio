@@ -116,7 +116,7 @@ export default function AboutEditor({
             contentKey="about.statement.title"
             defaultText="Statement de la Artista"
             as="h2"
-            className="font-sans text-[11px] uppercase tracking-[0.3em] text-neutral-400 font-medium block"
+            className="font-serif text-3xl sm:text-4xl text-neutral-950 font-normal tracking-tight block"
           />
 
           {isEditing ? (
@@ -152,7 +152,7 @@ export default function AboutEditor({
             contentKey="about.semblanza.title"
             defaultText="Semblanza"
             as="h2"
-            className="font-sans text-[11px] uppercase tracking-[0.3em] text-neutral-400 font-medium block"
+            className="font-serif text-3xl sm:text-4xl text-neutral-950 font-normal tracking-tight block"
           />
 
           {isEditing ? (
@@ -188,7 +188,7 @@ export default function AboutEditor({
             contentKey="about.process.title"
             defaultText="Proceso & Materiales"
             as="h3"
-            className="font-sans text-[11px] uppercase tracking-[0.3em] text-neutral-400 font-medium block mb-6"
+            className="font-serif text-2xl sm:text-3xl text-neutral-950 font-normal tracking-tight block mb-6"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="p-5 bg-neutral-50 border border-neutral-100">
