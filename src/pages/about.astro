@@ -20,22 +20,32 @@ const semblanza = aboutEntry?.data.semblanza ?? (aboutEntry?.body && aboutEntry.
 const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://liapaz.com';
 const aboutSchema = {
   '@context': 'https://schema.org',
-  '@type': 'AboutPage',
+  '@type': 'ProfilePage',
   '@id': `${siteUrl}/about#webpage`,
   url: `${siteUrl}/about`,
-  name: 'Sobre Lía Paz · Biografía y Trayectoria Artística',
-  description: 'Biografía, trayectoria y filosofía pictórica de la artista visual mexicana Lía Paz.',
+  name: 'Sobre Lía Paz · Artista Visual en Puebla, México',
+  description: 'Biografía, trayectoria y filosofía pictórica de la artista visual mexicana Lía Paz. Especialista en retratos al óleo y acrílico, radicada en Puebla, México.',
   isPartOf: { '@id': `${siteUrl}/#website` },
-  mainEntity: { '@id': `${siteUrl}/#artist` },
+  mainEntity: {
+    '@type': 'Person',
+    '@id': `${siteUrl}/#artist`,
+    name: 'Lía Paz',
+    jobTitle: 'Artista Visual',
+    homeLocation: {
+      '@type': 'Place',
+      name: 'Puebla, México'
+    },
+    knowsAbout: ['Pintura al óleo', 'Acrílico', 'Retratos', 'Wedding Live Painting']
+  },
   inLanguage: 'es-MX',
 };
 ---
 
 <BaseLayout
-  title="Sobre Lía Paz · Biografía y Filosofía Artística | Fractalia"
-  description="Conoce la trayectoria, visión plástica y filosofía de la artista visual Lía Paz (Fractalia). Pintura figurativa contemporánea y el arte de inmortalizar instantes."
+  title="Sobre Lía Paz · Artista Visual en Puebla, México | Fractalia"
+  description="Conoce la trayectoria de Lía Paz (Fractalia), artista visual contemporánea en Puebla, México. Especialista en pintura figurativa y retratos personalizados al óleo y acrílico."
   image={portrait}
-  imageAlt="Retrato de la artista visual Lía Paz"
+  imageAlt="Retrato de la artista visual Lía Paz en su estudio en Puebla"
   ogType="profile"
   jsonLd={aboutSchema}
 >

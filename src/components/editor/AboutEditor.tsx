@@ -104,7 +104,7 @@ export default function AboutEditor({
           />
         </div>
         <p className="font-sans text-[11px] text-neutral-400 uppercase tracking-widest text-center mt-3">
-          Lía Paz en su estudio de creación
+          Lía Paz en su estudio · Puebla, México
         </p>
       </div>
 

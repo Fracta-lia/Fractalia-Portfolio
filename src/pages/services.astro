@@ -11,13 +11,20 @@ const servicesSchema = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
   '@id': `${siteUrl}/services#business`,
-  name: 'Lía Paz · Wedding Live Painting & Fine Art',
+  name: 'Lía Paz · Wedding Live Painting & Retratos en Óleo y Acrílico',
   url: `${siteUrl}/services`,
   image: `${siteUrl}/images/services/wedding-live.svg`,
   email: 'liapazart@gmail.com',
   priceRange: '$$$',
   currenciesAccepted: 'MXN, USD',
+  address: {
+    '@type': 'PostalAddress',
+    'addressLocality': 'Puebla',
+    'addressRegion': 'PUE',
+    'addressCountry': 'MX'
+  },
   areaServed: [
+    { '@type': 'City', name: 'Puebla' },
     { '@type': 'Country', name: 'México' },
     { '@type': 'Country', name: 'Internacional' }
   ],
@@ -31,7 +38,7 @@ const servicesSchema = {
         itemOffered: {
           '@type': 'Service',
           name: 'Wedding Live Painting (Pintura en Vivo para Bodas)',
-          description: 'Creación de una obra pictórica al óleo en tiempo real durante la ceremonia o fiesta de bodas, capturando a los novios y el ambiente del evento.',
+          description: 'Creación de una obra pictórica al óleo o acrílico en tiempo real durante la ceremonia o fiesta de bodas, capturando a los novios y el ambiente del evento.',
           provider: { '@id': `${siteUrl}/#artist` }
         }
       },
@@ -39,8 +46,8 @@ const servicesSchema = {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: 'Retratos al Óleo por Encargo',
-          description: 'Retratos personalizados de autor trabajados al óleo sobre lienzo con rigor anatómico y sensibilidad lumínica a partir de sesiones o referencias.',
+          name: 'Retratos en Óleo y Acrílico por Encargo',
+          description: 'Retratos personalizados de autor trabajados al óleo y acrílico sobre lienzo con rigor anatómico y sensibilidad lumínica a partir de sesiones o referencias.',
           provider: { '@id': `${siteUrl}/#artist` }
         }
       }
@@ -50,10 +57,10 @@ const servicesSchema = {
 ---
 
 <BaseLayout
-  title="Wedding Live Painting & Retratos al Óleo · Lía Paz | Servicios"
-  description="Servicios artísticos exclusivos: pintura en vivo para bodas (Wedding Live Painting) y encargo de retratos al óleo sobre lienzo por la artista visual Lía Paz."
+  title="Wedding Live Painting & Retratos en Óleo y Acrílico · Lía Paz | Puebla, MX"
+  description="Servicios artísticos exclusivos desde Puebla, México: pintura en vivo para bodas (Wedding Live Painting) y retratos personalizados por encargo al óleo y acrílico."
   image="/images/services/wedding-live.svg"
-  imageAlt="Wedding Live Painting y Retratos al Óleo por Lía Paz"
+  imageAlt="Wedding Live Painting y Retratos en Óleo y Acrílico por Lía Paz en Puebla"
   jsonLd={servicesSchema}
 >
   <!-- Page Header -->
@@ -76,7 +83,7 @@ const servicesSchema = {
       <EditableText
         client:load
         contentKey="services.header.desc"
-        defaultText="Obras de arte hechas a mano que celebran los lazos humanos y momentos irrepetibles."
+        defaultText="Obras de arte hechas a mano en mi estudio en Puebla, México, celebrando los lazos humanos y momentos irrepetibles."
         as="p"
         className="font-sans text-sm sm:text-base text-neutral-500 font-light max-w-xl mx-auto mt-4 leading-relaxed"
         multiline
@@ -92,8 +99,8 @@ const servicesSchema = {
       <ServiceCard
         keyPrefix="services.s1"
         title="Retratos Personalizados"
-        tagline="Comisiones & Arte Figurativo"
-        description="Retratos al óleo sobre lienzo o lino que buscan captar la esencia, mirada y carácter del retratado. Perfecto como homenaje personal, regalo de aniversario o legado familiar atemporal."
+        tagline="Comisiones en Acrílico y Óleo"
+        description="Retratos en acrílico y óleo sobre lienzo o lino que buscan captar la esencia, mirada y carácter del retratado. Trabajados desde mi estudio en Puebla para el mundo. Perfecto como homenaje personal, regalo de aniversario o legado familiar atemporal."
         details={[
           "Retratos individuales, parejas, familias o retratos conmemorativos",
           "Trabajo a partir de fotografías de alta resolución o sesión guiada",
@@ -278,14 +285,14 @@ const servicesSchema = {
           <EditableText
             client:load
             contentKey="services.faq.q2"
-            defaultText="¿Te trasladas fuera de tu ciudad o internacionalmente?"
+            defaultText="¿Te trasladas fuera de Puebla o internacionalmente?"
             as="h3"
             className="font-serif text-xl text-neutral-900 font-normal mb-2"
           />
           <EditableText
             client:load
             contentKey="services.faq.a2"
-            defaultText="Sí. He viajado para documentar bodas en diversas locaciones y destinos. Los costos de traslado y hospedaje se cotizan con total transparencia según el destino."
+            defaultText="Sí. Aunque mi estudio está en Puebla, México, viajo frecuentemente para documentar bodas en diversas locaciones y destinos nacionales e internacionales. Los costos de traslado y hospedaje se cotizan con total transparencia."
             as="p"
             className="font-sans text-sm text-neutral-600 font-light leading-relaxed"
             multiline
