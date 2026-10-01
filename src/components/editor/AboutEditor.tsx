@@ -147,12 +147,12 @@ export default function AboutEditor({
         </div>
 
         {/* Section 2: Semblanza */}
-        <div className="space-y-4 pt-8 border-t border-neutral-100">
+        <div className="space-y-6 pt-8 border-t border-neutral-100">
           <EditableText
             contentKey="about.semblanza.title"
             defaultText="Semblanza"
             as="h2"
-            className="font-serif text-3xl sm:text-4xl text-neutral-950 font-normal tracking-tight block"
+            className="font-sans text-[11px] uppercase tracking-[0.3em] text-neutral-400 font-medium block"
           />
 
           {isEditing ? (
@@ -188,7 +188,7 @@ export default function AboutEditor({
             contentKey="about.process.title"
             defaultText="Proceso & Materiales"
             as="h3"
-            className="font-serif text-xl sm:text-2xl text-neutral-900 font-normal mb-4 block"
+            className="font-sans text-[11px] uppercase tracking-[0.3em] text-neutral-400 font-medium block mb-6"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="p-5 bg-neutral-50 border border-neutral-100">
