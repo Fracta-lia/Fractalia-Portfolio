@@ -111,12 +111,12 @@ export default function AboutEditor({
       {/* Right Column: Statement & Semblanza */}
       <div className="lg:col-span-7 space-y-10 text-neutral-700 font-sans font-light leading-relaxed reveal-on-scroll delay-150">
         {/* Section 1: Statement */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <EditableText
             contentKey="about.statement.title"
-            defaultText="Statement"
+            defaultText="Statement de la Artista"
             as="h2"
-            className="font-serif text-3xl sm:text-4xl text-neutral-950 font-normal tracking-tight block"
+            className="font-sans text-[11px] uppercase tracking-[0.3em] text-neutral-400 font-medium block"
           />
 
           {isEditing ? (
@@ -133,7 +133,7 @@ export default function AboutEditor({
               />
             </div>
           ) : (
-            <div className="space-y-4 text-sm sm:text-base text-neutral-600 font-sans leading-relaxed font-light whitespace-pre-line">
+            <div className="pl-6 sm:pl-8 border-l-[3px] border-neutral-200 py-1 space-y-5 text-xl sm:text-2xl text-neutral-800 font-serif italic leading-relaxed whitespace-pre-line">
               {statement.split('\n\n').map((paragraph, idx) => (
                 <p
                   key={idx}
