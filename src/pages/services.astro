@@ -6,7 +6,7 @@ import EditableText from '../components/editor/EditableText';
 const rawBase = import.meta.env.BASE_URL ?? '/';
 const base = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
 
-const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://fractalia-iota.vercel.app';
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://liapaz.com';
 const servicesSchema = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
@@ -345,3 +345,4 @@ const servicesSchema = {
     </div>
   </section>
 </BaseLayout>
+

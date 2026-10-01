@@ -17,7 +17,7 @@ Yo estoy viva, mi arte habla de vivir cerca de la muerte.`;
 
 const semblanza = aboutEntry?.data.semblanza ?? (aboutEntry?.body && aboutEntry.body.trim().length > 0 ? aboutEntry.body : `Mi producción se inclina al campo de lo figurativo, centrándose en la representación del rostro como territorio donde la fragilidad y la fuerza conviven, construyendo imágenes intensas que dialogan con la salud mental, la tensión interna, la fugacidad del momento: Carpe Diem, et Memento Mori.`);
 
-const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://fractalia-iota.vercel.app';
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://liapaz.com';
 const aboutSchema = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
@@ -72,4 +72,5 @@ const aboutSchema = {
     </div>
   </section>
 </BaseLayout>
+
 

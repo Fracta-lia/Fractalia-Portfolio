@@ -68,7 +68,7 @@ function localDevSavePlugin() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://fractalia-iota.vercel.app',
+  site: 'https://liapaz.com',
   output: 'static',
   devToolbar: {
     enabled: false,

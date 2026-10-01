@@ -20,7 +20,7 @@ const featuredWorks = galleryEntries.slice(0, 4).map(entry => ({
 const homeEntry = await getEntry('pages', 'home');
 const heroImage = homeEntry?.data.heroImage ?? '/images/gallery/mares-de-silencio.webp';
 const visionQuote = homeEntry?.data.artisticVisionQuote ?? 'Cada pincelada guarda un latido.';
-const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://fractalia-iota.vercel.app';
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://liapaz.com';
 const homePageSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -372,3 +372,4 @@ const homePageSchema = {
     </div>
   </section>
 </BaseLayout>
+

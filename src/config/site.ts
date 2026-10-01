@@ -1,9 +1,10 @@
-ï»¿export const SITE = {
-  url: 'https://fractalia-iota.vercel.app',
-  name: 'LÃ­a Paz Â· Arte Visual & Live Painting',
-  shortName: 'LÃ­a Paz',
+export const SITE = {
+  url: 'https://liapaz.com',
+  name: 'Lía Paz · Arte Visual & Live Painting',
+  shortName: 'Lía Paz',
   brand: 'Fractalia',
-  author: 'LÃ­a Paz',
+  author: 'Lía Paz',
   email: 'liapazart@gmail.com',
   instagram: 'https://www.instagram.com/fracta.lia/',
 };
+
