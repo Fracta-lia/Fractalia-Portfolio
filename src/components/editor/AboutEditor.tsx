@@ -48,7 +48,19 @@ export default function AboutEditor({
       setStatement(EditorStore.getText('about.statement.body', initialStatement));
       setSemblanza(EditorStore.getText('about.semblanza.body', initialSemblanza));
     });
-    return () => unsubscribe();
+
+    const handleLangChange = (e: any) => {
+      const newL = e?.detail?.lang || EditorStore.getLang();
+      setLang(newL);
+      setStatement(EditorStore.getText('about.statement.body', initialStatement, newL));
+      setSemblanza(EditorStore.getText('about.semblanza.body', initialSemblanza, newL));
+    };
+    window.addEventListener('lia_lang_change', handleLangChange);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('lia_lang_change', handleLangChange);
+    };
   }, [initialStatement, initialSemblanza]);
 
   const updateDraft = (newStatement: string, newSemblanza: string, newPortrait: string) => {

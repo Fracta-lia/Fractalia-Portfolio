@@ -87,7 +87,17 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       setIsEditing(EditorStore.isEditMode());
       setLang(EditorStore.getLang());
     });
-    return () => unsubscribe();
+
+    const handleLangChange = (e: any) => {
+      const newL = e?.detail?.lang;
+      if (newL) setLang(newL);
+    };
+    window.addEventListener('lia_lang_change', handleLangChange);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('lia_lang_change', handleLangChange);
+    };
   }, []);
 
   const t = uiTranslations[lang] || uiTranslations.en;

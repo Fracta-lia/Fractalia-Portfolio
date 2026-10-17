@@ -7,19 +7,31 @@ interface Props {
 }
 
 export default function LanguageSwitcher({ className = '' }: Props) {
-  const [lang, setLang] = useState<Lang>(EditorStore.getLang());
+  const [lang, setLang] = useState<Lang>(() => EditorStore.getLang());
 
   useEffect(() => {
     setLang(EditorStore.getLang());
     const unsubscribe = EditorStore.subscribe(() => {
       setLang(EditorStore.getLang());
     });
-    return () => unsubscribe();
+    const handleLangChange = (e: any) => {
+      const newL = e?.detail?.lang;
+      if (newL) setLang(newL);
+    };
+    window.addEventListener('lia_lang_change', handleLangChange);
+    return () => {
+      unsubscribe();
+      window.removeEventListener('lia_lang_change', handleLangChange);
+    };
   }, []);
 
   const handleSelect = (target: Lang) => {
-    if (lang === target) return;
-    EditorStore.setLang(target);
+    if (typeof window !== 'undefined' && (window as any).__liaSetLang) {
+      (window as any).__liaSetLang(target);
+    } else {
+      EditorStore.setLang(target);
+    }
+    setLang(target);
   };
 
   return (
@@ -30,6 +42,7 @@ export default function LanguageSwitcher({ className = '' }: Props) {
     >
       <button
         type="button"
+        data-lang-btn="es"
         onClick={() => handleSelect('es')}
         className={`px-1 py-0.5 transition-all cursor-pointer ${
           lang === 'es'
@@ -43,6 +56,7 @@ export default function LanguageSwitcher({ className = '' }: Props) {
       <span className="text-neutral-300 text-[10px] mx-1">/</span>
       <button
         type="button"
+        data-lang-btn="en"
         onClick={() => handleSelect('en')}
         className={`px-1 py-0.5 transition-all cursor-pointer ${
           lang === 'en'

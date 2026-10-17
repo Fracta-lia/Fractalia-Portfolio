@@ -1,6 +1,4 @@
 ---
-import LanguageSwitcher from './LanguageSwitcher';
-
 interface Props {
   currentPath?: string;
 }
@@ -68,13 +66,49 @@ const isActive = (href: string) => {
 
       <!-- Language Selector -->
       <div class="pl-2 border-l border-neutral-200/80">
-        <LanguageSwitcher client:load />
+        <div class="inline-flex items-center text-[11px] font-sans tracking-[0.2em] uppercase select-none" role="group" aria-label="Language selector">
+          <button
+            type="button"
+            data-lang-btn="es"
+            class="px-1 py-0.5 transition-all cursor-pointer text-neutral-950 font-semibold border-b border-neutral-900"
+            aria-label="Cambiar a Español"
+          >
+            ES
+          </button>
+          <span class="text-neutral-300 text-[10px] mx-1">/</span>
+          <button
+            type="button"
+            data-lang-btn="en"
+            class="px-1 py-0.5 transition-all cursor-pointer text-neutral-400 hover:text-neutral-800"
+            aria-label="Switch to English"
+          >
+            EN
+          </button>
+        </div>
       </div>
     </nav>
 
     <!-- Mobile Header Actions (Language Switcher + Hamburger) -->
     <div class="flex items-center space-x-3 md:hidden">
-      <LanguageSwitcher client:load />
+      <div class="inline-flex items-center text-[11px] font-sans tracking-[0.2em] uppercase select-none" role="group" aria-label="Language selector">
+        <button
+          type="button"
+          data-lang-btn="es"
+          class="px-1 py-0.5 transition-all cursor-pointer text-neutral-950 font-semibold border-b border-neutral-900"
+          aria-label="Cambiar a Español"
+        >
+          ES
+        </button>
+        <span class="text-neutral-300 text-[10px] mx-1">/</span>
+        <button
+          type="button"
+          data-lang-btn="en"
+          class="px-1 py-0.5 transition-all cursor-pointer text-neutral-400 hover:text-neutral-800"
+          aria-label="Switch to English"
+        >
+          EN
+        </button>
+      </div>
       <button
         id="mobile-menu-button"
         type="button"

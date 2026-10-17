@@ -35,7 +35,7 @@ function notify() {
 if (typeof window !== 'undefined') {
   window.addEventListener('lia_lang_change', (e: any) => {
     const newLang = e?.detail?.lang;
-    if (newLang && (newLang === 'es' || newLang === 'en') && newLang !== currentLang) {
+    if (newLang && (newLang === 'es' || newLang === 'en')) {
       currentLang = newLang;
       notify();
     }
@@ -49,7 +49,6 @@ export const EditorStore = {
 
   setLang(lang: Lang) {
     if (typeof window === 'undefined') return;
-    if (currentLang === lang) return;
     currentLang = lang;
     try {
       localStorage.setItem(LANG_STORAGE_KEY, lang);

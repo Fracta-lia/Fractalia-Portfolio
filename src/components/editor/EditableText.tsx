@@ -18,7 +18,12 @@ export default function EditableText({
 }: EditableTextProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [text, setText] = useState(defaultText);
+  const [text, setText] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return EditorStore.getText(contentKey, defaultText);
+    }
+    return defaultText;
+  });
   const elementRef = useRef<HTMLElement>(null);
   const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -31,8 +36,15 @@ export default function EditableText({
       setText(EditorStore.getText(contentKey, defaultText));
     });
 
+    const handleLangChange = (e: any) => {
+      const newL = e?.detail?.lang;
+      setText(EditorStore.getText(contentKey, defaultText, newL));
+    };
+    window.addEventListener('lia_lang_change', handleLangChange);
+
     return () => {
       unsubscribe();
+      window.removeEventListener('lia_lang_change', handleLangChange);
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
       }
@@ -116,9 +128,16 @@ export default function EditableText({
     }
   };
 
-  // Normal view: 100% original element, zero extra tags or wrappers
+  // Normal view: 100% original element with data-i18n for 0ms instant DOM translation
   if (!isEditing) {
-    return React.createElement(Component, { className }, text);
+    return React.createElement(
+      Component,
+      {
+        className,
+        'data-i18n': contentKey,
+      },
+      text
+    );
   }
 
   // Edit mode: keeps exact tag and className, only adds subtle active focus outline
@@ -132,6 +151,7 @@ export default function EditableText({
       ref: elementRef,
       'data-editable': 'true',
       'data-content-key': contentKey,
+      'data-i18n': contentKey,
       contentEditable: isActive,
       suppressContentEditableWarning: true,
       onClick: handleClick,

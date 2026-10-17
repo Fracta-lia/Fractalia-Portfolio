@@ -21,7 +21,18 @@ export default function HomeVisionEditor({ initialQuote, heroImage }: HomeVision
       setQuote(EditorStore.getText('home.vision.quote', initialQuote));
       setLabel(EditorStore.getText('home.vision.label', 'Visión Artística'));
     });
-    return () => unsubscribe();
+
+    const handleLangChange = (e: any) => {
+      const newL = e?.detail?.lang || EditorStore.getLang();
+      setQuote(EditorStore.getText('home.vision.quote', initialQuote, newL));
+      setLabel(EditorStore.getText('home.vision.label', 'Visión Artística', newL));
+    };
+    window.addEventListener('lia_lang_change', handleLangChange);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('lia_lang_change', handleLangChange);
+    };
   }, [initialQuote]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -47,7 +58,7 @@ artisticVisionQuote: "${val.replace(/"/g, '\\"')}"
   return (
     <section className="py-14 sm:py-20 md:py-28 bg-white border-b border-neutral-100">
       <div className="max-w-3xl mx-auto px-6 text-center reveal-on-scroll">
-        <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-4">
+        <span data-i18n="home.vision.label" className="font-sans text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-4">
           {label}
         </span>
 
@@ -65,7 +76,7 @@ artisticVisionQuote: "${val.replace(/"/g, '\\"')}"
           </div>
         ) : (
           <blockquote className="font-serif text-2xl sm:text-3xl md:text-4xl text-neutral-900 font-light italic leading-snug">
-            &ldquo;{quote}&rdquo;
+            &ldquo;<span data-i18n="home.vision.quote">{quote}</span>&rdquo;
           </blockquote>
         )}
 

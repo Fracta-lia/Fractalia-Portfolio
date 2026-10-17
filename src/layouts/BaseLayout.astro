@@ -3,6 +3,14 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SaveBar from '../components/editor/SaveBar';
+import siteContentEs from '../data/siteContent.json';
+import siteContentEn from '../data/siteContent.en.json';
+import { uiTranslations } from '../i18n/translations';
+
+const allTranslations = {
+  es: { ...uiTranslations.es, ...siteContentEs },
+  en: { ...uiTranslations.en, ...siteContentEn }
+};
 
 interface Props {
   title?: string;
@@ -155,8 +163,8 @@ const structuredDataArray = [
       rel="stylesheet"
     />
 
-    <!-- Language Detection & Dynamic Translation Script -->
-    <script is:inline>
+    <!-- Language Detection & Universal Instant Translation Engine -->
+    <script is:inline define:vars={{ allTranslations }}>
       (function() {
         const getPreferredLang = () => {
           try {
@@ -171,86 +179,69 @@ const structuredDataArray = [
           return 'en';
         };
 
-        const currentLang = getPreferredLang();
-        document.documentElement.lang = currentLang;
-
-        const translations = {
-          es: {
-            'nav.home': 'Inicio',
-            'nav.gallery': 'Galería',
-            'nav.services': 'Servicios',
-            'nav.about': 'Sobre Mí',
-            'nav.contact': 'Contacto',
-            'footer.copyright': 'Todos los derechos reservados.',
-            'home.hero.discover': 'Descubrir',
-            'home.gallery.explore_btn': 'Explorar Galería Completa',
-            'home.services.explore_btn': 'Conocer detalles & tarifas',
-            'contact.direct_ig_label': 'Instagram Direct',
-            'contact.direct_ig_desc': 'También puedes enviarme un mensaje directo por Instagram para consultas rápidas.',
-            'contact.email_label': 'Correo Electrónico',
-            'contact.email_desc': 'Para consultas de bodas, cotizaciones formales y encargos de obra original.',
-            'contact.coverage_label': 'Cobertura Geográfica',
-            'contact.coverage_desc': 'Disponible para eventos y traslados a nivel nacional e internacional.',
-            'contact.response_label': 'Tiempo de Respuesta',
-            'contact.response_desc': 'Menos de 24 a 48 horas en días hábiles.',
-            '404.badge': 'Error 404 · Sala Inexistente',
-            '404.title': 'Esta obra no se encuentra aquí',
-            '404.desc': 'La página o pieza que intentas consultar ha sido reubicada o el enlace no es el correcto. Te invitamos a continuar descubriendo la colección.',
-            '404.gallery_btn': 'Explorar Galería',
-            '404.home_btn': 'Volver al Inicio',
-            'about.location_caption': 'Lía Paz en su estudio · Puebla, México',
-            'about.follow_label': 'Sígueme en el proceso:'
-          },
-          en: {
-            'nav.home': 'Home',
-            'nav.gallery': 'Gallery',
-            'nav.services': 'Services',
-            'nav.about': 'About',
-            'nav.contact': 'Contact',
-            'footer.copyright': 'All rights reserved.',
-            'home.hero.discover': 'Discover',
-            'home.gallery.explore_btn': 'Explore Full Gallery',
-            'home.services.explore_btn': 'View Details & Pricing',
-            'contact.direct_ig_label': 'Instagram Direct',
-            'contact.direct_ig_desc': 'You can also send me a direct message on Instagram for quick inquiries.',
-            'contact.email_label': 'Email Address',
-            'contact.email_desc': 'For wedding inquiries, formal quotes, and original artwork commissions.',
-            'contact.coverage_label': 'Geographic Coverage',
-            'contact.coverage_desc': 'Available for domestic travel across Mexico and worldwide destination weddings.',
-            'contact.response_label': 'Response Time',
-            'contact.response_desc': 'Usually within 24 to 48 business hours.',
-            '404.badge': 'Error 404 · Room Not Found',
-            '404.title': 'This artwork is not here',
-            '404.desc': 'The page or piece you are looking for has been relocated or the link is incorrect. We invite you to continue exploring the collection.',
-            '404.gallery_btn': 'Explore Gallery',
-            '404.home_btn': 'Back to Home',
-            'about.location_caption': 'Lía Paz in her studio · Puebla, Mexico',
-            'about.follow_label': 'Follow the creative process:'
-          }
-        };
-
-        const applyTranslations = (lang) => {
-          document.documentElement.lang = lang;
-          const dict = translations[lang] || translations.en;
-          const elements = document.querySelectorAll('[data-i18n]');
-          elements.forEach((el) => {
-            const key = el.getAttribute('data-i18n');
-            if (key && dict[key]) {
-              el.textContent = dict[key];
+        const updateButtons = (lang) => {
+          document.querySelectorAll('[data-lang-btn]').forEach((btn) => {
+            const btnLang = btn.getAttribute('data-lang-btn');
+            if (btnLang === lang) {
+              btn.className = 'px-1 py-0.5 transition-all cursor-pointer text-neutral-950 font-semibold border-b border-neutral-900';
+              btn.setAttribute('aria-current', 'true');
+            } else {
+              btn.className = 'px-1 py-0.5 transition-all cursor-pointer text-neutral-400 hover:text-neutral-800';
+              btn.removeAttribute('aria-current');
             }
           });
         };
 
-        window.liaApplyI18n = applyTranslations;
-
-        const init = () => {
-          applyTranslations(getPreferredLang());
+        const applyTranslations = (lang) => {
+          document.documentElement.lang = lang;
+          const dict = allTranslations[lang] || allTranslations.en;
+          const elements = document.querySelectorAll('[data-i18n]');
+          elements.forEach((el) => {
+            const key = el.getAttribute('data-i18n');
+            if (key && dict[key] !== undefined) {
+              if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = dict[key];
+              } else {
+                el.textContent = dict[key];
+              }
+            }
+          });
+          updateButtons(lang);
         };
 
+        window.__liaTranslations = allTranslations;
+        window.__liaApplyI18n = applyTranslations;
+
+        window.__liaSetLang = function(newLang) {
+          if (newLang !== 'es' && newLang !== 'en') return;
+          try {
+            localStorage.setItem('lia_lang', newLang);
+          } catch (e) {}
+
+          applyTranslations(newLang);
+          window.dispatchEvent(new CustomEvent('lia_lang_change', { detail: { lang: newLang } }));
+        };
+
+        // Delegated click listener: responds immediately even before React islands hydrate
+        document.addEventListener('click', function(e) {
+          const btn = e.target && e.target.closest ? e.target.closest('[data-lang-btn]') : null;
+          if (btn) {
+            const target = btn.getAttribute('data-lang-btn');
+            if (target === 'es' || target === 'en') {
+              window.__liaSetLang(target);
+            }
+          }
+        });
+
+        const initialLang = getPreferredLang();
+        document.documentElement.lang = initialLang;
+
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', init);
+          document.addEventListener('DOMContentLoaded', () => {
+            applyTranslations(initialLang);
+          });
         } else {
-          init();
+          applyTranslations(initialLang);
         }
 
         window.addEventListener('lia_lang_change', (e) => {
