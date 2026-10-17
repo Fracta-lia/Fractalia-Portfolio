@@ -95,7 +95,7 @@ const homePageSchema = {
 
     <!-- Scroll Indicator -->
     <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center opacity-60 hover:opacity-100 transition-opacity">
-      <span class="text-[10px] uppercase tracking-[0.3em] font-sans text-neutral-400 mb-2">Descubrir</span>
+      <span data-i18n="home.hero.discover" class="text-[10px] uppercase tracking-[0.3em] font-sans text-neutral-400 mb-2">Descubrir</span>
       <div class="w-[1px] h-8 bg-neutral-500 animate-pulse"></div>
     </div>
   </section>
@@ -115,7 +115,7 @@ const homePageSchema = {
           <EditableText
             client:load
             contentKey="home.gallery.label"
-            defaultText="Portfolio"
+            defaultText="COLECCIÓN & ARCHIVO"
             as="span"
             className="font-sans text-[11px] tracking-[0.25em] uppercase text-neutral-400 block mb-2 font-medium"
           />
@@ -160,7 +160,7 @@ const homePageSchema = {
           href={`${base}/gallery`}
           class="inline-block px-9 py-4 border border-neutral-900 text-neutral-900 hover:bg-neutral-900 hover:text-white text-xs font-sans tracking-[0.25em] uppercase transition-colors duration-300 font-medium"
         >
-          Explorar Galería Completa
+          <EditableText client:load contentKey="home.gallery.explore_btn" defaultText="Explorar Galería Completa" as="span" />
         </a>
       </div>
     </div>
@@ -190,7 +190,7 @@ const homePageSchema = {
           href={`${base}/services`}
           class="mt-4 md:mt-0 font-sans text-xs tracking-[0.2em] uppercase text-neutral-800 hover:text-black font-medium inline-flex items-center group"
         >
-          <span>Conocer detalles & tarifas</span>
+          <EditableText client:load contentKey="home.services.explore_btn" defaultText="Conocer detalles & tarifas" as="span" />
           <span class="ml-2 group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
       </div>

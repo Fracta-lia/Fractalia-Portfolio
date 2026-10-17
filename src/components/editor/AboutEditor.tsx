@@ -32,24 +32,36 @@ export default function AboutEditor({
 }: AboutEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [portrait, setPortrait] = useState(initialPortrait);
-  const [statement, setStatement] = useState(initialStatement);
-  const [semblanza, setSemblanza] = useState(initialSemblanza);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [statement, setStatement] = useState(EditorStore.getText('about.statement.body', initialStatement));
+  const [semblanza, setSemblanza] = useState(EditorStore.getText('about.semblanza.body', initialSemblanza));
+  const [lang, setLang] = useState(EditorStore.getLang());
 
   useEffect(() => {
     setIsEditing(EditorStore.isEditMode());
+    setLang(EditorStore.getLang());
+    setStatement(EditorStore.getText('about.statement.body', initialStatement));
+    setSemblanza(EditorStore.getText('about.semblanza.body', initialSemblanza));
+
     const unsubscribe = EditorStore.subscribe(() => {
       setIsEditing(EditorStore.isEditMode());
+      setLang(EditorStore.getLang());
+      setStatement(EditorStore.getText('about.statement.body', initialStatement));
+      setSemblanza(EditorStore.getText('about.semblanza.body', initialSemblanza));
     });
     return () => unsubscribe();
-  }, []);
+  }, [initialStatement, initialSemblanza]);
 
   const updateDraft = (newStatement: string, newSemblanza: string, newPortrait: string) => {
-    const md = serializeAbout(newStatement, newSemblanza, newPortrait);
-    EditorStore.setDraft('src/content/pages/about.md', {
-      content: md,
-      label: 'Página Sobre la Artista (Statement / Semblanza)',
-    });
+    EditorStore.updateText('about.statement.body', newStatement);
+    EditorStore.updateText('about.semblanza.body', newSemblanza);
+
+    if (EditorStore.getLang() === 'es') {
+      const md = serializeAbout(newStatement, newSemblanza, newPortrait);
+      EditorStore.setDraft('src/content/pages/about.md', {
+        content: md,
+        label: 'Página Sobre la Artista (Statement / Semblanza)',
+      });
+    }
   };
 
   const handleStatementChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -103,8 +115,8 @@ export default function AboutEditor({
             base={base}
           />
         </div>
-        <p className="font-sans text-[11px] text-neutral-400 uppercase tracking-widest text-center mt-3">
-          Lía Paz en su estudio · Puebla, México
+        <p data-i18n="about.location_caption" className="font-sans text-[11px] text-neutral-400 uppercase tracking-widest text-center mt-3">
+          {lang === 'en' ? 'Lía Paz in her studio · Puebla, Mexico' : 'Lía Paz en su estudio · Puebla, México'}
         </p>
       </div>
 
@@ -114,7 +126,7 @@ export default function AboutEditor({
         <div className="space-y-6">
           <EditableText
             contentKey="about.statement.title"
-            defaultText="Statement de la Artista"
+            defaultText={lang === 'en' ? "Artist's Statement" : "Statement de la Artista"}
             as="h2"
             className="font-serif text-3xl sm:text-4xl text-neutral-950 font-normal tracking-tight block"
           />
@@ -122,13 +134,13 @@ export default function AboutEditor({
           {isEditing ? (
             <div className="p-4 bg-neutral-50 border border-dashed border-neutral-300 rounded-sm space-y-2">
               <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium">
-                Statement de la Artista (Haz clic para editar / párrafos o markdown):
+                {lang === 'en' ? "Artist's Statement (Click to edit):" : "Statement de la Artista (Haz clic para editar):"}
               </label>
               <textarea
                 value={statement}
                 onChange={handleStatementChange}
                 rows={8}
-                placeholder="Escribe tu statement de artista..."
+                placeholder={lang === 'en' ? "Write your artist statement..." : "Escribe tu statement de artista..."}
                 className="w-full text-sm sm:text-base text-neutral-700 font-sans leading-relaxed bg-transparent focus:outline-none resize-y"
               />
             </div>
@@ -150,7 +162,7 @@ export default function AboutEditor({
         <div className="space-y-6 pt-8 border-t border-neutral-100">
           <EditableText
             contentKey="about.semblanza.title"
-            defaultText="Semblanza"
+            defaultText={lang === 'en' ? "Biography & Career" : "Semblanza"}
             as="h2"
             className="font-serif text-3xl sm:text-4xl text-neutral-950 font-normal tracking-tight block"
           />
@@ -158,13 +170,13 @@ export default function AboutEditor({
           {isEditing ? (
             <div className="p-4 bg-neutral-50 border border-dashed border-neutral-300 rounded-sm space-y-2">
               <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium">
-                Semblanza Curricular / Trayectoria (Haz clic para editar / párrafos o markdown):
+                {lang === 'en' ? "Biography & Career (Click to edit):" : "Semblanza Curricular / Trayectoria (Haz clic para editar):"}
               </label>
               <textarea
                 value={semblanza}
                 onChange={handleSemblanzaChange}
                 rows={8}
-                placeholder="Escribe tu semblanza o trayectoria..."
+                placeholder={lang === 'en' ? "Write your biography or career..." : "Escribe tu semblanza o trayectoria..."}
                 className="w-full text-sm sm:text-base text-neutral-700 font-sans leading-relaxed bg-transparent focus:outline-none resize-y"
               />
             </div>
@@ -186,7 +198,7 @@ export default function AboutEditor({
         <div className="pt-8 border-t border-neutral-100">
           <EditableText
             contentKey="about.process.title"
-            defaultText="Proceso & Materiales"
+            defaultText={lang === 'en' ? "Process & Materials" : "Proceso & Materiales"}
             as="h3"
             className="font-serif text-2xl sm:text-3xl text-neutral-950 font-normal tracking-tight block mb-6"
           />
@@ -194,13 +206,13 @@ export default function AboutEditor({
             <div className="p-5 bg-neutral-50 border border-neutral-100">
               <EditableText
                 contentKey="about.process.f1.title"
-                defaultText="Pigmentos & Óleos Finos"
+                defaultText={lang === 'en' ? "Fine Pigments & Oils" : "Pigmentos & Óleos Finos"}
                 as="span"
                 className="font-serif text-lg text-neutral-900 block mb-1"
               />
               <EditableText
                 contentKey="about.process.f1.desc"
-                defaultText="Uso exclusivo de óleos profesionales de alta resistencia a la luz y durabilidad de grado museo."
+                defaultText={lang === 'en' ? "Exclusive use of professional artists' oils with exceptional lightfastness and museum-grade archival quality." : "Uso exclusivo de óleos profesionales de alta resistencia a la luz y durabilidad de grado museo."}
                 as="p"
                 className="text-xs text-neutral-500 leading-relaxed block"
                 multiline
@@ -209,13 +221,13 @@ export default function AboutEditor({
             <div className="p-5 bg-neutral-50 border border-neutral-100">
               <EditableText
                 contentKey="about.process.f2.title"
-                defaultText="Lienzos de Lino & Algodón"
+                defaultText={lang === 'en' ? "Linen & Cotton Canvases" : "Lienzos de Lino & Algodón"}
                 as="span"
                 className="font-serif text-lg text-neutral-900 block mb-1"
               />
               <EditableText
                 contentKey="about.process.f2.desc"
-                defaultText="Soportes preparados artesanalmente con imprimación tradicional para asegurar una textura óptima."
+                defaultText={lang === 'en' ? "Artisan-prepared supports primed traditionally to guarantee optimal tooth, flexibility, and longevity." : "Soportes preparados artesanalmente con imprimación tradicional para asegurar una textura óptima."}
                 as="p"
                 className="text-xs text-neutral-500 leading-relaxed block"
                 multiline
@@ -227,14 +239,17 @@ export default function AboutEditor({
         {/* Social / Contact Links */}
         <div className="pt-8 border-t border-neutral-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-sans tracking-wider uppercase text-neutral-400 block">Sígueme en el proceso:</span>
+            <span data-i18n="about.follow_label" className="text-xs font-sans tracking-wider uppercase text-neutral-400 block">
+              {lang === 'en' ? 'Follow the creative process:' : 'Sígueme en el proceso:'}
+            </span>
             <a
               href="https://www.instagram.com/fracta.lia/"
               target="_blank"
               rel="noopener noreferrer"
+              data-i18n="about.follow_link"
               className="font-sans text-sm text-neutral-900 hover:text-neutral-600 font-medium underline underline-offset-4"
             >
-              @fracta.lia en Instagram
+              {lang === 'en' ? '@fracta.lia on Instagram' : '@fracta.lia en Instagram'}
             </a>
           </div>
           <a
@@ -243,7 +258,7 @@ export default function AboutEditor({
           >
             <EditableText
               contentKey="about.cta"
-              defaultText="Contactar a Lía"
+              defaultText={lang === 'en' ? "Contact Lía" : "Contactar a Lía"}
               as="span"
             />
           </a>

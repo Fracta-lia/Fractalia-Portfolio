@@ -154,6 +154,111 @@ const structuredDataArray = [
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Language Detection & Dynamic Translation Script -->
+    <script is:inline>
+      (function() {
+        const getPreferredLang = () => {
+          try {
+            const saved = localStorage.getItem('lia_lang');
+            if (saved === 'es' || saved === 'en') return saved;
+            const langs = navigator.languages || [navigator.language || ''];
+            for (const l of langs) {
+              if (l.toLowerCase().startsWith('es')) return 'es';
+              if (l.toLowerCase().startsWith('en')) return 'en';
+            }
+          } catch (e) {}
+          return 'en';
+        };
+
+        const currentLang = getPreferredLang();
+        document.documentElement.lang = currentLang;
+
+        const translations = {
+          es: {
+            'nav.home': 'Inicio',
+            'nav.gallery': 'Galería',
+            'nav.services': 'Servicios',
+            'nav.about': 'Sobre Mí',
+            'nav.contact': 'Contacto',
+            'footer.copyright': 'Todos los derechos reservados.',
+            'home.hero.discover': 'Descubrir',
+            'home.gallery.explore_btn': 'Explorar Galería Completa',
+            'home.services.explore_btn': 'Conocer detalles & tarifas',
+            'contact.direct_ig_label': 'Instagram Direct',
+            'contact.direct_ig_desc': 'También puedes enviarme un mensaje directo por Instagram para consultas rápidas.',
+            'contact.email_label': 'Correo Electrónico',
+            'contact.email_desc': 'Para consultas de bodas, cotizaciones formales y encargos de obra original.',
+            'contact.coverage_label': 'Cobertura Geográfica',
+            'contact.coverage_desc': 'Disponible para eventos y traslados a nivel nacional e internacional.',
+            'contact.response_label': 'Tiempo de Respuesta',
+            'contact.response_desc': 'Menos de 24 a 48 horas en días hábiles.',
+            '404.badge': 'Error 404 · Sala Inexistente',
+            '404.title': 'Esta obra no se encuentra aquí',
+            '404.desc': 'La página o pieza que intentas consultar ha sido reubicada o el enlace no es el correcto. Te invitamos a continuar descubriendo la colección.',
+            '404.gallery_btn': 'Explorar Galería',
+            '404.home_btn': 'Volver al Inicio',
+            'about.location_caption': 'Lía Paz en su estudio · Puebla, México',
+            'about.follow_label': 'Sígueme en el proceso:'
+          },
+          en: {
+            'nav.home': 'Home',
+            'nav.gallery': 'Gallery',
+            'nav.services': 'Services',
+            'nav.about': 'About',
+            'nav.contact': 'Contact',
+            'footer.copyright': 'All rights reserved.',
+            'home.hero.discover': 'Discover',
+            'home.gallery.explore_btn': 'Explore Full Gallery',
+            'home.services.explore_btn': 'View Details & Pricing',
+            'contact.direct_ig_label': 'Instagram Direct',
+            'contact.direct_ig_desc': 'You can also send me a direct message on Instagram for quick inquiries.',
+            'contact.email_label': 'Email Address',
+            'contact.email_desc': 'For wedding inquiries, formal quotes, and original artwork commissions.',
+            'contact.coverage_label': 'Geographic Coverage',
+            'contact.coverage_desc': 'Available for domestic travel across Mexico and worldwide destination weddings.',
+            'contact.response_label': 'Response Time',
+            'contact.response_desc': 'Usually within 24 to 48 business hours.',
+            '404.badge': 'Error 404 · Room Not Found',
+            '404.title': 'This artwork is not here',
+            '404.desc': 'The page or piece you are looking for has been relocated or the link is incorrect. We invite you to continue exploring the collection.',
+            '404.gallery_btn': 'Explore Gallery',
+            '404.home_btn': 'Back to Home',
+            'about.location_caption': 'Lía Paz in her studio · Puebla, Mexico',
+            'about.follow_label': 'Follow the creative process:'
+          }
+        };
+
+        const applyTranslations = (lang) => {
+          document.documentElement.lang = lang;
+          const dict = translations[lang] || translations.en;
+          const elements = document.querySelectorAll('[data-i18n]');
+          elements.forEach((el) => {
+            const key = el.getAttribute('data-i18n');
+            if (key && dict[key]) {
+              el.textContent = dict[key];
+            }
+          });
+        };
+
+        window.liaApplyI18n = applyTranslations;
+
+        const init = () => {
+          applyTranslations(getPreferredLang());
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', init);
+        } else {
+          init();
+        }
+
+        window.addEventListener('lia_lang_change', (e) => {
+          const lang = e?.detail?.lang || getPreferredLang();
+          applyTranslations(lang);
+        });
+      })();
+    </script>
   </head>
   <body class="min-h-screen flex flex-col bg-white text-neutral-900 font-sans selection:bg-neutral-900 selection:text-white antialiased">
     <Header currentPath={currentPath} />

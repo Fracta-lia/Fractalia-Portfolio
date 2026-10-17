@@ -42,17 +42,17 @@ const currentYear = new Date().getFullYear();
 
     <!-- Quick Navigation -->
     <div class="flex flex-wrap justify-center gap-6 pt-2">
-      <a href={`${base}/`} class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Home</a>
-      <a href={`${base}/gallery`} class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Galería</a>
-      <a href={`${base}/services`} class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Servicios</a>
-      <a href={`${base}/about`} class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">About</a>
-      <a href={`${base}/contact`} class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Contacto</a>
+      <a href={`${base}/`} data-i18n="nav.home" class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Inicio</a>
+      <a href={`${base}/gallery`} data-i18n="nav.gallery" class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Galería</a>
+      <a href={`${base}/services`} data-i18n="nav.services" class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Servicios</a>
+      <a href={`${base}/about`} data-i18n="nav.about" class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Sobre Mí</a>
+      <a href={`${base}/contact`} data-i18n="nav.contact" class="text-xs text-neutral-400 hover:text-neutral-800 transition-colors uppercase tracking-widest">Contacto</a>
     </div>
 
     <!-- Copyright & Discreet Editor Trigger -->
     <div class="flex items-center justify-center gap-3 pt-4">
       <p id="footer-copyright" class="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400 select-none cursor-default" title="© Lía Paz">
-        &copy; {currentYear} Lía Paz. Todos los derechos reservados.
+        &copy; {currentYear} Lía Paz. <span data-i18n="footer.copyright">Todos los derechos reservados.</span>
       </p>
       <span id="footer-separator" class="text-neutral-300 hidden">·</span>
       <button
@@ -80,11 +80,12 @@ const currentYear = new Date().getFullYear();
     const checkEditState = () => {
       const urlHasEdit = window.location.search.includes('edit=true');
       const isEditing = localStorage.getItem('lia_edit_mode') === 'true' || urlHasEdit;
+      const lang = localStorage.getItem('lia_lang') === 'en' ? 'en' : 'es';
       if (isEditing) {
         editBtn?.classList.remove('hidden');
         editBtn?.classList.add('flex');
         separator?.classList.remove('hidden');
-        if (editLabel) editLabel.textContent = 'Salir de Edición';
+        if (editLabel) editLabel.textContent = lang === 'en' ? 'Exit Edit Mode' : 'Salir de Edición';
       } else {
         editBtn?.classList.add('hidden');
         editBtn?.classList.remove('flex');
@@ -93,6 +94,7 @@ const currentYear = new Date().getFullYear();
     };
 
     checkEditState();
+    window.addEventListener('lia_lang_change', checkEditState);
 
     editBtn?.addEventListener('click', () => {
       const active = localStorage.getItem('lia_edit_mode') === 'true' || window.location.search.includes('edit=true');
@@ -131,4 +133,3 @@ const currentYear = new Date().getFullYear();
     });
   })();
 </script>
-

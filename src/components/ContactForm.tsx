@@ -1,6 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { EditorStore } from './editor/EditorStore';
+import { uiTranslations, type Lang } from '../i18n/translations';
 
 export default function ContactForm() {
+  const [lang, setLang] = useState<Lang>(EditorStore.getLang());
+
+  useEffect(() => {
+    setLang(EditorStore.getLang());
+    const unsubscribe = EditorStore.subscribe(() => {
+      setLang(EditorStore.getLang());
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const t = uiTranslations[lang] || uiTranslations.en;
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,11 +49,11 @@ export default function ContactForm() {
         body: JSON.stringify({
           Nombre: formData.name,
           Email: formData.email,
-          Teléfono: formData.phone || 'No proporcionado',
+          Teléfono: formData.phone || (lang === 'en' ? 'Not provided' : 'No proporcionado'),
           Servicio: formData.service,
-          Fecha_Evento: formData.eventDate || 'No especificada',
+          Fecha_Evento: formData.eventDate || (lang === 'en' ? 'Not specified' : 'No especificada'),
           Mensaje: formData.message,
-          _subject: `Nueva consulta web: ${formData.name} · Lía Paz Art`,
+          _subject: `Nueva consulta web (${lang.toUpperCase()}): ${formData.name} · Lía Paz Art`,
           _template: 'table',
         }),
       });
@@ -59,9 +73,7 @@ export default function ContactForm() {
       });
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(
-        'Hubo un inconveniente al enviar tu mensaje automáticamente. Por favor escribe directamente a liapazart@gmail.com o contáctame por Instagram @fracta.lia.'
-      );
+      setErrorMessage(t['form.error_msg']);
     }
   };
 
@@ -75,17 +87,17 @@ export default function ContactForm() {
             </svg>
           </div>
           <h3 className="font-serif text-2xl text-neutral-900 font-normal">
-            ¡Mensaje Recibido!
+            {t['form.success_title']}
           </h3>
-          <p className="font-sans text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
-            Muchas gracias por escribir. Me pondré en contacto contigo a la brevedad para conversar sobre tu proyecto o evento.
+          <p className="font-sans text-sm text-neutral-600 max-w-md mx-auto leading-relaxed font-light">
+            {t['form.success_desc']}
           </p>
           <div className="pt-4">
             <button
               onClick={() => setStatus('idle')}
-              className="text-xs font-sans tracking-widest uppercase text-neutral-500 hover:text-neutral-900 underline underline-offset-4"
+              className="text-xs font-sans tracking-widest uppercase text-neutral-500 hover:text-neutral-900 underline underline-offset-4 cursor-pointer"
             >
-              Enviar otro mensaje
+              {t['form.send_another']}
             </button>
           </div>
         </div>
@@ -94,7 +106,7 @@ export default function ContactForm() {
           {/* Nombre */}
           <div>
             <label htmlFor="name" className="block text-xs font-sans tracking-[0.15em] uppercase text-neutral-700 mb-2">
-              Nombre completo <span className="text-neutral-400">*</span>
+              {t['form.name_label']} <span className="text-neutral-400">*</span>
             </label>
             <input
               type="text"
@@ -103,7 +115,7 @@ export default function ContactForm() {
               required
               value={formData.name}
               onChange={handleChange}
-              placeholder="Tu nombre y apellido"
+              placeholder={t['form.name_placeholder']}
               className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
             />
           </div>
@@ -112,7 +124,7 @@ export default function ContactForm() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="email" className="block text-xs font-sans tracking-[0.15em] uppercase text-neutral-700 mb-2">
-                Correo Electrónico <span className="text-neutral-400">*</span>
+                {t['form.email_label']} <span className="text-neutral-400">*</span>
               </label>
               <input
                 type="email"
@@ -121,13 +133,13 @@ export default function ContactForm() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="tu@correo.com"
+                placeholder={t['form.email_placeholder']}
                 className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
               />
             </div>
             <div>
               <label htmlFor="phone" className="block text-xs font-sans tracking-[0.15em] uppercase text-neutral-700 mb-2">
-                Teléfono / WhatsApp
+                {t['form.phone_label']}
               </label>
               <input
                 type="tel"
@@ -135,7 +147,7 @@ export default function ContactForm() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="+52 ..."
+                placeholder={t['form.phone_placeholder']}
                 className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors"
               />
             </div>
@@ -144,7 +156,7 @@ export default function ContactForm() {
           {/* Servicio de Interés */}
           <div>
             <label htmlFor="service" className="block text-xs font-sans tracking-[0.15em] uppercase text-neutral-700 mb-2">
-              Servicio de Interés <span className="text-neutral-400">*</span>
+              {t['form.service_label']} <span className="text-neutral-400">*</span>
             </label>
             <select
               id="service"
@@ -153,18 +165,18 @@ export default function ContactForm() {
               onChange={handleChange}
               className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors cursor-pointer"
             >
-              <option value="retrato">Retrato Personalizado por Encargo</option>
-              <option value="wedding">Wedding Live Painting (Boda en Vivo)</option>
-              <option value="original">Obra Original de Galería</option>
-              <option value="otro">Otra Consulta Artística</option>
+              <option value="wedding">{t['form.service_wedding']}</option>
+              <option value="retrato">{t['form.service_portrait']}</option>
+              <option value="original">{t['form.service_original']}</option>
+              <option value="otro">{t['form.service_other']}</option>
             </select>
           </div>
 
-          {/* Fecha tentativa del evento (relevante para bodas) */}
+          {/* Fecha tentativa del evento */}
           {formData.service === 'wedding' && (
             <div>
               <label htmlFor="eventDate" className="block text-xs font-sans tracking-[0.15em] uppercase text-neutral-700 mb-2">
-                Fecha Estimada del Evento / Boda
+                {t['form.date_label']}
               </label>
               <input
                 type="date"
@@ -180,7 +192,7 @@ export default function ContactForm() {
           {/* Mensaje */}
           <div>
             <label htmlFor="message" className="block text-xs font-sans tracking-[0.15em] uppercase text-neutral-700 mb-2">
-              Mensaje o Detalles del Proyecto <span className="text-neutral-400">*</span>
+              {t['form.message_label']} <span className="text-neutral-400">*</span>
             </label>
             <textarea
               id="message"
@@ -189,7 +201,7 @@ export default function ContactForm() {
               rows={5}
               value={formData.message}
               onChange={handleChange}
-              placeholder="Cuéntame sobre la fecha, lugar o idea que tienes en mente..."
+              placeholder={t['form.message_placeholder']}
               className="w-full px-4 py-3 text-base sm:text-sm bg-neutral-50 border border-neutral-200 focus:border-neutral-900 focus:bg-white focus:outline-none transition-colors resize-none"
             />
           </div>
@@ -206,15 +218,14 @@ export default function ContactForm() {
             disabled={status === 'loading'}
             className="w-full py-4 bg-neutral-950 text-white hover:bg-neutral-800 disabled:bg-neutral-400 text-xs font-sans tracking-[0.25em] uppercase font-medium transition-colors duration-200 cursor-pointer"
           >
-            {status === 'loading' ? 'Enviando...' : 'Enviar Consulta'}
+            {status === 'loading' ? t['form.submitting'] : t['form.submit']}
           </button>
 
           <p className="text-center text-[11px] text-neutral-400 font-sans tracking-wider">
-            Respuesta habitual en menos de 24-48 horas.
+            {t['form.response_note']}
           </p>
         </form>
       )}
     </div>
   );
 }
-

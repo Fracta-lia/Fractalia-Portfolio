@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { EditorStore } from './editor/EditorStore';
 import { processImageFile, type ProcessedImage } from '../utils/imageProcess';
+import {
+  uiTranslations,
+  translateTechnique,
+  translateArtworkType,
+  translateArtworkDescription,
+  type Lang
+} from '../i18n/translations';
 
 export interface GalleryItem {
   id: string;
@@ -71,13 +78,19 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
 
+  const [lang, setLang] = useState<Lang>(EditorStore.getLang());
+
   useEffect(() => {
     setIsEditing(EditorStore.isEditMode());
+    setLang(EditorStore.getLang());
     const unsubscribe = EditorStore.subscribe(() => {
       setIsEditing(EditorStore.isEditMode());
+      setLang(EditorStore.getLang());
     });
     return () => unsubscribe();
   }, []);
+
+  const t = uiTranslations[lang] || uiTranslations.en;
 
   // Sync initial list with order
   useEffect(() => {
@@ -845,16 +858,16 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
       {isEditing && (
         <div className="mb-8 p-4 bg-neutral-50 border border-neutral-200 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs font-sans text-neutral-600">
-            <span className="font-semibold text-neutral-900 uppercase tracking-wider">Modo Edición Galería:</span>
-            <span>Arrastra cualquier cuadro con el cursor para moverlo de posición, o haz clic para editar su ficha.</span>
+            <span className="font-semibold text-neutral-900 uppercase tracking-wider">{t['gallery.edit_banner_title']}</span>
+            <span>{t['gallery.edit_banner_desc']}</span>
           </div>
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="px-5 py-2.5 bg-neutral-900 text-white hover:bg-neutral-800 text-xs font-sans tracking-[0.2em] uppercase font-medium rounded-sm flex items-center gap-2 transition-colors shadow-sm"
+            className="px-5 py-2.5 bg-neutral-900 text-white hover:bg-neutral-800 text-xs font-sans tracking-[0.2em] uppercase font-medium rounded-sm flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
           >
             <span>+</span>
-            <span>Agregar Nueva Obra</span>
+            <span>{t['gallery.add_artwork']}</span>
           </button>
         </div>
       )}
@@ -897,7 +910,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   <svg className="w-3.5 h-3.5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
                   </svg>
-                  <span>Arrastrar para mover</span>
+                  <span>{lang === 'en' ? 'Drag to move' : 'Arrastrar para mover'}</span>
                 </span>
               </div>
             )}
@@ -926,8 +939,8 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                     zoomTo(2.5);
                   }
                 }}
-                aria-label={isZoomed ? "Alejar imagen" : "Acercar imagen"}
-                title={isZoomed ? "Alejar imagen" : "Acercar imagen"}
+                aria-label={isZoomed ? t['gallery.zoom_out'] : t['gallery.zoom_in']}
+                title={isZoomed ? t['gallery.zoom_out'] : t['gallery.zoom_in']}
                 className={`w-10 h-10 bg-neutral-950/80 hover:bg-neutral-900 text-white flex items-center justify-center transition-all duration-200 rounded-full border shadow-lg cursor-pointer ${
                   isZoomed ? 'border-amber-400/80 text-amber-300' : 'border-neutral-700/60'
                 }`}
@@ -949,7 +962,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               <button
                 type="button"
                 onClick={handleClose}
-                aria-label="Cerrar modal"
+                aria-label={t['gallery.close']}
                 className="w-10 h-10 bg-neutral-950/80 hover:bg-neutral-900 text-white flex items-center justify-center transition-colors rounded-full border border-neutral-700/60 shadow-lg cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1040,7 +1053,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span>Cambiar Imagen</span>
+                    <span>{t['gallery.change_image']}</span>
                   </button>
                 </div>
               )}
@@ -1053,7 +1066,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                     onClick={handlePrev}
                     onMouseDown={(e) => e.stopPropagation()}
                     onTouchStart={(e) => e.stopPropagation()}
-                    aria-label="Obra anterior"
+                    aria-label={lang === 'en' ? 'Previous artwork' : 'Obra anterior'}
                     className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1065,7 +1078,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                     onClick={handleNext}
                     onMouseDown={(e) => e.stopPropagation()}
                     onTouchStart={(e) => e.stopPropagation()}
-                    aria-label="Obra siguiente"
+                    aria-label={lang === 'en' ? 'Next artwork' : 'Obra siguiente'}
                     className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 bg-neutral-900/70 hover:bg-neutral-900 active:scale-90 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-xs rounded-full cursor-pointer z-20 border border-white/10 shadow-lg"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1082,7 +1095,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 }`}
               >
                 <span className="text-[10px] text-white/80 tracking-wider uppercase font-sans bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10 shadow-lg">
-                  ← Desliza para navegar →
+                  {t['gallery.swipe_hint']}
                 </span>
               </div>
             </div>
@@ -1092,9 +1105,9 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
               <div key={selectedItem.id} className="animate-slide-fade-up space-y-6">
                 <div>
                   <div className="flex items-center justify-between text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium mb-3">
-                    <span>Ficha Técnica</span>
+                    <span>{t['gallery.spec_sheet']}</span>
                     <span>
-                      {(selectedIndex ?? 0) + 1} de {list.length}
+                      {(selectedIndex ?? 0) + 1} {t['gallery.of']} {list.length}
                     </span>
                   </div>
 
@@ -1102,7 +1115,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   {isEditing ? (
                     <div>
                       <label className="block text-[10px] uppercase font-sans tracking-widest text-neutral-400 mb-1">
-                        Título de la Obra:
+                        {lang === 'en' ? 'Artwork Title:' : 'Título de la Obra:'}
                       </label>
                       <input
                         type="text"
@@ -1121,7 +1134,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                 <div className="space-y-3 pt-4 border-t border-neutral-100 text-sm font-sans">
                   {/* Technique */}
                   <div className="flex justify-between items-center py-1 border-b border-neutral-100">
-                    <span className="text-neutral-400 uppercase text-xs tracking-wider">Técnica</span>
+                    <span className="text-neutral-400 uppercase text-xs tracking-wider">{t['gallery.technique']}</span>
                     {isEditing ? (
                       <input
                         type="text"
@@ -1130,14 +1143,14 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                         className="text-right text-xs font-sans border-b border-neutral-300 focus:border-neutral-900 pb-0.5 focus:outline-none text-neutral-900"
                       />
                     ) : (
-                      <span className="text-neutral-900">{selectedItem.technique}</span>
+                      <span className="text-neutral-900">{translateTechnique(selectedItem.technique, lang)}</span>
                     )}
                   </div>
 
                   {/* Dimensions */}
                   {(selectedItem.dimensions || isEditing) && (
                     <div className="flex justify-between items-center py-1 border-b border-neutral-100">
-                      <span className="text-neutral-400 uppercase text-xs tracking-wider">Dimensiones</span>
+                      <span className="text-neutral-400 uppercase text-xs tracking-wider">{t['gallery.dimensions']}</span>
                       {isEditing ? (
                         <input
                           type="text"
@@ -1154,7 +1167,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
                   {/* Year */}
                   <div className="flex justify-between items-center py-1 border-b border-neutral-100">
-                    <span className="text-neutral-400 uppercase text-xs tracking-wider">Año</span>
+                    <span className="text-neutral-400 uppercase text-xs tracking-wider">{t['gallery.year']}</span>
                     {isEditing ? (
                       <input
                         type="text"
@@ -1169,7 +1182,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 
                   {/* Tipo */}
                   <div className="flex justify-between items-center py-1 border-b border-neutral-100">
-                    <span className="text-neutral-400 uppercase text-xs tracking-wider">Tipo</span>
+                    <span className="text-neutral-400 uppercase text-xs tracking-wider">{t['gallery.type']}</span>
                     {isEditing ? (
                       <input
                         type="text"
@@ -1179,7 +1192,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                         className="text-right text-xs font-sans border-b border-neutral-300 focus:border-neutral-900 pb-0.5 focus:outline-none text-neutral-900 placeholder:text-neutral-300"
                       />
                     ) : (
-                      <span className="text-neutral-900">{selectedItem.artworkType || 'Obra original'}</span>
+                      <span className="text-neutral-900">{translateArtworkType(selectedItem.artworkType, lang)}</span>
                     )}
                   </div>
                 </div>
@@ -1189,7 +1202,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   {isEditing ? (
                     <div className="space-y-1.5">
                       <label className="block text-[10px] uppercase font-sans tracking-wider text-neutral-400">
-                        Descripción de la pieza
+                        {t['gallery.description']}
                       </label>
                       <textarea
                         rows={3}
@@ -1208,9 +1221,14 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                       ? selectedItem.description
                       : 'Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.') && (
                       <p className="text-xs text-neutral-500 font-sans font-light leading-relaxed">
-                        {selectedItem.description !== undefined
-                          ? selectedItem.description
-                          : 'Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.'}
+                        {translateArtworkDescription(
+                          selectedItem.description !== undefined
+                            ? selectedItem.description
+                            : (lang === 'en'
+                                ? 'Original artwork created in oil with archival pigments on handcrafted canvas.'
+                                : 'Pieza original realizada al óleo con pigmentos de alta permanencia sobre soporte preparado artesanalmente.'),
+                          lang
+                        )}
                       </p>
                     )
                   )}
@@ -1223,16 +1241,16 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   <button
                     type="button"
                     onClick={handleDeleteItem}
-                    className="w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-sans tracking-[0.2em] uppercase font-medium transition-colors border border-rose-200"
+                    className="w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-sans tracking-[0.2em] uppercase font-medium transition-colors border border-rose-200 cursor-pointer"
                   >
-                    Eliminar Obra de Galería
+                    {t['gallery.delete_artwork']}
                   </button>
                 ) : (
                   <a
                     href={`/contact?obra=${encodeURIComponent(selectedItem.title)}`}
                     className="block w-full py-3.5 text-center bg-neutral-900 text-white hover:bg-neutral-800 text-xs font-sans tracking-[0.25em] uppercase font-medium transition-colors"
                   >
-                    Consultar por esta Obra
+                    {t['gallery.inquire']}
                   </a>
                 )}
 
@@ -1240,16 +1258,16 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
                   <button
                     type="button"
                     onClick={handlePrev}
-                    className="text-xs font-sans tracking-wider uppercase text-neutral-500 hover:text-neutral-900 transition-colors flex items-center space-x-1"
+                    className="text-xs font-sans tracking-wider uppercase text-neutral-500 hover:text-neutral-900 transition-colors flex items-center space-x-1 cursor-pointer"
                   >
-                    <span>&larr; Anterior</span>
+                    <span>&larr; {t['gallery.prev']}</span>
                   </button>
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="text-xs font-sans tracking-wider uppercase text-neutral-500 hover:text-neutral-900 transition-colors flex items-center space-x-1"
+                    className="text-xs font-sans tracking-wider uppercase text-neutral-500 hover:text-neutral-900 transition-colors flex items-center space-x-1 cursor-pointer"
                   >
-                    <span>Siguiente &rarr;</span>
+                    <span>{t['gallery.next']} &rarr;</span>
                   </button>
                 </div>
               </div>
